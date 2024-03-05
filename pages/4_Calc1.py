@@ -21,7 +21,7 @@ from streamlit.hello.utils import show_code
 import system as OCS
 
 def calc1() -> None:
-    @st.cache_data
+    #@st.cache_data
     ## CONDUCTOR PARTICULARS AND LOADING CONDITIONS
     cN = OCS.conductor_particulars((1.544, 5000), (1.063, 3300), 0.2)
     
