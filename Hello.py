@@ -21,7 +21,7 @@ LOGGER = get_logger(__name__)
 
 def run():
     st.set_page_config(
-        page_title="STV SYSTEMS OCS",
+        page_title="OCS Calculations",
         page_icon="🚊",
     )
 
