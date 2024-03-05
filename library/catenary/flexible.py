@@ -6,8 +6,7 @@ Created on Thu Feb 29 08:36:43 2024
 """
 import numpy as np
 import sys
-sys.path.insert(0, '..\\')
-from library import general as GenFun
+import ../general as GenFun
 
 dimensionalTolerance = 0.001*12
 loadTolerance = 0.01
