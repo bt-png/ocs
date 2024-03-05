@@ -28,7 +28,7 @@ def calc1() -> None:
     ## LAYOUT DESIGN
     #filepath_none = '..\\input\\InputData_none.csv'
     file = st.file_uploader('upload WR data', type={'csv', 'txt'})
-    wr = OCS.wire_run(filepath_none)
+    wr = OCS.wire_run(file)
     
     
     ## POINT LOADS
