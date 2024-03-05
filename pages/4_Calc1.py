@@ -21,27 +21,40 @@ from streamlit.hello.utils import show_code
 import system as OCS
 
 def calc1() -> None:
-    #@st.cache_data
-    ## CONDUCTOR PARTICULARS AND LOADING CONDITIONS
-    cN = OCS.conductor_particulars((1.544, 5000), (1.063, 3300), 0.2)
-    
-    ## LAYOUT DESIGN
-    #filepath_none = '..\\input\\InputData_none.csv'
-    file = st.file_uploader('upload WR data', type={'csv', 'txt'})
-    wr = OCS.wire_run(file)
-    
-    
-    ## POINT LOADS
-    pN = (
-    ('term span', 'uninsulated overlap', 'mpa z-anchor', 'mpa z-anchor', 'SI and feeders', 'insulated overlap', 'term span'),
-    (162442+30, 162442-15, 164755-25, 164755+25, 166379-15, 166980-15, 167160-30),
-    (15, 5, -15, -15, 30, 5, 15),
-    (15, 5, 0, 0, 85, 5, 15)
-    )
-    
-    Nominal = OCS.CatenaryFlexible(cN, wr)
-    Nominal.resetloads(pN)
-    return Nominal.dataframe()
+    @st.cache_data
+    def get_cat_data():
+        ## CONDUCTOR PARTICULARS AND LOADING CONDITIONS
+        cN = OCS.conductor_particulars((1.544, 5000), (1.063, 3300), 0.2)
+        
+        ## LAYOUT DESIGN
+        #filepath_none = '..\\input\\InputData_none.csv'
+        
+        wr = OCS.wire_run(file)
+        
+        
+        ## POINT LOADS
+        pN = (
+        ('term span', 'uninsulated overlap', 'mpa z-anchor', 'mpa z-anchor', 'SI and feeders', 'insulated overlap', 'term span'),
+        (162442+30, 162442-15, 164755-25, 164755+25, 166379-15, 166980-15, 167160-30),
+        (15, 5, -15, -15, 30, 5, 15),
+        (15, 5, 0, 0, 85, 5, 15)
+        )
+        
+        Nominal = OCS.CatenaryFlexible(cN, wr)
+        Nominal.resetloads(pN)
+        return Nominal.dataframe()
+
+    try:
+        file = st.file_uploader('upload WR data', type={'csv', 'txt'})
+        df = get_cat_data()
+        st.write('### Catenary Wire Sag', df.head())
+        chart = st.line_chart(
+            data = df, x='Stationing', y='Elevation', color='cable'
+            )
+        st.write(chart)
+
+    except:
+        return None
 
 st.set_page_config(page_title="Calculation Set 1", page_icon="📹")
 st.markdown("# Calculation Set 1")
