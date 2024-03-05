@@ -21,37 +21,39 @@ LOGGER = get_logger(__name__)
 
 def run():
     st.set_page_config(
-        page_title="Hello",
-        page_icon="👋",
+        page_title="STV SYSTEMS OCS",
+        page_icon="🚊",
     )
 
-    st.write("# Welcome to Streamlit! 👋")
+    st.write("# Welcome to OCS Calculation Templates!")
 
-    st.sidebar.success("Select a demo above.")
+    st.sidebar.success("Select a calculation set above.")
 
     st.markdown(
         """
-        Streamlit is an open-source app framework built specifically for
-        Machine Learning and Data Science projects.
-        **👈 Select a demo from the sidebar** to see some examples
-        of what Streamlit can do!
-        ### Want to learn more?
-        - Check out [streamlit.io](https://streamlit.io)
-        - Jump into our [documentation](https://docs.streamlit.io)
-        - Ask a question in our [community
-          forums](https://discuss.streamlit.io)
-        ### See more complex demos
-        - Use a neural net to [analyze the Udacity Self-driving Car Image
-          Dataset](https://github.com/streamlit/demo-self-driving)
-        - Explore a [New York City rideshare dataset](https://github.com/streamlit/demo-uber-nyc-pickups)
+        These calculation sets are developed by Brett Tharp and
+        made available as an open-source app framework built 
+        using Python and Streamlit.
+        <br>**👈 Select a calculation set from the sidebar** to get started!
+        ### What to expect?
+        - Select a calculation set from the sidebar.
+        - The calculation will be shown using **template** input data so you 
+        may have an idea of the purpose for the calculation.
+        - You may utilize the sidebar and main frame input fields to customize
+        the input data for your needs.
+        - The applications are instance based and nothing will be stored.
+        You will be responsible to **export** any data generated that you
+        would like to reference for the future.
+        - Once a selection has been made to the calculation set you would
+        like to use on the sidebar.You may utilize the input fields in the sidebar
+        - Ask a question through teams to brett.tharp@stvinc.com
     """
     )
-    st.write(df.head(2))
+    st.write(df.tail(2))
 
 df = pd.DataFrame({
-'first column': [1, 2, 3, 4],
-'second column': [10 ,20 ,30, 40],
-'third column': ['this', 'is', 'a', 'fun test']
+'Updated By': [BMT, BMT, BMT, BMT],
+'Updated On': ['3/2/2024' ,'3/3/2024' ,'3/4/20243, '3/5/2024']
 })
 
 if __name__ == "__main__":
