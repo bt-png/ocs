@@ -33,8 +33,8 @@ def run():
         """
         These calculation sets are developed by Brett Tharp and
         made available as an open-source app framework built 
-        using Python and Streamlit.
-        <br>**👈 Select a calculation set from the sidebar** to get started!
+        using Python and Streamlit.  
+        **👈 Select a calculation set from the sidebar** to get started!
         ### What to expect?
         - Select a calculation set from the sidebar.
         - The calculation will be shown using **template** input data so you 
