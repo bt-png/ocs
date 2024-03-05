@@ -46,7 +46,7 @@ def run():
         would like to reference for the future.
         - Once a selection has been made to the calculation set you would
         like to use on the sidebar.You may utilize the input fields in the sidebar
-        - Ask a question through teams to brett.tharp@stvinc.com
+        - Ask a question through teams or email brett.tharp@stvinc.com
     """
     )
     st.write(df.tail(2))
