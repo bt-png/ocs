@@ -9,9 +9,8 @@ import pandas as pd
 import numpy as np
 import seaborn as sns
 import sys
-sys.path.insert(0, '..\\')
-from library import general as GenFun
-from library.catenary import flexible as Flex
+import general as GenFun
+from catenary import flexible as Flex
 
 def conductor_particulars(mw, cw, ha):
     """
