@@ -53,7 +53,7 @@ def run():
 
 df = pd.DataFrame({
 'Updated By': [BMT, BMT, BMT, BMT],
-'Updated On': ['3/2/2024' ,'3/3/2024' ,'3/4/20243, '3/5/2024']
+'Updated On': ['3/2/2024' ,'3/3/2024' ,'3/4/20243', '3/5/2024']
 })
 
 if __name__ == "__main__":
