@@ -50,7 +50,8 @@ def run():
 
 df = pd.DataFrame({
 'first column': [1, 2, 3, 4],
-'second column': [10 ,20 ,30, 40]
+'second column': [10 ,20 ,30, 40],
+'third column': ['this', 'is', 'a', 'fun test']
 })
 
 if __name__ == "__main__":
