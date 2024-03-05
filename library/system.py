@@ -4,11 +4,9 @@ Created on Thu Feb 29 08:36:43 2024
 
 @author: TharpBM
 """
-import time
 import pandas as pd
 import numpy as np
-import seaborn as sns
-import sys
+#import seaborn as sns
 import general as GenFun
 from catenary import flexible as Flex
 
@@ -91,80 +89,6 @@ def wire_run(path, first=None, last=None):
     _wr = GenFun.WireRun_df(_df,1)
     return _wr
 
-def combine_plots(names, dfargs, col=None, row=None, xscale = 1, yscale = 1):
-    """
-    Combine plots of wire sag for comparison
-
-    Parameters
-    ----------
-    names : string
-        'Type' description for plots associated with the dataFrame.
-    dfargs : pandas DataFrame
-        Output dataFram.
-    col : TYPE, optional
-        DESCRIPTION. The default is None.
-    row : TYPE, optional
-        DESCRIPTION. The default is None.
-    xscale : TYPE, optional
-        DESCRIPTION. The default is 1.
-    yscale : TYPE, optional
-        DESCRIPTION. The default is 1.
-
-    Returns
-    -------
-    plot : Seaborn 
-        Seaborn plot of combined wire charts.
-
-    """
-    """
-    combine plots of wire sag for comparison
-
-    Parameters
-    ----------
-    names : string
-        'Type' description for plots associated with the dataFrame
-    dfargs : pandas dataFrame
-        Output dataFrame
-
-    Returns
-    -------
-    Seaborn plot of combined wire charts
-
-    """
-    for _n, _df in zip(names, dfargs):
-        _df.type = _n
-        _df.Elevation *= yscale
-        _df.Stationing *= xscale
-    _cdf = pd.concat(dfargs)
-    plot = sns.relplot(data=_cdf, x='Stationing', y='Elevation', kind='line',
-                       hue='type', size='cable', sizes=(1,1),
-                       col=col, row=row) #, margin_titles=True)
-    return plot
-
-def combine_plots_load(names, dfargs, col=None, row=None):
-    """
-    combine plots of loading for comparison
-
-    Parameters
-    ----------
-    names : string
-        Type description for plots associated with the dataFrame
-    dfargs : pandas dataFrame
-        Output dataFrame
-
-    Returns
-    -------
-    Seaborn plot of combined wire charts
-
-    """
-    for _n, _df in zip(names, dfargs):
-        _df.type = _n
-    _cdf = pd.concat(dfargs)
-    plot = sns.relplot(data=_cdf, x='Stationing', y='Load', kind='line',
-                       hue='type',
-                       col=col, row=row) #, margin_titles=True)
-    return plot
-
 class CatenaryFlexible():
     """ A simple container for the catenary system containing all design data
     """
@@ -243,73 +167,6 @@ class CatenaryFlexible():
         if not self._solved:
             self._solve()
         self._sag.to_csv(path)
-
-    def plot(self):
-        """ return a seaborn plot of the wire """
-        """ default y exaggeration  is 5:1"""
-        if not self._solved:
-            self._solve()
-        __sta = self._catenarysag.get('Stationing')
-        _xtotal = (__sta[-1] - __sta[0])
-        __elMax = max(
-            max(self._catenarysag.get('LoadedSag_MW')),
-            max(self._catenarysag.get('LoadedSag'))
-            ) 
-        __elMin = min(
-            min(self._catenarysag.get('LoadedSag_MW')),
-            min(self._catenarysag.get('LoadedSag'))
-            )
-        _ytotal = 5*(__elMax-__elMin)
-        print('x', _xtotal, 'y', _ytotal)
-        pl = sns.relplot(
-            data=self._sag, x='Stationing', y='Elevation',
-            kind='line', hue='type', height=10, aspect=_xtotal/_ytotal/10)
-        return pl 
-
-    def plot_spt(self):
-        """ return a seaborn plot of the wire """
-        if not self._solved:
-            self._solve()
-        _sptL_cw = pd.DataFrame({
-            'Stationing': self._catenarysag.get('HA_STA'),
-            'Load': self._catenarysag.get('SupportLoad_CW'),
-            'type': 'HA',
-            'cable': 'HA'
-            })
-        _sptL_mw = pd.DataFrame({
-            'Stationing': self._wr.STA,
-            'Load': self._catenarysag.get('SupportLoad_MW'),
-            'type': 'MW',
-            'cable': 'MW'
-            })
-        _sptL_df = pd.concat([_sptL_mw, _sptL_cw], ignore_index=False)
-        pl = sns.relplot(
-            data=_sptL_df, x='Stationing', y='Load',
-            kind='scatter', hue='type')
-        #pl.refline(y=self._hd[1])
-        return pl
-
-    def plot_halength(self):
-        """ return a seaborn plot of the wire """
-        if not self._solved:
-            self._solve()
-        __sta = self._catenarysag.get('Stationing')
-        __hasta = self._catenarysag.get('HA_STA')
-        __cwel = self._catenarysag.get('LoadedSag')
-        __mwel = self._catenarysag.get('LoadedSag_MW')
-        _haL = __mwel[np.in1d(__sta, __hasta)] - __cwel[np.in1d(__sta, __hasta)]
-        _haL_df = pd.DataFrame({
-            'Stationing': __hasta,
-            'Length': _haL*12,
-            'type': 'HA Length',
-            'cable': 'HA Length'
-            })
-        pl = sns.relplot(
-            data=_haL_df, x='Stationing', y='Length',
-            kind='scatter')
-        pl.set_axis_labels(y_var='HA Length (in)')
-        pl.refline(y=self._hd[2]*12)
-        return pl
 
     def dataframe(self):
         """ return a pandas dataFrame of the wire """
@@ -402,42 +259,6 @@ class AltCondition():
             self._solve()
         self._sag.to_csv(path)
 
-    def plot_alt(self):
-        """ return a seaborn plot of the wire """
-        if not self._solved:
-            self._solve()
-        return sns.relplot(
-            data=self._sag, x='Stationing', y='Elevation',
-            kind='line', hue='type')
-    
-    def plot_sr(self):
-        """ Output reaction resistance of steady arms due to radial load """
-        if not self._solved:
-            self._solve()
-        return sns.relplot(
-            data=self._srdf, x='Stationing', y='Load',
-            kind='line')
-
-    def plot_cwdiff(self):
-        """ Output CW EL difference """
-        if not self._solved:
-            self._solve()
-        return sns.relplot(
-            data=self._cwdiffdf, x='Stationing', y='Elevation',
-            kind='line')
-    
-    def compareplot(self):
-        """ return a seaborn plot of the wire overlayed with the
-        original design data
-        """
-        if not self._solved:
-            self._solve()
-        _plot = combine_plots(
-            ('Original', 'Alternate'),
-            (self._ref.dataframe(), self.dataframe())
-            )
-        return _plot
-
     def dataframe(self):
         """ return a pandas dataFrame of the wire """
         if not self._solved:
@@ -522,12 +343,6 @@ class Elasticity():
     def savetocsv(self, path):
         """ Output wire data to CSV """
         self._diff.to_csv(path)
-
-    def plot(self):
-        """ return a seaborn plot of the wire """
-        return sns.relplot(
-            data=self._diff, x='Stationing', y='Rise (in)',
-            kind='line', hue='type')
 
     def dataframe(self):
         """ return a pandas dataFrame of the wire """
