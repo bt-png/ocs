@@ -18,7 +18,7 @@ import numpy as np
 
 import streamlit as st
 from streamlit.hello.utils import show_code
-from ../library import system as OCS
+import ../library/system as OCS
 
 def calc1() -> None:
 
