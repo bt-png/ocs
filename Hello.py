@@ -46,7 +46,7 @@ def run():
         - Explore a [New York City rideshare dataset](https://github.com/streamlit/demo-uber-nyc-pickups)
     """
     )
-    df
+    df.head(2)
 
 df = pd.DataFrame({
 'first column': [1, 2, 3, 4],
