@@ -14,57 +14,80 @@
 
 from typing import Any
 
+import pandas as pd
 import numpy as np
 
 import streamlit as st
-from streamlit.hello.utils import show_code
+#from streamlit.hello.utils import show_code
 import system as OCS
 
 def calc1() -> None:
-    @st.cache_data
-    def get_cat_data():
-        ## CONDUCTOR PARTICULARS AND LOADING CONDITIONS
-        cN = OCS.conductor_particulars((1.544, 5000), (1.063, 3300), 0.2)
-        
+    
+    ## CONDUCTOR PARTICULARS AND LOADING CONDITIONS
+    st.write('##### Input conductor particulars:')
+    cond_data = pd.DataFrame({
+        'Cable': ['MW', 'CW', 'HA'],
+        'Weight': [1.544, 1.063, 0.2],
+        'Tension': [5000, 3300, 0]
+        })
+    econd_data = st.data_editor(cond_data, hide_index=True)
+    mwWeight = econd_data.Weight[cond_data.Cable == 'MW'].iloc[0]
+    cwWeight = float(econd_data.Weight[cond_data.Cable == 'CW'].iloc[0])
+    haWeight = float(econd_data.Weight[cond_data.Cable == 'HA'].iloc[0])
+    mwTension = float(econd_data.Tension[cond_data.Cable == 'MW'].iloc[0])
+    cwTension = float(econd_data.Tension[cond_data.Cable == 'CW'].iloc[0])
+    cN = OCS.conductor_particulars(
+        (mwWeight, mwTension), (cwWeight, cwTension), haWeight
+        )
+    
+    ## POINT LOADS
+    st.write('##### Input point loads:')
+    pl_data = pd.DataFrame({
+        'Description': ['Description of point load for reference'],
+        'Stationing': [0],
+        'CW Loading': [0],
+        'MW Loading': [0]
+        })
+    epl_data = st.data_editor(pl_data, hide_index=True, num_rows="dynamic")
+    file = st.file_uploader(
+        'Upload a formatted "*.csv" file containing your WR data.',
+        type={'csv', 'txt'},
+        accept_multiple_files = False
+        )
+
+    pN = (
+    ('term span', 'uninsulated overlap', 'mpa z-anchor', 'mpa z-anchor', 'SI and feeders', 'insulated overlap', 'term span'),
+    (162442+30, 162442-15, 164755-25, 164755+25, 166379-15, 166980-15, 167160-30),
+    (15, 5, -15, -15, 30, 5, 15),
+    (15, 5, 0, 0, 85, 5, 15)
+    )
+    
+    st.write(pN)
+    st.write(epl_data.Stationing[epl_data.Station])
+
+    if file is not None:
         ## LAYOUT DESIGN
-        #filepath_none = '..\\input\\InputData_none.csv'
-        
         wr = OCS.wire_run(file)
         
-        
-        ## POINT LOADS
-        pN = (
-        ('term span', 'uninsulated overlap', 'mpa z-anchor', 'mpa z-anchor', 'SI and feeders', 'insulated overlap', 'term span'),
-        (162442+30, 162442-15, 164755-25, 164755+25, 166379-15, 166980-15, 167160-30),
-        (15, 5, -15, -15, 30, 5, 15),
-        (15, 5, 0, 0, 85, 5, 15)
-        )
-        
-        Nominal = OCS.CatenaryFlexible(cN, wr)
-        Nominal.resetloads(pN)
-        return Nominal.dataframe()
-
-    try:
-        file = st.file_uploader('upload WR data', type={'csv', 'txt'})
-        df = get_cat_data()
-        st.write('### Catenary Wire Sag', df.head())
+        Nom = OCS.CatenaryFlexible(cN, wr)
+        Nom.resetloads(pN)
+        df = Nom.dataframe()
+        st.write('### Catenary Wire Sag Plot')
         chart = st.line_chart(
             data = df, x='Stationing', y='Elevation', color='cable'
             )
-        st.write(chart)
+        st.write('#### Sag Data ', df)
+        st.write('#### HA Data', Nom.dataframe_ha())
 
-    except:
-        return None
-
-st.set_page_config(page_title="Calculation Set 1", page_icon="📹")
-st.markdown("# Calculation Set 1")
-st.sidebar.header("Calculation Set 1")
+st.set_page_config(page_title="CAT SAG", page_icon="📹")
+st.markdown("# Simple Catenary Sag")
+st.sidebar.header("CAT SAG")
 st.write(
-    """This app shows how you can use Streamlit to build cool animations.
-It displays an animated fractal based on the the Julia Set. Use the slider
-to tune different parameters."""
-)
+    """This app shows you the simple sag curves for a flexible catenary system
+    utilizing a **sum of moments** method. The CW is assumed to be supported only
+    at hanger locations, with elevations calculated based on designed elevation at 
+    supports and the designated pre-sag. It displays an animated fractal based on the the Julia Set. Use the slider
+    to tune different parameters."""
+    )
 
 calc1()
-
-show_code(calc1)

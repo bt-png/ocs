@@ -134,7 +134,7 @@ class CatenaryFlexible():
         self._sag = pd.concat([_df_mw, _df_cw], ignore_index=False)
         self._solved = True
 
-    def resetloads(self, loadlist):
+    def resetloads(self, df_loadlist):
         """ update the load list for the alternate condition """
         self._solved = False
         self._sl = (
@@ -173,6 +173,26 @@ class CatenaryFlexible():
         if not self._solved:
             self._solve()
         return self._sag
+
+    def dataframe_ha(self):
+        """ return a pandas dataFrame of the hangers """
+        if not self._solved:
+            self._solve()
+        _cwel = self._catenarysag.get('LoadedSag')[
+            np.in1d(self._catenarysag.get('Stationing'),
+                    self._catenarysag.get('HA_STA'))]
+        _mwel = self._catenarysag.get('LoadedSag_MW')[
+            np.in1d(self._catenarysag.get('Stationing'),
+                    self._catenarysag.get('HA_STA'))]
+        _hal = _mwel - _cwel
+        _df_ha = pd.DataFrame({
+            'Stationing': self._catenarysag.get('HA_STA'),
+            'CW Elevation': _cwel,
+            'MW Elevation': _mwel,
+            'HA Length': _hal,
+            'HA Load': self._catenarysag.get('SupportLoad_CW')
+            })
+        return _df_ha
 
 class AltCondition():
     """ container for calculating changes made to an already calculated
@@ -258,14 +278,6 @@ class AltCondition():
         if not self._solved:
             self._solve()
         self._sag.to_csv(path)
-
-    def plot_alt(self):
-        """ return a seaborn plot of the wire """
-        if not self._solved:
-            self._solve()
-        return sns.relplot(
-            data=self._sag, x='Stationing', y='Elevation',
-            kind='line', hue='type')
 
     def dataframe(self):
         """ return a pandas dataFrame of the wire """

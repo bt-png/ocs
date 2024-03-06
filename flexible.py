@@ -205,27 +205,3 @@ def CatenarySag_FlexibleHA_Iterative(WireRun, L_WeightChange, L_Tension, L_Desig
             'P_SpanWeight': Cycle_P_SpanWeight*xMultiplier/yMultiplier,
             'LoadedSag_MW': Cycle_LoadedSag_MW/yMultiplier, 'SupportLoad_MW': Cycle_SupportLoad_MW*xMultiplier/yMultiplier,
             'P_SpanWeight_MW': Cycle_P_SpanWeight_MW*xMultiplier/yMultiplier}, TotalLoops, Cycle_CWSupportReaction*xMultiplier/yMultiplier
-
-# def CatenaryElasticity_FlexibleHA(WireRun, L_WeightDiff, L_Tension, L_DesignHA, L_DesignBase, UpliftLoad,
-#                                   LoadSteps, ORIGINALDESIGN, StartSPT, EndSPT):
-#     #ORIGINALDESIGN is the return dictionary from CatenarySag
-#     StartSTA = WireRun['STA'].iloc[StartSPT]
-#     EndSTA = WireRun['STA'].iloc[EndSPT]
-#     STAVal = np.arange(StartSTA, EndSTA, LoadSteps, dtype=float)
-#     print('Checking elasticity from STA', StartSTA, 'to STA', EndSTA)
-#     print(' | ', int(len(STAVal)), 'total cycles')
-#     DiffMIN = np.copy(STAVal*0)
-#     DiffMAX = np.copy(STAVal*0)
-#     CycleLoops = np.copy(STAVal*0)
-#     i = 0
-#     for UpliftSTA in STAVal:
-#         print(i, ' | calculating uplift at STA =', UpliftSTA)
-#         L_StaticCWUplift = np.array([-UpliftLoad, UpliftSTA])
-#         CYCLE, cloops, NewCWSupportReaction = CatenarySag_FlexibleHA_Iterative(WireRun, L_WeightDiff, L_Tension, L_DesignHA,
-#                                                                                L_DesignBase, L_StaticCWUplift, ORIGINALDESIGN)
-#         EL_DIFF = CYCLE.get('LoadedSag') - ORIGINALDESIGN.get('LoadedSag')
-#         DiffMIN[i] = np.nanmin(EL_DIFF)
-#         DiffMAX[i] = np.nanmax(EL_DIFF)
-#         CycleLoops = cloops
-#         i += 1
-#     return {'STAVal': STAVal, 'DiffMIN': DiffMIN, 'DiffMAX': DiffMAX, 'CycleLoops': CycleLoops}

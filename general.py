@@ -125,6 +125,10 @@ def DistanceFromHA_WeightSpan(STAList, HangerStationing, STARound):
         a[i] += (STAList[i] - HangerStationing[j-1])
     return a
 
+def HangerLength(Stationing, CWSag, MWSag, HangerStationing):
+    HALength = MWSag[np.in1d(Stationing,HangerStationing)] - CWSag[np.in1d(Stationing,HangerStationing)]
+    return HALength
+
 def HangerLengthDifference(Stationing, OriginalCWSag, OriginalMWSag, NewCWSag, NewMWSag, HangerStationing):
     oHALength = OriginalMWSag[np.in1d(Stationing,HangerStationing)] - OriginalCWSag[np.in1d(Stationing,HangerStationing)]
     nHALength = NewMWSag[np.in1d(Stationing,HangerStationing)] - NewCWSag[np.in1d(Stationing,HangerStationing)]
