@@ -134,9 +134,13 @@ class CatenaryFlexible():
         self._sag = pd.concat([_df_mw, _df_cw], ignore_index=False)
         self._solved = True
 
-    def resetloads(self, df_loadlist):
+    def resetloads(self, loadlist):
         """ update the load list for the alternate condition """
         self._solved = False
+        #self._sl = (
+        #    df_loadlist['CW Loading'], df_loadlist['Stationing'],
+        #    df_loadlist['MW Loading'], df_loadlist['Stationing']
+        #    )
         self._sl = (
             loadlist[2], loadlist[1],
             loadlist[3], loadlist[1]

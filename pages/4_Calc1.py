@@ -49,28 +49,31 @@ def calc1() -> None:
         'MW Loading': [0]
         })
     epl_data = st.data_editor(pl_data, hide_index=True, num_rows="dynamic")
+    df_loading = epl_data[~epl_data['Stationing'].isnull()]
+    df_loading.replace(to_replace=np.nan, value=0, inplace=True)
+    if df_loading.empty:
+        df_loading = pl_data
+    #df_loading = df_loading.transpose()
+    df_loading = (
+        df_loading['Description'].values,
+        df_loading['Stationing'].values,
+        df_loading['CW Loading'].values,
+        df_loading['MW Loading'].values
+        )
+
+    ## WIRE RUN
     file = st.file_uploader(
         'Upload a formatted "*.csv" file containing your WR data.',
         type={'csv', 'txt'},
         accept_multiple_files = False
         )
 
-    pN = (
-    ('term span', 'uninsulated overlap', 'mpa z-anchor', 'mpa z-anchor', 'SI and feeders', 'insulated overlap', 'term span'),
-    (162442+30, 162442-15, 164755-25, 164755+25, 166379-15, 166980-15, 167160-30),
-    (15, 5, -15, -15, 30, 5, 15),
-    (15, 5, 0, 0, 85, 5, 15)
-    )
-    
-    st.write(pN)
-    st.write(epl_data.Stationing[epl_data.Station])
-
-    if file is not None:
+    if file is not None and not st.session_state['pauseCalc']:
         ## LAYOUT DESIGN
         wr = OCS.wire_run(file)
         
         Nom = OCS.CatenaryFlexible(cN, wr)
-        Nom.resetloads(pN)
+        Nom.resetloads(df_loading)
         df = Nom.dataframe()
         st.write('### Catenary Wire Sag Plot')
         chart = st.line_chart(
@@ -82,12 +85,14 @@ def calc1() -> None:
 st.set_page_config(page_title="CAT SAG", page_icon="📹")
 st.markdown("# Simple Catenary Sag")
 st.sidebar.header("CAT SAG")
+
+checkbox = st.sidebar.checkbox('Pause Calculation', key='pauseCalc', value=False)
+
 st.write(
     """This app shows you the simple sag curves for a flexible catenary system
     utilizing a **sum of moments** method. The CW is assumed to be supported only
     at hanger locations, with elevations calculated based on designed elevation at 
-    supports and the designated pre-sag. It displays an animated fractal based on the the Julia Set. Use the slider
-    to tune different parameters."""
+    supports and the designated pre-sag."""
     )
 
 calc1()
