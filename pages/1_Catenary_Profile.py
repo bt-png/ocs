@@ -93,7 +93,7 @@ st.write(
     supports and the designated pre-sag."""
     )
 
-if st.session_state['access-key'] != 'ocs': #st.secrets['access-key']:
+if st.session_state['accesskey'] != st.secrets['access-key']:
         st.stop()
 
 checkbox = st.sidebar.checkbox('Pause Calculation', key='pauseCalc', value=False)

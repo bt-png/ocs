@@ -28,7 +28,7 @@ def run():
     )
 
     st.write("# Welcome to OCS Calculation Templates!")
-    st.sidebar.text_input('access key', key='access-key', value=st.session_state['access-key'])
+    st.sidebar.text_input('access key', key='accesskey')
     
     st.markdown(
         """
