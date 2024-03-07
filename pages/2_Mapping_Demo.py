@@ -20,6 +20,7 @@ import pydeck as pdk
 import streamlit as st
 from streamlit.hello.utils import show_code
 
+st.session_state.accesskey = st.session_state.accesskey
 
 def mapping_demo():
     @st.cache_data

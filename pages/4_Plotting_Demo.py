@@ -19,6 +19,7 @@ import numpy as np
 import streamlit as st
 from streamlit.hello.utils import show_code
 
+st.session_state.accesskey = st.session_state.accesskey
 
 def plotting_demo():
     progress_bar = st.sidebar.progress(0)

@@ -20,6 +20,7 @@ import pandas as pd
 import streamlit as st
 from streamlit.hello.utils import show_code
 
+st.session_state.accesskey = st.session_state.accesskey
 
 def data_frame_demo():
     @st.cache_data

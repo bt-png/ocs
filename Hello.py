@@ -19,37 +19,33 @@ import pandas as pd
 LOGGER = get_logger(__name__)
 
 if 'accesskey' not in st.session_state:
-    st.session_state['accesskey'] = ''
+    st.session_state.accesskey = ''
+else:
+    st.session_state.accesskey = st.session_state.accesskey
 
 def run():
     st.set_page_config(
         page_title="OCS Calculations",
         page_icon="🚊",
     )
-    st.sidebar.text_input('access key', key='accesskey')
     st.write("# Welcome to OCS Calculation Templates!")
-    
     st.markdown(
         """
         These calculation sets are developed by Brett Tharp and
         made available as an open-source app framework built 
         using Python and Streamlit.  
-        **👈 Select a calculation set from the sidebar** to get started!
+        
         ### What to expect?
-        - Select a calculation set from the sidebar.
-        - The calculation will be shown using **template** input data so you 
-        may have an idea of the purpose for the calculation.
-        - You may utilize the sidebar and main frame input fields to customize
+        **👈 Select a calculation set from the sidebar** to get started!
+        - You may utilize sidebar and main frame input fields to customize
         the input data for your needs.
         - The applications are instance based and nothing will be stored.
         You will be responsible to **export** any data generated that you
         would like to reference for the future.
-        - Once a selection has been made to the calculation set you would
-        like to use on the sidebar.You may utilize the input fields in the sidebar
         - Ask a question through email brett.tharp@stvinc.com
     """
     )
-    
+    st.sidebar.text_input('access key', key='accesskey')
     if st.session_state['accesskey'] == st.secrets['accesskey']:
         st.write('#### access granted')
     st.write(df.tail(2))
