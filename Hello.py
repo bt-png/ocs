@@ -26,9 +26,8 @@ def run():
         page_title="OCS Calculations",
         page_icon="🚊",
     )
-
-    st.write("# Welcome to OCS Calculation Templates!")
     st.sidebar.text_input('access key', key='accesskey')
+    st.write("# Welcome to OCS Calculation Templates!")
     
     st.markdown(
         """
