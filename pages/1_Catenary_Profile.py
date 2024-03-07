@@ -46,17 +46,8 @@ def calc1() -> None:
             df_loading['MW Loading'].values
             )
 
-        ## WIRE RUN
-        file = st.file_uploader(
-            'Upload a formatted "*.csv" file containing your WR data.',
-            type={'csv', 'txt'},
-            accept_multiple_files = False
-            )
-
-    if file is not None and not st.session_state['pauseCalc']:
-        ## LAYOUT DESIGN
-        wr = OCS.wire_run(file)
-        
+    if wrfile is not None and not st.session_state['pauseCalc']:
+        ## LAYOUT DESIGN       
         Nom = OCS.CatenaryFlexible(cN, wr)
         Nom.resetloads(df_loading)
         df = Nom.dataframe()
@@ -68,6 +59,9 @@ def calc1() -> None:
         with tab3:
             st.write('#### Sag Data ', df)
             st.write('#### HA Data', Nom.dataframe_ha())
+
+def convert_df(df):
+   return df.to_csv(index=False).encode('utf-8')
 
 st.set_page_config(page_title="CAT SAG", page_icon="📹")
 st.markdown("# Simple Catenary Sag")
@@ -86,5 +80,50 @@ if st.session_state['accesskey'] != st.secrets['accesskey']:
 tab1, tab2, tab3 = st.tabs(['Input', 'Results', 'Output'])
 
 st.sidebar.checkbox('Pause Calculation', key='pauseCalc', value=False)
+
+with tab1:
+    with st.container(border=True):
+        ##Design Data
+        sample_dd_csv = convert_df(OCS.sample_wr_df())
+        st.markdown("#### Load catenary system design data")
+        st.download_button(
+            label="### press to download sample csv file for Design data",
+            data=sample_dd_csv,
+            file_name="_dd_Data.csv",
+            mime="text/csv"
+        )
+        ddfile = st.file_uploader(
+                'Upload a properly formatted csv file containing Wire Run data',
+                type={'csv', 'txt'},
+                accept_multiple_files = False,
+                key='_ddfile'
+                )
+        if ddfile is not None:
+            with st.container(border=True):
+                dd = OCS.wire_run(ddfile)
+                st.write('###### Loaded design data:')
+                st.dataframe(dd.head(), hide_index=True)
+
+    with st.container(border=True):
+        ##Wire Run Data
+        sample_wr_csv = convert_df(OCS.sample_wr_df())
+        st.markdown("#### Load layout design data for wire run")
+        st.download_button(
+            label="### press to download sample csv file for Wire Run data",
+            data=sample_wr_csv,
+            file_name="_WR_Data.csv",
+            mime="text/csv"
+        )
+        wrfile = st.file_uploader(
+                'Upload a properly formatted csv file containing Wire Run data',
+                type={'csv', 'txt'},
+                accept_multiple_files = False,
+                key='_wrfile'
+                )
+        if wrfile is not None:
+            with st.container(border=True):
+                wr = OCS.wire_run(wrfile)
+                st.write('###### First several rows of input file:')
+                st.dataframe(wr.head(), hide_index=True)
 
 calc1()

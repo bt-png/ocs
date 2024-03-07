@@ -45,6 +45,22 @@ def conductor_particulars(mw, cw, ha):
          })
     return _df
 
+def sample_wr_df():
+    """
+    Create a pandas DataFrame of a sample input csv file necessary
+    to properly import wire run data.
+    """
+    _df = pd.DataFrame({
+        'PoleID': ['Pole1', 'Pole2', 'Pole3'],
+        'STA': [162297, 162452, 162612],
+        'Rail EL': [0, 0, 0],
+        'MW Height': [24, 23.5, 22.5],
+        'CW Height': [20, 19.25, 18.5],
+        'PreSag': [0.19375, 0.2, 0.16625],
+        'Deviation Angle': [0, 4, -5]
+    })
+    return _df
+
 def wire_run(path, first=None, last=None):
     """
     Create a pandas DataFrame of the wire run details for use in running
