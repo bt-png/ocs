@@ -86,13 +86,16 @@ st.set_page_config(page_title="CAT SAG", page_icon="📹")
 st.markdown("# Simple Catenary Sag")
 st.sidebar.header("CAT SAG")
 
-checkbox = st.sidebar.checkbox('Pause Calculation', key='pauseCalc', value=False)
-
 st.write(
     """This app shows you the simple sag curves for a flexible catenary system
     utilizing a **sum of moments** method. The CW is assumed to be supported only
     at hanger locations, with elevations calculated based on designed elevation at 
     supports and the designated pre-sag."""
     )
+
+if st.session_state['access-key'] != 'ocs': #st.secrets['access-key']:
+        st.stop()
+
+checkbox = st.sidebar.checkbox('Pause Calculation', key='pauseCalc', value=False)
 
 calc1()

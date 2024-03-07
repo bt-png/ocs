@@ -18,6 +18,8 @@ import pandas as pd
 
 LOGGER = get_logger(__name__)
 
+if 'access-key' not in st.session_state:
+    st.session_state['access-key'] = ''
 
 def run():
     st.set_page_config(
@@ -26,9 +28,8 @@ def run():
     )
 
     st.write("# Welcome to OCS Calculation Templates!")
-
-    st.sidebar.success("Select a calculation set above.")
-
+    st.sidebar.text_input('access key', key='access-key', value=st.session_state['access-key'])
+    
     st.markdown(
         """
         These calculation sets are developed by Brett Tharp and
@@ -46,9 +47,12 @@ def run():
         would like to reference for the future.
         - Once a selection has been made to the calculation set you would
         like to use on the sidebar.You may utilize the input fields in the sidebar
-        - Ask a question through teams or email brett.tharp@stvinc.com
+        - Ask a question through email brett.tharp@stvinc.com
     """
     )
+    
+    if st.session_state['access-key'] == 'ocs': #st.secrets['access-key']:
+        st.write('#### access granted')
     st.write(df.tail(2))
 
 df = pd.DataFrame({
