@@ -42,7 +42,7 @@ def run():
         - The applications are instance based and nothing will be stored.
         You will be responsible to **export** any data generated that you
         would like to reference for the future.
-        - Ask a question through email brett.tharp@stvinc.com
+        - Ask a question through email BrettT_OCS@outlook.com
     """
     )
     st.sidebar.text_input('access key', key='accesskey')
