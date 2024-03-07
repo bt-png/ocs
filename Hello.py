@@ -18,8 +18,8 @@ import pandas as pd
 
 LOGGER = get_logger(__name__)
 
-if 'access-key' not in st.session_state:
-    st.session_state['access-key'] = ''
+if 'accesskey' not in st.session_state:
+    st.session_state['accesskey'] = ''
 
 def run():
     st.set_page_config(
@@ -51,7 +51,7 @@ def run():
     """
     )
     
-    if st.session_state['access-key'] == 'ocs': #st.secrets['access-key']:
+    if st.session_state['accesskey'] == st.secrets['access-key']:
         st.write('#### access granted')
     st.write(df.tail(2))
 
