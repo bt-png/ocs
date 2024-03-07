@@ -51,7 +51,7 @@ def run():
     """
     )
     
-    if st.session_state['accesskey'] == st.secrets['access-key']:
+    if st.session_state['accesskey'] == st.secrets['accesskey']:
         st.write('#### access granted')
     st.write(df.tail(2))
 
