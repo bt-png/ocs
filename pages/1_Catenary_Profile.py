@@ -3,9 +3,9 @@ import numpy as np
 
 import streamlit as st
 import system as OCS
+import linebline as LL
 
 st.session_state.accesskey = st.session_state.accesskey
-df_cd = None
 
 def calc1() -> None:
     with tab1:
@@ -63,38 +63,6 @@ def calc1() -> None:
 def convert_df(df):
    return df.to_csv(index=False).encode('utf-8')
 
-def design_data(path):
-    df_cd = design_data_cd(path)
-
-def design_data_cd(path):
-    _df = pd.DataFrame({
-        'Cable': ['MW', 'CW', 'HA'],
-        'Weight': [0, 0, 0],
-        'Tension': [0, 0, 0]
-    })
-    header = False
-    for line in path:
-        val = line.decode('utf-8')
-        head = 'Conductor Particulars'
-        if header:
-            if val[:1] != ',':
-                header = False
-                break
-            _lineval = val.split(',')
-            if _lineval[1] == 'MW':
-                _df.Weight.iloc[0] = float(_lineval[2])
-                _df.Tension.iloc[0] = float(_lineval[3])
-            if _lineval[1] == 'CW':
-                _df.Weight.iloc[1] = float(_lineval[2])
-                _df.Tension.iloc[1] = float(_lineval[3])
-            if _lineval[1] == 'HA':
-                _df.Weight.iloc[2] = float(_lineval[2])
-        if val[:len(head)] == head:
-            st.write(val)
-            header = True
-    st.dataframe(_df, hide_index=True)
-    return _df
-
 st.set_page_config(page_title="CAT SAG", page_icon="📹")
 st.markdown("# Simple Catenary Sag")
 st.sidebar.header("CAT SAG")
@@ -132,9 +100,24 @@ with tab1:
                 key='_ddfile'
                 )
         if ddfile is not None:
-            with st.container(border=True):
-                st.write('###### Loaded design data:')
-                st.dataframe(dd.head(), hide_index=True)
+            st.dataframe(pd.read_csv(ddfile))
+            st.write()
+        if False: #ddfile is not None:
+            col1, col2 = st.columns([0.6, 0.4])
+            _df_cd = LL.design_data_cd(ddfile)
+            _df_acd = LL.design_data_acd(ddfile)
+            _df_sd = LL.design_data_sd(ddfile)
+            _df_cc = LL.design_data_cc(ddfile)
+            with col1:
+                st.write('###### Loaded conductor particulars data:')
+                st.dataframe(_df_cd, hide_index=True)
+                st.write('###### Loaded alternate conductor particulars data:')
+                st.dataframe(_df_cd, hide_index=True)
+            with col2:
+                st.write('###### Loaded system design variables:')
+                st.dataframe(_df_sd, hide_index=True)
+                st.write('###### Loaded calculation constants:')
+                st.dataframe(_df_cc, hide_index=True)
 
     with st.container(border=True):
         ##Wire Run Data

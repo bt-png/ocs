@@ -47,8 +47,8 @@ def conductor_particulars(mw, cw, ha):
 
 def sample_wr_df():
     """
-    Create a pandas DataFrame of a sample input csv file necessary
-    to properly import wire run data.
+    Create a properly formatted pandas DataFrame containing wire run data.
+    This can be written to csv as a sample to properly import wire run data.
     """
     _df = pd.DataFrame({
         'PoleID': ['Pole1', 'Pole2', 'Pole3'],
@@ -60,6 +60,12 @@ def sample_wr_df():
         'Deviation Angle': [0, 4, -5]
     })
     return _df
+
+def sample_dd_str():
+    """
+    Create a properly formatted string containing design data.
+    This can be written to csv as a sample to properly import design data.
+    """
 
 def wire_run(path, first=None, last=None):
     """
