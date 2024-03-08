@@ -9,47 +9,36 @@ st.session_state.accesskey = st.session_state.accesskey
 
 def calc1() -> None:
     with tab1:
-         ## CONDUCTOR PARTICULARS AND LOADING CONDITIONS
-        st.write('##### Input conductor particulars:')
-        cond_data = pd.DataFrame({
-            'Cable': ['MW', 'CW', 'HA'],
-            'Weight': [1.544, 1.063, 0.2],
-            'Tension': [5000, 3300, 0]
-            })
-        econd_data = st.data_editor(cond_data, hide_index=True)
-        mwWeight = econd_data.Weight[cond_data.Cable == 'MW'].iloc[0]
-        cwWeight = float(econd_data.Weight[cond_data.Cable == 'CW'].iloc[0])
-        haWeight = float(econd_data.Weight[cond_data.Cable == 'HA'].iloc[0])
-        mwTension = float(econd_data.Tension[cond_data.Cable == 'MW'].iloc[0])
-        cwTension = float(econd_data.Tension[cond_data.Cable == 'CW'].iloc[0])
-        cN = OCS.conductor_particulars(
-            (mwWeight, mwTension), (cwWeight, cwTension), haWeight
-            )
-        ## POINT LOADS
-        st.write('##### Input point loads:')
-        pl_data = pd.DataFrame({
-            'Description': ['Description of point load for reference'],
-            'Stationing': [0],
-            'CW Loading': [0],
-            'MW Loading': [0]
-            })
-        epl_data = st.data_editor(pl_data, hide_index=True, num_rows="dynamic")
-        df_loading = epl_data[~epl_data['Stationing'].isnull()]
-        df_loading.replace(to_replace=np.nan, value=0, inplace=True)
-        if df_loading.empty:
-            df_loading = pl_data
-        #df_loading = df_loading.transpose()
-        df_loading = (
-            df_loading['Description'].values,
-            df_loading['Stationing'].values,
-            df_loading['CW Loading'].values,
-            df_loading['MW Loading'].values
-            )
-
-    if wrfile is not None and not st.session_state['pauseCalc']:
-        ## LAYOUT DESIGN       
-        Nom = OCS.CatenaryFlexible(cN, wr)
-        Nom.resetloads(df_loading)
+        if ddfile is not None:
+            with cdd1:
+                _dd = pd.read_csv(ddfile)
+                #_df_cd = LL.design_data_cd(ddfile)
+                #_df_acd = LL.design_data_acd(ddfile)
+                #_df_sd = LL.design_data_sd(ddfile)
+                #_df_cc = LL.design_data_cc(ddfile)
+                
+            with cdd2:
+                st.write('###### Loaded conductor particulars data:')
+                #st.dataframe(_df_cd, hide_index=True)
+                st.write('###### Loaded alternate conductor particulars data:')
+                #st.dataframe(_df_cd, hide_index=True)
+                st.write('###### Loaded system design variables:')
+                #st.dataframe(_df_sd, hide_index=True)
+                st.write('###### Loaded calculation constants:')
+                #st.dataframe(_df_cc, hide_index=True)
+        if wrfile is not None:
+            with cwr:
+                wr = OCS.wire_run(wrfile)
+                st.write('###### First several rows of input file:')
+                st.dataframe(wr.head(), hide_index=True)
+    if not st.session_state['pauseCalc']:
+        ## LAYOUT DESIGN
+        if wrfile is not None:
+            Nom = OCS.CatenaryFlexible(OCS.sample_df_cp(), wr)
+            Nom.resetloads(OCS.sample_df_sl())
+        else:
+            Nom = OCS.CatenaryFlexible(OCS.sample_df_cp(), OCS.sample_df_wr())
+            Nom.resetloads(OCS.sample_df_sl())
         df = Nom.dataframe()
         with tab2:
             st.write('### Catenary Wire Sag Plot')
@@ -82,47 +71,32 @@ tab1, tab2, tab3 = st.tabs(['Input', 'Results', 'Output'])
 st.sidebar.checkbox('Pause Calculation', key='pauseCalc', value=False)
 
 with tab1:
-    with st.container(border=True):
+    cdd = st.container(border=True)
+    cdd_val = st.container(border=True)
+    cwr = st.container(border=True)
+    with cdd:
         ##Design Data
-        #sample_dd_csv = convert_df(OCS.sample_wr_df())
-        st.markdown("#### Load catenary system design data - not yet functional")
-        #st.download_button(
-        #    label="### press to download sample csv file for Design data",
-        #    data=sample_dd_csv,
-        #    file_name="_dd_Data.csv",
-        #    mime="text/csv"
-        #)
+        st.markdown("#### Load catenary system design data")
+        sample_dd_csv = convert_df(OCS.sample_df_dd())
+        st.download_button(
+            label="### press to download sample csv file for Design data",
+            data=sample_dd_csv,
+            file_name="_dd_Data.csv",
+            mime="text/csv"
+        )
 
         ddfile = st.file_uploader(
-                'Upload a properly formatted csv file containing Catenary Design data',
+                'Upload a properly formatted csv file containing Design data',
                 type={'csv', 'txt'},
                 accept_multiple_files = False,
                 key='_ddfile'
                 )
-        if ddfile is not None:
-            st.dataframe(pd.read_csv(ddfile))
-            st.write()
-        if False: #ddfile is not None:
-            col1, col2 = st.columns([0.6, 0.4])
-            _df_cd = LL.design_data_cd(ddfile)
-            _df_acd = LL.design_data_acd(ddfile)
-            _df_sd = LL.design_data_sd(ddfile)
-            _df_cc = LL.design_data_cc(ddfile)
-            with col1:
-                st.write('###### Loaded conductor particulars data:')
-                st.dataframe(_df_cd, hide_index=True)
-                st.write('###### Loaded alternate conductor particulars data:')
-                st.dataframe(_df_cd, hide_index=True)
-            with col2:
-                st.write('###### Loaded system design variables:')
-                st.dataframe(_df_sd, hide_index=True)
-                st.write('###### Loaded calculation constants:')
-                st.dataframe(_df_cc, hide_index=True)
-
-    with st.container(border=True):
+    with cdd_val:
+        cdd1, cdd2 = st.columns([0.6, 0.4])
+    with cwr:
         ##Wire Run Data
-        sample_wr_csv = convert_df(OCS.sample_wr_df())
         st.markdown("#### Load layout design data for wire run")
+        sample_wr_csv = convert_df(OCS.sample_df_wr())
         st.download_button(
             label="### press to download sample csv file for Wire Run data",
             data=sample_wr_csv,
@@ -135,10 +109,5 @@ with tab1:
                 accept_multiple_files = False,
                 key='_wrfile'
                 )
-        if wrfile is not None:
-            with st.container(border=True):
-                wr = OCS.wire_run(wrfile)
-                st.write('###### First several rows of input file:')
-                st.dataframe(wr.head(), hide_index=True)
 
 calc1()

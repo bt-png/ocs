@@ -5,6 +5,8 @@ Created on Thu Feb 29 08:36:43 2024
 @author: TharpBM
 """
 import numpy as np
+import pandas as pd
+
 # GENERAL
 
 def RoundVal(arr,num):
@@ -23,6 +25,23 @@ def shift(arr, num, fill_value=np.nan):
     else:
         val[:] = arr
     return val
+
+def df_pad(_df_original, name):
+    _df = _df_original.copy()
+    _df.insert(0,0,0)
+    _df.loc[-1] = (_df.columns.values)
+    _df.loc[-2] = (0)
+    _df.loc[-2,0] = name
+    _df.columns = range(_df.shape[1])
+    _df = _df.sort_index().reset_index(drop=True)
+    _df[0] = _df[0].replace(0,np.NaN)
+    _df.iloc[0] = _df.iloc[0].replace(0,np.NaN)
+    return _df
+
+def df_add(_df1, _df2):
+    _df_empty = pd.DataFrame(data=None, columns=[0], index=[0])
+    _df = pd.concat([_df1, _df_empty, _df2])
+    return _df
 
 # WIRE RUN GENERAL
 def WireRun_df(df, STARound):

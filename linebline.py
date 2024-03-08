@@ -1,15 +1,6 @@
-import streamlit as st
-import pandas as pd
 
-def df_pad(_df_original, name):
-    _df = _df_original.copy()
-    _df.insert(0,0,0)
-    _df.loc[-1] = (_df.columns.values)
-    _df.loc[-2] = (0)
-    _df.loc[-2,0] = name
-    _df.columns = range(_df.shape[1])
-    _df = _df.sort_index().reset_index(drop=True)
-    return _df
+import pandas as pd
+import system as OCS
 
 def design_data_cd(path):
     """Conductor Particulars"""
@@ -65,7 +56,7 @@ def design_data_sd(path):
         'Variable Description': ['Max HA Spacing',
                                 'Min CW Load',
                                 'Min HA Length',
-                                'Steady Arm Length'],
+                                'HA Accuracy'],
         'Value': [0, 0, 0, 0]
     })
     header = False
@@ -87,11 +78,11 @@ def design_data_sd(path):
 def design_data_cc(path):
     """Calculation Constants"""
     _df = pd.DataFrame({
-        'Variable Description': ['HA Accuracy',
-                                'xStep',
+        'Variable Description': ['xStep',
                                 'xRound',
                                 'xMultiplier',
-                                'yMultiplier'],
+                                'yMultiplier',
+                                'Steady Arm Length'],
         'Value': [0, 0, 0, 0, 0]
     })
     header = False

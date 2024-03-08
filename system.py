@@ -45,71 +45,104 @@ def conductor_particulars(mw, cw, ha):
          })
     return _df
 
-def sample_wr_df():
+def sample_df_cp():
+    _df = pd.DataFrame({
+        'Cable': ['MW', 'CW', 'HA'],
+        'Weight': [1.544, 1.063, 0.2],
+        'Tension': [5000, 3300, 0]
+    })
+    return _df
+
+def sample_df_acp():
+    _df = pd.DataFrame({
+        'Load Condition': ['LC1', 'LC2'],
+        'MW Weight': [1.544, 1.063],
+        'MW Tension': [5129, 4187],
+        'CW Weight': [1.063, 1.063],
+        'CW Tension': [3385, 2482],
+        'HA Weight': [0.2, 0.2]
+    })
+    return _df
+
+def sample_df_hd():
+    #[MaxHASpacing, minCW_P, MinHALength, HA_Accuracy]
+    #_hd = np.array([28, 0, 3/12, 1/50/12])
+    # test _hd[0] == 28
+    _df = pd.DataFrame({
+        'Variable Description': ['Max HA Spacing',
+                                'Min HA Load',
+                                'Min HA Length',
+                                'HA Accuracy'],
+        'Value': [28, 0, 3/12, 1/50/12]
+    })
+    # test _df.Values[0] == 28
+    return _df
+
+def sample_df_bd():
+    #[xStep, xRound, xMultiplier, yMultiplier, SteadyArmLength]
+    #_bd = np.array([1, 1, 1, 1, 3])
+    _df = pd.DataFrame({
+        'Variable Description': ['xStep',
+                                'xRound',
+                                'xMultiplier',
+                                'yMultiplier',
+                                'Steady Arm Length'],
+        'Value': [1, 1, 1, 1, 3]
+    })
+    return _df
+
+def sample_df_sl():
+    #[P_DiscreteLoad_CW, STA_DiscreteLoad_CW,
+    # P_DiscreteLoad_MW, STA_DiscreteLoad_MW]
+    #_sl = (
+    #    (0, 0, 0), (0, 0, 0),
+    #    (0, 0, 0), (0, 0, 0)
+    #    )
+    _df = pd.DataFrame({
+        'Description': ['a', 'b', 'c', 'd', 'e'],
+        'Stationing': [162472, 162427, 164730, 164780, 166364],
+        'CW Loading': [15, 5, -15, 15, 30],
+        'MW Loading': [15, 5, 5, 0, 85]
+    })
+    return _df
+
+def sample_df_dd():
+    """
+    Create a properly formatted string containing design data.
+    This can be written to csv as a sample to properly import design data.
+    """
+    _df = GenFun.df_pad(sample_df_cp(),'Conductor Particulars')
+    _df = GenFun.df_add(_df, GenFun.df_pad(sample_df_acp(),'Alternate Conductor Particulars'))
+    _df = GenFun.df_add(_df, GenFun.df_pad(sample_df_hd(),'Hanger Design Data'))
+    _df = GenFun.df_add(_df, GenFun.df_pad(sample_df_bd(),'Calculation Constants'))
+    _df = GenFun.df_add(_df, GenFun.df_pad(sample_df_sl(),'Span Loading'))
+    return _df
+
+def sample_df_wr():
     """
     Create a properly formatted pandas DataFrame containing wire run data.
     This can be written to csv as a sample to properly import wire run data.
     """
     _df = pd.DataFrame({
-        'PoleID': ['Pole1', 'Pole2', 'Pole3'],
-        'STA': [162297, 162452, 162612],
-        'Rail EL': [0, 0, 0],
-        'MW Height': [24, 23.5, 22.5],
-        'CW Height': [20, 19.25, 18.5],
-        'PreSag': [0.19375, 0.2, 0.16625],
-        'Deviation Angle': [0, 4, -5]
+        'PoleID': ['Pole1', 'Pole2', 'Pole3', 'Pole4'],
+        'STA': [162297, 162452, 162612, 162775],
+        'Rail EL': [0, 0, 0, 0],
+        'MW Height': [24, 23.5, 22.5, 24],
+        'CW Height': [20, 19.25, 18.5, 18.5],
+        'PreSag': [0.19375, 0.2, 0.16625, 0],
+        'Deviation Angle': [0, 4, -5, 0]
     })
     return _df
-
-def sample_dd_str():
-    """
-    Create a properly formatted string containing design data.
-    This can be written to csv as a sample to properly import design data.
-    """
 
 def wire_run(path, first=None, last=None):
     """
     Create a pandas DataFrame of the wire run details for use in running
     detailed span calculations.
-    
-    Example contents of a properly formatted csv file
-    
-    |  PoleID,STA,Rail EL,MW Height,CW Height,PreSag,Deviation Angle
-    |  1,162297,0,24,20,-1.1625,0
-    |  2,162452,0,23.5,19.25,-1.2,0
-    |  3,162612,0,23.5,18.5,-0.9975,0
-    |  4,162745,0,22.5,18.5,-1.125,0
-    |  5,162895,0,22.5,18.5,-1.2975,0
-    |  6,163068,0,22.5,18.5,-1.425,0
-
-    Please take note of the example units!
-    No unit conversion are made in this calculation set.
-    PoleID (string), STA (feet), Rail EL (feet), MW Height (feet),
-    CW Height (feet), PreSag (inches), Deviation Angle (degrees)
-    
-    Parameters
-    ----------
-    path : string
-        Full file path to a .csv file containing the wire run details.
-    first : int, optional
-        Index of row to start, leave out to go from start.
-    last : int, optional
-        Index of row to end, leave out to go to end.
-        
-    * Index is zero based. The first data row is 0. 
-    * The column header row is not counted
-    
-    Returns
-    -------
-    _wr : TYPE
-        DESCRIPTION.
-
     """
     _df = pd.read_csv(path)
     _df = _df.truncate(before=first, after=last, copy=False)
     _df.reset_index(drop=True, inplace=True)
-    _wr = GenFun.WireRun_df(_df,1)
-    return _wr
+    return _df
 
 class CatenaryFlexible():
     """ A simple container for the catenary system containing all design data
@@ -117,11 +150,9 @@ class CatenaryFlexible():
     # pylint: disable=too-many-instance-attributes
     def __init__(self, conductorparticulars, dataframe):
         self._cp = conductorparticulars
-        self._wr = dataframe
-        #[MaxHASpacing, minCW_P, MinHALength, HA_Accuracy]
-        self._hd = np.array([28, 0, 3/12, 1/50/12])
-        #[xStep, xRound, xMultiplier, yMultiplier, SteadyArmLength]
-        self._bd = np.array([1, 1, 1, 1, 3])
+        self._hd = sample_df_hd().Value
+        self._bd = sample_df_bd().Value
+        self._wr = GenFun.WireRun_df(dataframe,self._bd[1])
         #[P_DiscreteLoad_CW, STA_DiscreteLoad_CW,
         # P_DiscreteLoad_MW, STA_DiscreteLoad_MW]
         self._sl = (
@@ -163,9 +194,15 @@ class CatenaryFlexible():
         #    df_loadlist['CW Loading'], df_loadlist['Stationing'],
         #    df_loadlist['MW Loading'], df_loadlist['Stationing']
         #    )
+        df_loading = (
+            loadlist['Description'].values,
+            loadlist['Stationing'].values,
+            loadlist['CW Loading'].values,
+            loadlist['MW Loading'].values
+            )
         self._sl = (
-            loadlist[2], loadlist[1],
-            loadlist[3], loadlist[1]
+            df_loading[2], df_loading[1],
+            df_loading[3], df_loading[1]
             )
 
     def getcatenarysag(self):
