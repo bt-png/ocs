@@ -76,8 +76,8 @@ def ELDiff_FreeSag_NegativeLoadedHA_Simple(Cycle_Stationing, Cycle_P_SpanWeight,
 
 def CatenarySag_Flexible(WireRun, L_Weight, L_Tension, L_SpanLoading, L_DesignHA, L_DesignBase):
     P_DiscreteLoad_CW, STA_DiscreteLoad_CW, P_DiscreteLoad_MW, STA_DiscreteLoad_MW = [L_SpanLoading[i] for i in (0,1,2,3)]
-    MaxHASpacing, minCW_P, MinHALength, HA_Accuracy = [L_DesignHA[i] for i in (0,1,2,3)]
-    xStep, xRound, xMultiplier, yMultiplier, SteadyArmLength = [L_DesignBase[i] for i in (0,1,2,3,4)]
+    MaxHASpacing, minCW_P, MinHALength, HA_Accuracy = [L_DesignHA.iloc[i,1] for i in (0,1,2,3)]
+    xStep, xRound, xMultiplier, yMultiplier, SteadyArmLength = [L_DesignBase.iloc[i,1] for i in (0,1,2,3,4)]
     WR = GenFun.ScaleWireRun(WireRun, xMultiplier, yMultiplier)
     Stationing = GenFun.x_SPAN_LIST(WireRun, xStep, xRound)
     nHA = GenFun.L_HA_QTY(WR, MaxHASpacing*xMultiplier)

@@ -13,22 +13,20 @@ def calc1() -> None:
             with cdd_val:
                 cdd0, cdd1, cdd2 = st.columns([0.1, 0.6, 0.3])
                 _dd = pd.read_csv(ddfile)
+                _df_cd, _df_acd, _df_hd, _df_bd, _df_sl = OCS.create_df_dd(_dd)
                 with cdd1:
                     #st.write(_dd)
                     st.write('###### Loaded conductor particulars data:')
-                    #st.dataframe(_df_cd, hide_index=True)
+                    st.dataframe(_df_cd, hide_index=True)
                     st.write('###### Loaded alternate conductor particulars data:')
-                    #st.dataframe(_df_cd, hide_index=True)
+                    st.dataframe(_df_acd, hide_index=True)
                     st.write('###### Loaded span point loads:')
-                    #st.dataframe(_df_cd, hide_index=True)
+                    st.dataframe(_df_sl, hide_index=True)
                 with cdd2:
-                    st.write('###### Loaded system design variables:')
-                    #st.dataframe(_df_sd, hide_index=True)
+                    st.write('###### Loaded hanger design variables:')
+                    st.dataframe(_df_hd, hide_index=True)
                     st.write('###### Loaded calculation constants:')
-                    #st.dataframe(_df_cc, hide_index=True)
-                _df = _dd
-                _df_cd = _df.iloc[1:5:,1:4]
-                #st.write(_df)
+                    st.dataframe(_df_bd, hide_index=True)
         if wrfile is not None:
             with cwr_val:
                 cwr0, cwr1 = st.columns([0.1, 0.9])
@@ -38,14 +36,22 @@ def calc1() -> None:
                     st.dataframe(wr.head(), hide_index=True)
     if not st.session_state['pauseCalc']:
         ## LAYOUT DESIGN
-        if wrfile is not None:
-            Nom = OCS.CatenaryFlexible(OCS.sample_df_cp(), wr)
+        if wrfile is not None and ddfile is not None:
+            Nom = OCS.CatenaryFlexible(_df_cd, wr)
+            #Nom.resetloads(_df_sl)
             Nom.resetloads(OCS.sample_df_sl())
-        else:
+        elif wrfile is None and ddfile is None:
             Nom = OCS.CatenaryFlexible(OCS.sample_df_cp(), OCS.sample_df_wr())
             Nom.resetloads(OCS.sample_df_sl())
+        else:
+            with tab2:
+                st.markdown('#### Provide data for both system design and wire run!')
+                st.markdown('Sample data is only provided if no files have been uploaded.')
+            st.stop()
         df = Nom.dataframe()
         with tab2:
+            if wrfile is None and ddfile is None:
+                st.markdown('### SAMPLE DATA')
             st.write('### Catenary Wire Sag Plot')
             chart = st.line_chart(
                 data = df, x='Stationing', y='Elevation', color='cable'

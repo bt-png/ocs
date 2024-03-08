@@ -119,6 +119,26 @@ def sample_df_dd():
     _df.reset_index(drop=True, inplace=True)
     return _df
 
+def split_df(_df, first=None, last=None):
+    _dfc = _df.copy()
+    _dfc = _dfc.truncate(before=first, after=last, copy=False)
+    #_dfc = _dfc.iloc[start:end,:]
+    _dfc = _dfc.dropna(axis=1, how='all')
+    _dfc.columns = _dfc.iloc[0]
+    _dfc = _dfc[1:]
+    _dfc.reset_index(drop=True, inplace=True)
+    _dfc.iloc[:,1:] = _dfc.iloc[:,1:].astype(float)
+    return _dfc
+
+def create_df_dd(_df):
+    _dd = _df.copy()
+    _df_cd = split_df(_dd, 1, 4)
+    _df_acd = split_df(_dd, 7, 9)
+    _df_hd = split_df(_dd, 12, 16)
+    _df_bd = split_df(_dd, 19, 24)
+    _df_sl = split_df(_dd, 27)
+    return _df_cd, _df_acd, _df_hd, _df_bd, _df_sl  
+
 def sample_df_wr():
     """
     Create a properly formatted pandas DataFrame containing wire run data.
@@ -151,9 +171,9 @@ class CatenaryFlexible():
     # pylint: disable=too-many-instance-attributes
     def __init__(self, conductorparticulars, dataframe):
         self._cp = conductorparticulars
-        self._hd = sample_df_hd().Value
-        self._bd = sample_df_bd().Value
-        self._wr = GenFun.WireRun_df(dataframe,self._bd[1])
+        self._hd = sample_df_hd()
+        self._bd = sample_df_bd()
+        self._wr = GenFun.WireRun_df(dataframe,1)
         #[P_DiscreteLoad_CW, STA_DiscreteLoad_CW,
         # P_DiscreteLoad_MW, STA_DiscreteLoad_MW]
         self._sl = (
