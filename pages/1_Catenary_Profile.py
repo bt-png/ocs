@@ -3,6 +3,7 @@ import numpy as np
 
 import streamlit as st
 import system as OCS
+import general as GenFun
 
 st.session_state.accesskey = st.session_state.accesskey
 
@@ -21,27 +22,32 @@ def calc1() -> None:
                     st.dataframe(_df_acd, hide_index=True)
                     st.write('###### Loaded span point loads:')
                     st.dataframe(_df_sl, hide_index=True)
+                    P_DiscreteLoad_CW, STA_DiscreteLoad_CW, P_DiscreteLoad_MW, STA_DiscreteLoad_MW = [tuple(_df_sl.iloc[:,i].tolist()) for i in (2,1,3,1)]
+                    #P=(0,0,0,0,0,0)
+                    #st.write(P_DiscreteLoad_CW)
                 with cdd2:
                     st.write('###### Loaded hanger design variables:')
                     st.dataframe(_df_hd, hide_index=True)
                     st.write('###### Loaded calculation constants:')
                     st.dataframe(_df_bd, hide_index=True)
+                    #xStep, xRound, xMultiplier, yMultiplier, SteadyArmLength = [_df_bd.iloc[i,1] for i in (0,1,2,3,4)]
         if wrfile is not None:
             with cwr_val:
                 cwr0, cwr1 = st.columns([0.1, 0.9])
                 with cwr1:
                     wr = OCS.wire_run(wrfile)
                     st.write('###### First several rows of input file:')
-                    st.dataframe(wr.head(), hide_index=True)
+                    st.dataframe(wr, hide_index=True)
     if not st.session_state['pauseCalc']:
         ## LAYOUT DESIGN
         if wrfile is not None and ddfile is not None:
-            Nom = OCS.CatenaryFlexible(_df_cd, wr)
+            #st.write(_dd)
+            Nom = OCS.CatenaryFlexible(_dd, wr)
             #Nom.resetloads(_df_sl)
-            Nom.resetloads(OCS.sample_df_sl())
+            #Nom.resetloads(OCS.sample_df_sl())
         elif wrfile is None and ddfile is None:
-            Nom = OCS.CatenaryFlexible(OCS.sample_df_cp(), OCS.sample_df_wr())
-            Nom.resetloads(OCS.sample_df_sl())
+            Nom = OCS.CatenaryFlexible(OCS.sample_df_dd(), OCS.sample_df_wr())
+            #Nom.resetloads(OCS.sample_df_sl())
         else:
             with tab2:
                 st.markdown('#### Provide data for both system design and wire run!')
