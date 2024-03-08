@@ -163,23 +163,21 @@ def wire_run(path, first=None, last=None):
     _df = pd.read_csv(path)
     _df = _df.truncate(before=first, after=last, copy=False)
     _df.reset_index(drop=True, inplace=True)
+    _df.iloc[:,1:] = _df.iloc[:,1:].astype(float)
     return _df
 
 class CatenaryFlexible():
     """ A simple container for the catenary system containing all design data
     """
     # pylint: disable=too-many-instance-attributes
-    def __init__(self, conductorparticulars, dataframe):
-        self._cp = conductorparticulars
-        self._hd = sample_df_hd()
-        self._bd = sample_df_bd()
-        self._wr = GenFun.WireRun_df(dataframe,1)
+    def __init__(self, pandasdesigndetails, dataframe):
+        self._cp, self._acp, self._hd, self._bd, self._sl = create_df_dd(pandasdesigndetails)
+        #self._cp = conductorparticulars
+        #self._hd = sample_df_hd()
+        #self._bd = sample_df_bd()
+        self._wr = GenFun.WireRun_df(dataframe, self._bd.iloc[1,1])
         #[P_DiscreteLoad_CW, STA_DiscreteLoad_CW,
         # P_DiscreteLoad_MW, STA_DiscreteLoad_MW]
-        self._sl = (
-           (0, 0, 0), (0, 0, 0),
-            (0, 0, 0), (0, 0, 0)
-            )
         self._solved = False
         self._catenarysag = None
         self._sag = None
@@ -215,16 +213,17 @@ class CatenaryFlexible():
         #    df_loadlist['CW Loading'], df_loadlist['Stationing'],
         #    df_loadlist['MW Loading'], df_loadlist['Stationing']
         #    )
-        df_loading = (
-            loadlist['Description'].values,
-            loadlist['Stationing'].values,
-            loadlist['CW Loading'].values,
-            loadlist['MW Loading'].values
-            )
-        self._sl = (
-            df_loading[2], df_loading[1],
-            df_loading[3], df_loading[1]
-            )
+        #df_loading = (
+        #    loadlist['Description'].values,
+        #    loadlist['Stationing'].values,
+        #    loadlist['CW Loading'].values,
+        #    loadlist['MW Loading'].values
+        #    )
+        #self._sl = (
+        #    df_loading[2], df_loading[1],
+        ##    df_loading[3], df_loading[1]
+        #   )
+        self._sl = loadlist
 
     def getcatenarysag(self):
         """ return the cache solution dictionary """
