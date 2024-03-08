@@ -10,27 +10,30 @@ st.session_state.accesskey = st.session_state.accesskey
 def calc1() -> None:
     with tab1:
         if ddfile is not None:
-            with cdd1:
+            with cdd_val:
+                cdd0, cdd1, cdd2 = st.columns([0.1, 0.6, 0.3])
                 _dd = pd.read_csv(ddfile)
-                #_df_cd = LL.design_data_cd(ddfile)
-                #_df_acd = LL.design_data_acd(ddfile)
-                #_df_sd = LL.design_data_sd(ddfile)
-                #_df_cc = LL.design_data_cc(ddfile)
-                
-            with cdd2:
-                st.write('###### Loaded conductor particulars data:')
-                #st.dataframe(_df_cd, hide_index=True)
-                st.write('###### Loaded alternate conductor particulars data:')
-                #st.dataframe(_df_cd, hide_index=True)
-                st.write('###### Loaded system design variables:')
-                #st.dataframe(_df_sd, hide_index=True)
-                st.write('###### Loaded calculation constants:')
-                #st.dataframe(_df_cc, hide_index=True)
+                with cdd1:
+                    #st.write(_dd)
+                    st.write('###### Loaded conductor particulars data:')
+                    #st.dataframe(_df_cd, hide_index=True)
+                    st.write('###### Loaded alternate conductor particulars data:')
+                    #st.dataframe(_df_cd, hide_index=True)
+                    st.write('###### Loaded span point loads:')
+                    #st.dataframe(_df_cd, hide_index=True)
+                with cdd2:
+                    st.write('###### Loaded system design variables:')
+                    #st.dataframe(_df_sd, hide_index=True)
+                    st.write('###### Loaded calculation constants:')
+                    #st.dataframe(_df_cc, hide_index=True)
+                st.write(_dd)
         if wrfile is not None:
-            with cwr:
-                wr = OCS.wire_run(wrfile)
-                st.write('###### First several rows of input file:')
-                st.dataframe(wr.head(), hide_index=True)
+            with cwr_val:
+                cwr0, cwr1 = st.columns([0.1, 0.9])
+                with cwr1:
+                    wr = OCS.wire_run(wrfile)
+                    st.write('###### First several rows of input file:')
+                    st.dataframe(wr.head(), hide_index=True)
     if not st.session_state['pauseCalc']:
         ## LAYOUT DESIGN
         if wrfile is not None:
@@ -72,8 +75,9 @@ st.sidebar.checkbox('Pause Calculation', key='pauseCalc', value=False)
 
 with tab1:
     cdd = st.container(border=True)
-    cdd_val = st.container(border=True)
+    cdd_val = st.container(border=False)
     cwr = st.container(border=True)
+    cwr_val = st.container(border=False)
     with cdd:
         ##Design Data
         st.markdown("#### Load catenary system design data")
@@ -91,8 +95,8 @@ with tab1:
                 accept_multiple_files = False,
                 key='_ddfile'
                 )
-    with cdd_val:
-        cdd1, cdd2 = st.columns([0.6, 0.4])
+    #with cdd_val:
+        
     with cwr:
         ##Wire Run Data
         st.markdown("#### Load layout design data for wire run")
