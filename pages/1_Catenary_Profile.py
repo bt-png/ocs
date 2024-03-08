@@ -26,7 +26,9 @@ def calc1() -> None:
                     #st.dataframe(_df_sd, hide_index=True)
                     st.write('###### Loaded calculation constants:')
                     #st.dataframe(_df_cc, hide_index=True)
-                st.write(_dd)
+                _df = _dd
+                _df_cd = _df.iloc[1:5:,1:4]
+                #st.write(_df)
         if wrfile is not None:
             with cwr_val:
                 cwr0, cwr1 = st.columns([0.1, 0.9])

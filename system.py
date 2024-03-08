@@ -116,6 +116,7 @@ def sample_df_dd():
     _df = GenFun.df_add(_df, GenFun.df_pad(sample_df_hd(),'Hanger Design Data'))
     _df = GenFun.df_add(_df, GenFun.df_pad(sample_df_bd(),'Calculation Constants'))
     _df = GenFun.df_add(_df, GenFun.df_pad(sample_df_sl(),'Span Loading'))
+    _df.reset_index(drop=True, inplace=True)
     return _df
 
 def sample_df_wr():
