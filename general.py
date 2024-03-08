@@ -56,7 +56,9 @@ def WireRun_df(df, STARound):
 
 def ScaleWireRun(WR,xScale,yScale):
     #expected DataFrame Headers [PoleID, STA, RailEL, MWHT, CWHT, PreSag, DeviationAngle, SpanLength
-    val = WR*[1,xScale,yScale,yScale,yScale,yScale,1,xScale]
+    val = WR.copy()
+    val.iloc[:,1:] = val.iloc[:,1:]*[xScale,yScale,yScale,yScale,yScale,1,xScale]
+    #val = WR*[1,xScale,yScale,yScale,yScale,yScale,1,xScale]
     return val
 
 # SIMPLE SAG SPAN EQUATIONS
