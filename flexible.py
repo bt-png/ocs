@@ -124,8 +124,8 @@ def CatenarySag_Flexible(WireRun, L_Weight, L_Tension, L_SpanLoading, L_DesignHA
             'P_SpanWeight_MW': P_SpanWeight_MW*xMultiplier/yMultiplier}
 
 def CatenarySag_FlexibleHA_Iterative(WireRun, L_WeightChange, L_Tension, L_DesignHA, L_DesignBase, L_StaticCWUplift, ORIGINALDESIGN):
-    MaxHASpacing, minCW_P, MinHALength, HA_Accuracy = [L_DesignHA[i] for i in (0,1,2,3)]
-    xStep, xRound, xMultiplier, yMultiplier, SteadyArmLength = [L_DesignBase[i] for i in (0,1,2,3,4)]
+    MaxHASpacing, minCW_P, MinHALength, HA_Accuracy = [L_DesignHA.iloc[i,1] for i in (0,1,2,3)]
+    xStep, xRound, xMultiplier, yMultiplier, SteadyArmLength = [L_DesignBase.iloc[i,1] for i in (0,1,2,3,4)]
     INPUT_StaticUplift_P, INPUT_StaticUpliftSTA = [L_StaticCWUplift[i] for i in (0,1)]
     #ORIGINALDESIGN is the return dictionary from CatenarySag
     RadialLoad = GenFun.RadialLoad(np.array(WireRun['Deviation Angle']),L_Tension[1])
