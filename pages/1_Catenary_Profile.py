@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import altair as alt
 
 import streamlit as st
 import system as OCS
@@ -41,21 +42,19 @@ def calc1() -> None:
     if not st.session_state['pauseCalc']:
         ## LAYOUT DESIGN
         if wrfile is not None and ddfile is not None:
-            #st.write(_dd)
             Nom = OCS.CatenaryFlexible(_dd, wr)
-            #if _df_acd is not None:
-                #LC1 = OCS.AltCondition(_df_acd, Nom)
-            #Nom.resetloads(_df_sl)
-            #Nom.resetloads(OCS.sample_df_sl())
+            df = Nom.dataframe()
+            if st.session_state['altConductors']:
+                LC = OCS.AltCondition_Series(_df_acd, Nom)
         elif wrfile is None and ddfile is None:
             Nom = OCS.CatenaryFlexible(OCS.sample_df_dd(), OCS.sample_df_wr())
-            #Nom.resetloads(OCS.sample_df_sl())
+            df = Nom.dataframe()
         else:
             with tab2:
                 st.markdown('#### Provide data for both system design and wire run!')
                 st.markdown('Sample data is only provided if no files have been uploaded.')
             st.stop()
-        df = Nom.dataframe()
+        
         with tab2:
             if wrfile is None and ddfile is None:
                 st.markdown('### SAMPLE DATA')
@@ -63,16 +62,29 @@ def calc1() -> None:
             chart = st.line_chart(
                     data = df, x='Stationing', y='Elevation', color='cable'
                 )
-            if _df_acd is not None:
+            if ddfile is not None and st.session_state['altConductors']:
                 st.write(_df_acd)
-                #dfa = LC1.dataframe()
-                #st.write('### Alternate Condition Sag Plot')
-                #chart = st.line_chart(
-                #    data = dfa, x='Stationing', y='Elevation', color ='cable'
-                #)
+                dfa = LC.dataframe()
+                st.write('### Alternate Condition Sag Plot')
+                chart = st.line_chart(
+                    data = dfa, x='Stationing', y='Elevation', color ='type'
+                )
+        with tab3:
+            if ddfile is not None and st.session_state['elasticity']:
+                ec = OCS.Elasticity(_df_cd, Nom, pUplift, stepSize, startSPT, endSPT)
+                dfe = ec.dataframe()
+                st.write('### Elasticity')
+                chart = st.line_chart(
+                    data = dfe, x='Stationing', y='Rise (in)', color ='cable'
+                )
+
         with tab4:
             st.write('#### Sag Data ', df)
             st.write('#### HA Data', Nom.dataframe_ha())
+            if ddfile is not None and st.session_state['altConductors']:
+                st.write('#### Alternate Conductor Data', dfa)
+            if ddfile is not None and st.session_state['elasticity']:
+                st.write('#### Elasticity', dfe)
 
 def convert_df(df):
    return df.to_csv(index=False).encode('utf-8')
@@ -94,6 +106,8 @@ if st.session_state['accesskey'] != st.secrets['accesskey']:
 tab1, tab2, tab3, tab4 = st.tabs(['Input', 'Sag Plot', 'Elasticity', 'Output'])
 
 st.sidebar.checkbox('Pause Calculation', key='pauseCalc', value=False)
+st.sidebar.checkbox('Consider Alt Conductors', key='altConductors', value=False)
+st.sidebar.checkbox('Perform Elasticity Check', key='elasticity', value=False)
 
 with tab1:
     cdd = st.container(border=True)
@@ -135,5 +149,13 @@ with tab1:
                 accept_multiple_files = False,
                 key='_wrfile'
                 )
-
+with tab3:
+    if ddfile is not None:
+        e0, e1 = st.columns([0.5, 0.5])
+        with e0:
+            pUplift = st.number_input(label='Uplift Force (lbf)', value=25)
+            stepSize = st.number_input(label='Resolution (ft)', min_value = 1, step=1, value=1)
+        with e1:
+            startSPT = st.number_input(label='Starting structure', value=1)
+            endSPT = st.number_input(label='Ending structure', value=2)
 calc1()

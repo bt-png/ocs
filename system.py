@@ -140,11 +140,16 @@ def split_df(_df, first=None, last=None):
 
 def create_df_dd(_df):
     _dd = _df.copy()
-    _df_cd = split_df(_dd, 1, 4)
-    _df_acd = split_df(_dd, 7, 9)
-    _df_hd = split_df(_dd, 12, 16)
-    _df_bd = split_df(_dd, 19, 24)
-    _df_sl = split_df(_dd, 27)
+    icp = int(np.where(_dd == 'Conductor Particulars')[0])
+    iacp = int(np.where(_dd == 'Alternate Conductor Particulars')[0])
+    ihd = int(np.where(_dd == 'Hanger Design Data')[0])
+    ibd = int(np.where(_dd == 'Calculation Constants')[0])
+    isl = int(np.where(_dd == 'Span Loading')[0])
+    _df_cd = split_df(_dd, icp+1, iacp-2)
+    _df_acd = split_df(_dd, iacp+1, ihd-2)
+    _df_hd = split_df(_dd, ihd+1, ibd-2)
+    _df_bd = split_df(_dd, ibd+1, isl-2)
+    _df_sl = split_df(_dd, isl+1)
     return _df_cd, _df_acd, _df_hd, _df_bd, _df_sl  
 
 def sample_df_wr():
@@ -399,23 +404,24 @@ class AltCondition_Series():
     
     def _solve(self):
         for index, row in self._data.iterrows():
-            _acd = split_acd(self._data,index)
-            ALT = AltCondition(_acd,self._bd)
-            _df_tmp = ALT.dataframe()
-            _df_cwdiff_tmp = ALT.dataframe_cwdiff()
-            _df_sr_tmp = ALT.dataframe_sr()
-            _df_tmp.type = row['Load Condition']
-            _df_cwdiff_tmp.type = row['Load Condition']
-            _df_sr_tmp.type = row['Load Condition']
-            if index == 0:
-                _df = _df_tmp.copy()
-                _df_cwdiff = _df_cwdiff_tmp.copy()
-                _df_sr = _df_sr_tmp.copy()
-            else:
-                #_df_old = _df.copy()
-                _df = pd.concat([_df, _df_tmp], ignore_index=False)
-                _df_cwdiff = pd.concat([_df_cwdiff, _df_cwdiff_tmp], ignore_index=False)
-                _df_sr = pd.concat([_df_sr, _df_sr_tmp], ignore_index=False)
+            if np.isfinite(row['MW Weight']):
+                _acd = split_acd(self._data,index)
+                ALT = AltCondition(_acd,self._bd)
+                _df_tmp = ALT.dataframe()
+                _df_cwdiff_tmp = ALT.dataframe_cwdiff()
+                _df_sr_tmp = ALT.dataframe_sr()
+                _df_tmp.type += '_' + row['Load Condition']
+                _df_cwdiff_tmp.type += '_' + row['Load Condition']
+                _df_sr_tmp.type += '_' + row['Load Condition']
+                if index == 0:
+                    _df = _df_tmp.copy()
+                    _df_cwdiff = _df_cwdiff_tmp.copy()
+                    _df_sr = _df_sr_tmp.copy()
+                else:
+                    #_df_old = _df.copy()
+                    _df = pd.concat([_df, _df_tmp], ignore_index=False)
+                    _df_cwdiff = pd.concat([_df_cwdiff, _df_cwdiff_tmp], ignore_index=False)
+                    _df_sr = pd.concat([_df_sr, _df_sr_tmp], ignore_index=False)
         self._df = _df
         self._df_cwdiff = _df_cwdiff
         self._df_sr = _df_sr
