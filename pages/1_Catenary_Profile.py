@@ -43,6 +43,8 @@ def calc1() -> None:
         if wrfile is not None and ddfile is not None:
             #st.write(_dd)
             Nom = OCS.CatenaryFlexible(_dd, wr)
+            #if _df_acd is not None:
+                #LC1 = OCS.AltCondition(_df_acd, Nom)
             #Nom.resetloads(_df_sl)
             #Nom.resetloads(OCS.sample_df_sl())
         elif wrfile is None and ddfile is None:
@@ -59,9 +61,16 @@ def calc1() -> None:
                 st.markdown('### SAMPLE DATA')
             st.write('### Catenary Wire Sag Plot')
             chart = st.line_chart(
-                data = df, x='Stationing', y='Elevation', color='cable'
+                    data = df, x='Stationing', y='Elevation', color='cable'
                 )
-        with tab3:
+            if _df_acd is not None:
+                st.write(_df_acd)
+                #dfa = LC1.dataframe()
+                #st.write('### Alternate Condition Sag Plot')
+                #chart = st.line_chart(
+                #    data = dfa, x='Stationing', y='Elevation', color ='cable'
+                #)
+        with tab4:
             st.write('#### Sag Data ', df)
             st.write('#### HA Data', Nom.dataframe_ha())
 
@@ -82,7 +91,7 @@ st.write(
 if st.session_state['accesskey'] != st.secrets['accesskey']:
         st.stop()
 
-tab1, tab2, tab3 = st.tabs(['Input', 'Results', 'Output'])
+tab1, tab2, tab3, tab4 = st.tabs(['Input', 'Sag Plot', 'Elasticity', 'Output'])
 
 st.sidebar.checkbox('Pause Calculation', key='pauseCalc', value=False)
 

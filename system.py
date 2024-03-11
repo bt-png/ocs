@@ -380,6 +380,11 @@ class AltCondition():
             self._solve()
         return self._srdf
 
+class AltCondition_Series(AltCondition):
+    def __init__(self, altconductor, basedesign):
+        self.data = None
+        self.__init(self, altconductor, basedesign)
+
 class Elasticity():
     """ container for calculating span elasticity from an already calculated
     CatenaryFlexible """
