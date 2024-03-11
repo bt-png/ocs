@@ -119,6 +119,14 @@ def sample_df_dd():
     _df.reset_index(drop=True, inplace=True)
     return _df
 
+def split_acd(_acd, row):
+    _df = pd.DataFrame({
+        'Cable': ['MW', 'CW', 'HA'],
+        'Weight': [_acd.loc[row,'MW Weight'], _acd.loc[row,'CW Weight'], _acd.loc[row,'HA Weight']],
+        'Tension': [_acd.loc[row,'MW Tension'], _acd.loc[row,'CW Tension'], 0]
+        })
+    return _df
+    
 def split_df(_df, first=None, last=None):
     _dfc = _df.copy()
     _dfc = _dfc.truncate(before=first, after=last, copy=False)
@@ -380,10 +388,53 @@ class AltCondition():
             self._solve()
         return self._srdf
 
-class AltCondition_Series(AltCondition):
+class AltCondition_Series():
     def __init__(self, altconductor, basedesign):
-        self.data = None
-        self.__init(self, altconductor, basedesign)
+        self._data = altconductor
+        self._bd = basedesign
+        self._df = None
+        self._df_cwdiff = None
+        self._df_sr = None
+        self._solved = False
+    
+    def _solve(self):
+        for index, row in self._data.iterrows():
+            _acd = split_acd(self._data,index)
+            ALT = AltCondition(_acd,self._bd)
+            _df_tmp = ALT.dataframe()
+            _df_cwdiff_tmp = ALT.dataframe_cwdiff()
+            _df_sr_tmp = ALT.dataframe_sr()
+            _df_tmp.type = row['Load Condition']
+            _df_cwdiff_tmp.type = row['Load Condition']
+            _df_sr_tmp.type = row['Load Condition']
+            if index == 0:
+                _df = _df_tmp.copy()
+                _df_cwdiff = _df_cwdiff_tmp.copy()
+                _df_sr = _df_sr_tmp.copy()
+            else:
+                #_df_old = _df.copy()
+                _df = pd.concat([_df, _df_tmp], ignore_index=False)
+                _df_cwdiff = pd.concat([_df_cwdiff, _df_cwdiff_tmp], ignore_index=False)
+                _df_sr = pd.concat([_df_sr, _df_sr_tmp], ignore_index=False)
+        self._df = _df
+        self._df_cwdiff = _df_cwdiff
+        self._df_sr = _df_sr
+        self._solved = True
+
+    def dataframe(self):
+        if not self._solved:
+            self._solve()
+        return self._df
+
+    def dataframe_cwdiff(self):
+        if not self._solved:
+            self._solve()
+        return self._df_cwdiff
+
+    def dataframe_sr(self):
+        if not self._solved:
+            self._solve()
+        return self._df_sr
 
 class Elasticity():
     """ container for calculating span elasticity from an already calculated
