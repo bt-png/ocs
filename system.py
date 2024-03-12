@@ -417,7 +417,7 @@ class AltCondition_Series():
                 _acd = split_acd(self._data,index)
                 ALT = AltCondition(_acd,self._bd)
                 _df_tmp = ALT.dataframe()
-                _df_cwd_tmp = ALT.dataframe_cw()
+                _df_cw_tmp = ALT.dataframe_cw()
                 _df_cwdiff_tmp = ALT.dataframe_cwdiff()
                 _df_sr_tmp = ALT.dataframe_sr()
                 _df_tmp.type += '_' + row['Load Condition']
