@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import streamlit as st
+st.set_page_config(layout="wide")
 from streamlit.logger import get_logger
 import pandas as pd
 

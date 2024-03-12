@@ -6,6 +6,7 @@ import streamlit as st
 import system as OCS
 import general as GenFun
 
+
 st.session_state.accesskey = st.session_state.accesskey
 
 def plotdimensions(staList,elList,yscale):
@@ -187,7 +188,7 @@ with tab1:
     cwr = st.container(border=True)
     cwr_val = st.container(border=False)
     with cbd:
-        yExagg = st.number_input(label='Y Scale Exageration', value=5, min_value=1, step=1)
+        yExagg = st.number_input(label='Y Scale Exageration', value=20, min_value=1, step=1)
     with cdd:
         ##Design Data
         st.markdown("#### Load catenary system design data")
