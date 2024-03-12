@@ -128,7 +128,7 @@ def PlotSagaltCond(_Alt, _BASE, yscale) -> None:
     st.write(_df_acd)
 
 @st.cache_data()
-def Plotelasticity(df,yscale) -> None:
+def Plotelasticity(df) -> None:
     st.write('### Elasticity')
     chart = st.line_chart(
         data = df, x='Stationing', y='Rise (in)', color ='type'
