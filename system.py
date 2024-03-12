@@ -403,8 +403,9 @@ class AltCondition():
         return self._srdf
 
 class AltCondition_Series():
-    def __init__(self, altconductor, basedesign):
+    def __init__(self, baseconductor, altconductor, basedesign):
         basedesign._solve()
+        self._cp = baseconductor
         self._data = altconductor
         self._bd = basedesign
         self._df = None
@@ -414,6 +415,19 @@ class AltCondition_Series():
         self._solved = False
     
     def _solve(self):
+        ALT = AltCondition(self._cp,self._bd)
+        _df_tmp = ALT.dataframe()
+        _df_cw_tmp = ALT.dataframe_cw()
+        _df_cwdiff_tmp = ALT.dataframe_cwdiff()
+        _df_sr_tmp = ALT.dataframe_sr()
+        #_df_tmp.type += '_' + row['Load Condition']
+        _df_tmp.type = 'Base'
+        _df_cwdiff_tmp.type = 'Base'
+        _df_sr_tmp.type = 'Base'
+        _df = _df_tmp.copy()
+        _df_cw = _df_cw_tmp.copy()
+        _df_cwdiff = _df_cwdiff_tmp.copy()
+        _df_sr = _df_sr_tmp.copy()
         for index, row in self._data.iterrows():
             if np.isfinite(row['MW Weight']):
                 _acd = split_acd(self._data,index)
@@ -422,20 +436,14 @@ class AltCondition_Series():
                 _df_cw_tmp = ALT.dataframe_cw()
                 _df_cwdiff_tmp = ALT.dataframe_cwdiff()
                 _df_sr_tmp = ALT.dataframe_sr()
-                _df_tmp.type += '_' + row['Load Condition']
+                #_df_tmp.type += '_' + row['Load Condition']
+                _df_tmp.type = row['Load Condition']
                 _df_cwdiff_tmp.type += '_' + row['Load Condition']
                 _df_sr_tmp.type += '_' + row['Load Condition']
-                if index == 0:
-                    _df = _df_tmp.copy()
-                    _df_cw = _df_cw_tmp.copy()
-                    _df_cwdiff = _df_cwdiff_tmp.copy()
-                    _df_sr = _df_sr_tmp.copy()
-                else:
-                    #_df_old = _df.copy()
-                    _df = pd.concat([_df, _df_tmp], ignore_index=False)
-                    _df_cw = pd.concat([_df_cw, _df_cw_tmp], ignore_index=False)
-                    _df_cwdiff = pd.concat([_df_cwdiff, _df_cwdiff_tmp], ignore_index=False)
-                    _df_sr = pd.concat([_df_sr, _df_sr_tmp], ignore_index=False)
+                _df = pd.concat([_df, _df_tmp], ignore_index=False)
+                _df_cw = pd.concat([_df_cw, _df_cw_tmp], ignore_index=False)
+                _df_cwdiff = pd.concat([_df_cwdiff, _df_cwdiff_tmp], ignore_index=False)
+                _df_sr = pd.concat([_df_sr, _df_sr_tmp], ignore_index=False)
         self._df = _df
         self._df_cw = _df_cw
         self._df_cwdiff = _df_cwdiff
@@ -473,14 +481,14 @@ class Elasticity_series():
     def _cycle(self, upliftforce, stepsize, startspt, endspt):
         EL = Elasticity(self._cp, self._ref, upliftforce, stepsize, startspt, endspt)
         _df_tmp = EL.dataframe()
-        _df_tmp.type += '_' + 'Base'
+        _df_tmp.type = 'Base'
         _df = _df_tmp.copy()
         for index, row in self._acp.iterrows():
             if np.isfinite(row['MW Weight']):
                 _acd = split_acd(self._acp,index)
                 EL = Elasticity(_acd, self._ref, upliftforce, stepsize, startspt, endspt)
                 _df_tmp = EL.dataframe()
-                _df_tmp.type += '_' + row['Load Condition']
+                _df_tmp.type = row['Load Condition']
                 _df = pd.concat([_df, _df_tmp], ignore_index=False)
         self._df = _df
 

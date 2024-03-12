@@ -8,13 +8,21 @@ import general as GenFun
 
 st.session_state.accesskey = st.session_state.accesskey
 
+def plotdimensions(staList,elList,yscale):
+    max_x = max(staList) - min(staList)
+    max_y = max(elList) - min(elList)
+    width = 1000
+    widthratio = width/max_x
+    height = widthratio*yscale*max_y
+    return int(width), int(height)
+
 @st.cache_data()
 def SagData(data, wirerun) -> None:
     return OCS.CatenaryFlexible(data, wirerun)
 
 @st.cache_data()
-def altSagData(data, _ORIG) -> None:
-    return OCS.AltCondition_Series(data, _ORIG)
+def altSagData(bcd, data, _ORIG) -> None:
+    return OCS.AltCondition_Series(bcd, data, _ORIG)
 
 @st.cache_data()
 def elasticity(_df_cd, _BASE, pUplift, stepSize, startSPT, endSPT) -> None:
@@ -53,34 +61,75 @@ def preview_wrfile(wrfile) -> None:
         st.dataframe(wr, hide_index=True)  
 
 @st.cache_data()
-def PlotSag(_BASE) -> None:
+def PlotSagst(_BASE, yscale) -> None:
     df = _BASE.dataframe()
+    df.Elevation *= yscale
     st.write('### Catenary Wire Sag Plot')
     chart = st.line_chart(
             data = df, x='Stationing', y='Elevation', color='cable'
         )
-       
+
 @st.cache_data()
-def PlotSagSample(_BASE) -> None:
+def PlotSag(_BASE, yscale) -> None:
     df = _BASE.dataframe()
+    pwidth, pheight = plotdimensions(df['Stationing'],df['Elevation'],yscale)
+    #df.Elevation *= yscale
+    st.write('### Catenary Wire Sag Plot')
+    chart = alt.Chart(df).mark_line().encode(
+        alt.X('Stationing:Q').scale(zero=False), 
+        alt.Y('Elevation:Q').scale(zero=False, type='linear'),
+        alt.Detail('cable')
+        ).properties(
+            width=pwidth,
+            height=pheight
+        )
+    st.write(chart)
+
+@st.cache_data()
+def PlotSagSample(_BASE, yscale) -> None:
+    df = _BASE.dataframe()
+    pwidth, pheight = plotdimensions(df['Stationing'],df['Elevation'],yscale)
+    #df.Elevation *= yscale
     st.markdown('### SAMPLE DATA')
     st.write('### Catenary Wire Sag Plot')
-    chart = st.line_chart(
-            data = df, x='Stationing', y='Elevation', color='cable'
+    #chart = st.line_chart(
+    #        data = df, x='Stationing', y='Elevation', color='cable'
+    #    )
+    #st.write(chart)
+    chart = alt.Chart(df).mark_line().encode(
+        alt.X('Stationing:Q').scale(zero=False), 
+        alt.Y('Elevation:Q').scale(zero=False, type='linear'),
+        alt.Detail('cable')
+        ).properties(
+            width=pwidth,
+            height=pheight
         )
+    st.write(chart)
 
 @st.cache_data()
-def PlotSagaltCond(_BASE) -> None:
-    LC = altSagData(_df_acd, _BASE)
+def PlotSagaltCond(_BASE, yscale) -> None:
+    LC = altSagData(_df_cd, _df_acd, _BASE)
     dfa = LC.dataframe()
-    st.write(_df_acd)
+    pwidth, pheight = plotdimensions(dfa['Stationing'],dfa['Elevation'],yscale)
+    #dfa.Elevation *= yscale
     st.write('### Alternate Condition Sag Plot')
-    chart = st.line_chart(
-        data = dfa, x='Stationing', y='Elevation', color ='type'
-    )
+    #chart = st.line_chart(
+    #    data = dfa, x='Stationing', y='Elevation', color ='type'
+    #)
+    chart = alt.Chart(dfa).mark_line().encode(
+        alt.X('Stationing:Q').scale(zero=False), 
+        alt.Y('Elevation:Q').scale(zero=False),
+        alt.Detail('cable'),
+        alt.Color('type')
+        ).properties(
+            width=pwidth,
+            height=pheight
+        )
+    st.write(chart)
+    st.write(_df_acd)
 
 @st.cache_data()
-def Plotelasticity(df) -> None:
+def Plotelasticity(df,yscale) -> None:
     st.write('### Elasticity')
     chart = st.line_chart(
         data = df, x='Stationing', y='Rise (in)', color ='type'
@@ -132,10 +181,13 @@ st.sidebar.checkbox('Consider Alt Conductors', key='altConductors', value=False)
 st.sidebar.checkbox('Perform Elasticity Check', key='elasticity', value=False)
 
 with tab1:
+    cbd = st.container(border=True)
     cdd = st.container(border=True)
     cdd_val = st.container(border=False)
     cwr = st.container(border=True)
     cwr_val = st.container(border=False)
+    with cbd:
+        yExagg = st.number_input(label='Y Scale Exageration', value=5, min_value=1, step=1)
     with cdd:
         ##Design Data
         st.markdown("#### Load catenary system design data")
@@ -179,12 +231,13 @@ with tab1:
 with tab2:
     if ddfile is not None and wrfile is not None:
         Nom = SagData(_dd, wr)
-        PlotSag(Nom)
-        if st.session_state['altConductors']:
-            PlotSagaltCond(Nom)
+        if st.session_state['altConductors']:       
+            PlotSagaltCond(Nom, yExagg)
+        else:
+            PlotSag(Nom, yExagg)
     elif wrfile is None and ddfile is None:
         Nom = SagData(OCS.sample_df_dd(), OCS.sample_df_wr())
-        PlotSagSample(Nom)
+        PlotSagSample(Nom, yExagg)
 with tab3:
     if ddfile is not None and wrfile is not None and st.session_state['elasticity']:
         ec = None
