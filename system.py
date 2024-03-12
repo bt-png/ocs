@@ -381,7 +381,13 @@ class AltCondition():
         if not self._solved:
             self._solve()
         return self._sag
-    
+
+    def dataframe_cw(self):
+        """ return a pandas dataFrame of the wire """
+        if not self._solved:
+            self._solve()
+        return self._df_cw
+
     def dataframe_cwdiff(self):
         """ return the cw elevation difference from original, + is higher """
         if not self._solved:
@@ -400,6 +406,7 @@ class AltCondition_Series():
         self._data = altconductor
         self._bd = basedesign
         self._df = None
+        self._df_cw = None
         self._df_cwdiff = None
         self._df_sr = None
         self._solved = False
@@ -410,6 +417,7 @@ class AltCondition_Series():
                 _acd = split_acd(self._data,index)
                 ALT = AltCondition(_acd,self._bd)
                 _df_tmp = ALT.dataframe()
+                _df_cwd_tmp = ALT.dataframe_cw()
                 _df_cwdiff_tmp = ALT.dataframe_cwdiff()
                 _df_sr_tmp = ALT.dataframe_sr()
                 _df_tmp.type += '_' + row['Load Condition']
@@ -417,14 +425,17 @@ class AltCondition_Series():
                 _df_sr_tmp.type += '_' + row['Load Condition']
                 if index == 0:
                     _df = _df_tmp.copy()
+                    _df_cw = _df_cw_tmp.copy()
                     _df_cwdiff = _df_cwdiff_tmp.copy()
                     _df_sr = _df_sr_tmp.copy()
                 else:
                     #_df_old = _df.copy()
                     _df = pd.concat([_df, _df_tmp], ignore_index=False)
+                    _df_cw = pd.concat([_df_cw, _df_cw_tmp], ignore_index=False)
                     _df_cwdiff = pd.concat([_df_cwdiff, _df_cwdiff_tmp], ignore_index=False)
                     _df_sr = pd.concat([_df_sr, _df_sr_tmp], ignore_index=False)
         self._df = _df
+        self._df_cw = _df_cw
         self._df_cwdiff = _df_cwdiff
         self._df_sr = _df_sr
         self._solved = True
@@ -434,6 +445,11 @@ class AltCondition_Series():
             self._solve()
         return self._df
 
+    def dataframe_cwd(self):
+        if not self._solved:
+            self._solve()
+        return self._df_cw
+    
     def dataframe_cwdiff(self):
         if not self._solved:
             self._solve()
@@ -483,7 +499,7 @@ class Elasticity():
         """ Solve elasticitiy graph and cache results"""
         _st = time.time()
         _elastic = AltCondition(self._cp, self._ref)
-        _originalsag = _elastic.dataframe()
+        _originalsag = _elastic.dataframe_cw()
         if endspt is None:
             endspt = len(self._ref.getwr()['STA'])-1
         _startsta = self._ref.getwr()['STA'].iloc[startspt]
@@ -507,7 +523,7 @@ class Elasticity():
             _cst = time.time()
             #print(i, ' | calculating uplift at STA =', _sta)
             _elastic.resetloadlist((-upliftforce, _sta))
-            _upliftsag = _elastic.dataframe()
+            _upliftsag = _elastic.dataframe_cw()
             #_eldiff = _elastic.dataframe_cwdiff().Elevation
             _eldiff = GenFun.CWELDifference(_originalsag, _upliftsag)
             _diffmin[i] = np.nanmin(_eldiff)
