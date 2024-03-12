@@ -296,6 +296,7 @@ class AltCondition():
     """
     # pylint: disable=too-many-instance-attributes
     def __init__(self, altconductor, basedesign):
+        basedesign._solve()
         self._ref = basedesign
         self._cp = None
         self._ld = np.array([0,0])
@@ -395,6 +396,7 @@ class AltCondition():
 
 class AltCondition_Series():
     def __init__(self, altconductor, basedesign):
+        basedesign._solve()
         self._data = altconductor
         self._bd = basedesign
         self._df = None
@@ -442,6 +444,31 @@ class AltCondition_Series():
             self._solve()
         return self._df_sr
 
+class Elasticity_series():
+    def __init__(self, baseconductor, altconductor, basedesign, upliftforce, stepsize, startspt=0, endspt=None):
+        self._ref = basedesign
+        self._cp = baseconductor
+        self._acp = altconductor
+        self._df = None
+        self._cycle(upliftforce, stepsize, startspt, endspt)
+    
+    def _cycle(self, upliftforce, stepsize, startspt, endspt):
+        EL = Elasticity(self._cp, self._ref, upliftforce, stepsize, startspt, endspt)
+        _df_tmp = EL.dataframe()
+        _df_tmp.type += '_' + 'Base'
+        _df = _df_tmp.copy()
+        for index, row in self._acp.iterrows():
+            if np.isfinite(row['MW Weight']):
+                _acd = split_acd(self._acp,index)
+                EL = Elasticity(_acd, self._ref, upliftforce, stepsize, startspt, endspt)
+                _df_tmp = EL.dataframe()
+                _df_tmp.type += '_' + row['Load Condition']
+                _df = pd.concat([_df, _df_tmp], ignore_index=False)
+        self._df = _df
+
+    def dataframe(self):
+        return self._df
+    
 class Elasticity():
     """ container for calculating span elasticity from an already calculated
     CatenaryFlexible """
@@ -449,13 +476,14 @@ class Elasticity():
     def __init__(self, altconductor, basedesign, upliftforce, stepsize, startspt=0, endspt=None):
         self._ref = basedesign
         self._cp = altconductor
-        self._diff = None
+        self._df = None
         self._cycle(upliftforce, stepsize, startspt, endspt)
 
     def _cycle(self, upliftforce, stepsize, startspt, endspt):
         """ Solve elasticitiy graph and cache results"""
         _st = time.time()
         _elastic = AltCondition(self._cp, self._ref)
+        _originalsag = _elastic.dataframe()
         if endspt is None:
             endspt = len(self._ref.getwr()['STA'])-1
         _startsta = self._ref.getwr()['STA'].iloc[startspt]
@@ -479,7 +507,9 @@ class Elasticity():
             _cst = time.time()
             #print(i, ' | calculating uplift at STA =', _sta)
             _elastic.resetloadlist((-upliftforce, _sta))
-            _eldiff = _elastic.dataframe_cwdiff().Elevation
+            _upliftsag = _elastic.dataframe()
+            #_eldiff = _elastic.dataframe_cwdiff().Elevation
+            _eldiff = GenFun.CWELDifference(_originalsag, _upliftsag)
             _diffmin[i] = np.nanmin(_eldiff)
             _diffmax[i] = np.nanmax(_eldiff)
             _cycleloops[i] = _elastic.getloops()
@@ -498,7 +528,8 @@ class Elasticity():
             'type': 'DiffMAX',
             'cable': 'DiffMAX'
             })
-        self._diff = pd.concat([_df_min, _df_max], ignore_index=False)
+        #self._df = pd.concat([_df_min, _df_max], ignore_index=False)
+        self._df = _df_max
         _et = time.time()
         _totaltime = _et - _st
         _meantime = np.mean(_cycletime)
@@ -507,8 +538,8 @@ class Elasticity():
 
     def savetocsv(self, path):
         """ Output wire data to CSV """
-        self._diff.to_csv(path)
+        self._df.to_csv(path)
 
     def dataframe(self):
         """ return a pandas dataFrame of the wire """
-        return self._diff
+        return self._df

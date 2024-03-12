@@ -8,84 +8,100 @@ import general as GenFun
 
 st.session_state.accesskey = st.session_state.accesskey
 
-def calc1() -> None:
-    with tab1:
-        if ddfile is not None:
-            with cdd_val:
-                cdd0, cdd1, cdd2 = st.columns([0.1, 0.6, 0.3])
-                _dd = pd.read_csv(ddfile)
-                _df_cd, _df_acd, _df_hd, _df_bd, _df_sl = OCS.create_df_dd(_dd)
-                with cdd1:
-                    #st.write(_dd)
-                    st.write('###### Loaded conductor particulars data:')
-                    st.dataframe(_df_cd, hide_index=True)
-                    st.write('###### Loaded alternate conductor particulars data:')
-                    st.dataframe(_df_acd, hide_index=True)
-                    st.write('###### Loaded span point loads:')
-                    st.dataframe(_df_sl, hide_index=True)
-                    P_DiscreteLoad_CW, STA_DiscreteLoad_CW, P_DiscreteLoad_MW, STA_DiscreteLoad_MW = [tuple(_df_sl.iloc[:,i].tolist()) for i in (2,1,3,1)]
-                    #P=(0,0,0,0,0,0)
-                    #st.write(P_DiscreteLoad_CW)
-                with cdd2:
-                    st.write('###### Loaded hanger design variables:')
-                    st.dataframe(_df_hd, hide_index=True)
-                    st.write('###### Loaded calculation constants:')
-                    st.dataframe(_df_bd, hide_index=True)
-                    #xStep, xRound, xMultiplier, yMultiplier, SteadyArmLength = [_df_bd.iloc[i,1] for i in (0,1,2,3,4)]
-        if wrfile is not None:
-            with cwr_val:
-                cwr0, cwr1 = st.columns([0.1, 0.9])
-                with cwr1:
-                    wr = OCS.wire_run(wrfile)
-                    st.write('###### First several rows of input file:')
-                    st.dataframe(wr, hide_index=True)
-    if not st.session_state['pauseCalc']:
-        ## LAYOUT DESIGN
-        if wrfile is not None and ddfile is not None:
-            Nom = OCS.CatenaryFlexible(_dd, wr)
-            df = Nom.dataframe()
-            if st.session_state['altConductors']:
-                LC = OCS.AltCondition_Series(_df_acd, Nom)
-        elif wrfile is None and ddfile is None:
-            Nom = OCS.CatenaryFlexible(OCS.sample_df_dd(), OCS.sample_df_wr())
-            df = Nom.dataframe()
-        else:
-            with tab2:
-                st.markdown('#### Provide data for both system design and wire run!')
-                st.markdown('Sample data is only provided if no files have been uploaded.')
-            st.stop()
-        
-        with tab2:
-            if wrfile is None and ddfile is None:
-                st.markdown('### SAMPLE DATA')
-            st.write('### Catenary Wire Sag Plot')
-            chart = st.line_chart(
-                    data = df, x='Stationing', y='Elevation', color='cable'
-                )
-            if ddfile is not None and st.session_state['altConductors']:
-                st.write(_df_acd)
-                dfa = LC.dataframe()
-                st.write('### Alternate Condition Sag Plot')
-                chart = st.line_chart(
-                    data = dfa, x='Stationing', y='Elevation', color ='type'
-                )
-        with tab3:
-            if ddfile is not None and st.session_state['elasticity']:
-                ec = OCS.Elasticity(_df_cd, Nom, pUplift, stepSize, startSPT, endSPT)
-                dfe = ec.dataframe()
-                st.write('### Elasticity')
-                chart = st.line_chart(
-                    data = dfe, x='Stationing', y='Rise (in)', color ='cable'
-                )
+@st.cache_data()
+def SagData(data, wirerun) -> None:
+    return OCS.CatenaryFlexible(data, wirerun)
 
-        with tab4:
-            st.write('#### Sag Data ', df)
-            st.write('#### HA Data', Nom.dataframe_ha())
-            if ddfile is not None and st.session_state['altConductors']:
-                st.write('#### Alternate Conductor Data', dfa)
-            if ddfile is not None and st.session_state['elasticity']:
-                st.write('#### Elasticity', dfe)
+@st.cache_data()
+def altSagData(data, _ORIG) -> None:
+    return OCS.AltCondition_Series(data, _ORIG)
 
+@st.cache_data()
+def elasticity(_df_cd, _BASE, pUplift, stepSize, startSPT, endSPT) -> None:
+    EL = OCS.Elasticity(_df_cd, _BASE, pUplift, stepSize, startSPT, endSPT)
+    df = EL.dataframe()
+    return df
+
+@st.cache_data()
+def elasticityalt(_df_cd, _df_acd, _BASE, pUplift, stepSize, startSPT, endSPT) -> None:
+    EL = OCS.Elasticity_series(_df_cd, _df_acd, _BASE, pUplift, stepSize, startSPT, endSPT)
+    df = EL.dataframe()
+    return df
+
+@st.cache_data()
+def preview_ddfile(ddfile) -> None:
+    cdd0, cdd1, cdd2 = st.columns([0.1, 0.6, 0.3])
+    with cdd1:
+        #st.write(_dd)
+        st.write('###### Loaded conductor particulars data:')
+        st.dataframe(_df_cd, hide_index=True)
+        st.write('###### Loaded alternate conductor particulars data:')
+        st.dataframe(_df_acd, hide_index=True)
+        st.write('###### Loaded span point loads:')
+        st.dataframe(_df_sl, hide_index=True)
+    with cdd2:
+        st.write('###### Loaded hanger design variables:')
+        st.dataframe(_df_hd, hide_index=True)
+        st.write('###### Loaded calculation constants:')
+        st.dataframe(_df_bd, hide_index=True)
+
+@st.cache_data()
+def preview_wrfile(wrfile) -> None:
+    cwr0, cwr1 = st.columns([0.1, 0.9])
+    with cwr1:
+        st.write('###### First several rows of input file:')
+        st.dataframe(wr, hide_index=True)  
+
+@st.cache_data()
+def PlotSag(_BASE) -> None:
+    df = _BASE.dataframe()
+    st.write('### Catenary Wire Sag Plot')
+    chart = st.line_chart(
+            data = df, x='Stationing', y='Elevation', color='cable'
+        )
+       
+@st.cache_data()
+def PlotSagSample(_BASE) -> None:
+    df = _BASE.dataframe()
+    st.markdown('### SAMPLE DATA')
+    st.write('### Catenary Wire Sag Plot')
+    chart = st.line_chart(
+            data = df, x='Stationing', y='Elevation', color='cable'
+        )
+
+@st.cache_data()
+def PlotSagaltCond(_BASE) -> None:
+    LC = altSagData(_df_acd, _BASE)
+    dfa = LC.dataframe()
+    st.write(_df_acd)
+    st.write('### Alternate Condition Sag Plot')
+    chart = st.line_chart(
+        data = dfa, x='Stationing', y='Elevation', color ='type'
+    )
+
+@st.cache_data()
+def Plotelasticity(df) -> None:
+    st.write('### Elasticity')
+    chart = st.line_chart(
+        data = df, x='Stationing', y='Rise (in)', color ='type'
+    )
+
+@st.cache_data()
+def OutputSag(_BASE) -> None:
+    st.write('#### Sag Data ', _BASE.dataframe())
+    st.write('#### HA Data', _BASE.dataframe_ha())
+
+@st.cache_data()
+def OutputAltCond(_BASE) -> None:
+    LC = altSagData(_df_acd, _BASE)
+    dfa = LC.dataframe()
+    st.write('#### Alternate Conductor Data', dfa)
+
+@st.cache_data()
+def Outputelasticity(df) -> None:
+    st.write('#### Elasticity', df)
+
+@st.cache_data()
 def convert_df(df):
    return df.to_csv(index=False).encode('utf-8')
 
@@ -131,8 +147,10 @@ with tab1:
                 accept_multiple_files = False,
                 key='_ddfile'
                 )
-    #with cdd_val:
-        
+        if ddfile is not None:
+            _dd = pd.read_csv(ddfile)
+            _df_cd, _df_acd, _df_hd, _df_bd, _df_sl = OCS.create_df_dd(_dd)
+            preview_ddfile(ddfile)
     with cwr:
         ##Wire Run Data
         st.markdown("#### Load layout design data for wire run")
@@ -149,13 +167,40 @@ with tab1:
                 accept_multiple_files = False,
                 key='_wrfile'
                 )
+        if wrfile is not None:
+            wr = OCS.wire_run(wrfile)
+            preview_wrfile(wrfile)
+with tab2:
+    if ddfile is not None and wrfile is not None:
+        Nom = SagData(_dd, wr)
+        PlotSag(Nom)
+        if st.session_state['altConductors']:
+            PlotSagaltCond(Nom)
+    elif wrfile is None and ddfile is None:
+        Nom = SagData(OCS.sample_df_dd(), OCS.sample_df_wr())
+        PlotSagSample(Nom)
 with tab3:
-    if ddfile is not None:
-        e0, e1 = st.columns([0.5, 0.5])
-        with e0:
+    if ddfile is not None and wrfile is not None and st.session_state['elasticity']:
+        ec = None
+        with st.form('Input values'):
             pUplift = st.number_input(label='Uplift Force (lbf)', value=25)
             stepSize = st.number_input(label='Resolution (ft)', min_value = 1, step=1, value=1)
-        with e1:
             startSPT = st.number_input(label='Starting structure', value=1)
             endSPT = st.number_input(label='Ending structure', value=2)
-calc1()
+            submit_form = st.form_submit_button('Calculate')
+            if submit_form:
+                if st.session_state['altConductors']:
+                    ec = elasticityalt(_df_cd, _df_acd, Nom, pUplift, stepSize, startSPT, endSPT)
+                else:
+                    ec = elasticity(_df_cd, Nom, pUplift, stepSize, startSPT, endSPT)
+        if ec is not None:
+            Plotelasticity(ec)
+
+with tab4:
+    if ddfile is not None and wrfile is not None:
+        OutputSag(Nom)
+        if st.session_state['altConductors']:
+            OutputAltCond(Nom)
+        if st.session_state['elasticity'] and ec is not None:
+            Outputelasticity(ec)
+

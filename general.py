@@ -162,6 +162,17 @@ def CWSupportELDifference(Stationing, OriginalCWSag, NewCWSag, SupportStationing
     #print('lenSupportSTA', len(SupportStationing), 'lenSTA', len(Stationing), 'lenOrig', len(oSPTEL), 'lenNew', len(nSPTEL))
     return (nSPTEL - oSPTEL, rSTA)
 
+def CWELDifference(dforiginal, dfuplift):
+    oSTA = dforiginal['Stationing']
+    oCWEL = dforiginal['LoadedSag']
+    nSTA = dfuplift['Stationing']
+    nCWEL = dfuplift['LoadedSag']
+    rSTA = nSTA[np.in1d(nSTA, oSTA)]
+    oSPTEL = oCWEL[np.in1d(oSTA, nSTA)]
+    nSPTEL = nCWEL[np.in1d(nSTA, oSTA)]
+    #print('lenSupportSTA', len(SupportStationing), 'lenSTA', len(Stationing), 'lenOrig', len(oSPTEL), 'lenNew', len(nSPTEL))
+    return (nSPTEL - oSPTEL)
+
 # SPAN LOADING
 def LoadSpanWeight(StationList, UnitCableWeight):
     return UnitCableWeight*LoadTribSpan(StationList)
