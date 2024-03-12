@@ -26,8 +26,7 @@ else:
 def run():
     st.set_page_config(
         page_title='OCS Calculations',
-        page_icon='🚊',
-        layout='wide'
+        page_icon='🚊'
     )
     st.write('# Welcome to OCS Calculation Templates!')
     st.markdown(

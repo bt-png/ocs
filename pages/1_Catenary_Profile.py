@@ -160,7 +160,11 @@ def SPTID(num):
         ', STA: ' + str(wr.loc[num, 'STA'])
         )
 
-st.set_page_config(page_title="CAT SAG", page_icon="📹")
+st.set_page_config(
+    page_title="CAT SAG", 
+    page_icon="📹",
+    layout='wide')
+
 st.markdown("# Simple Catenary Sag")
 st.sidebar.header("CAT SAG")
 
