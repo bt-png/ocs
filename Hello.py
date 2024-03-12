@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import streamlit as st
-st.set_page_config(layout="wide")
 from streamlit.logger import get_logger
 import pandas as pd
 
@@ -26,10 +25,11 @@ else:
 
 def run():
     st.set_page_config(
-        page_title="OCS Calculations",
-        page_icon="🚊",
+        page_title='OCS Calculations',
+        page_icon='🚊',
+        layout='wide'
     )
-    st.write("# Welcome to OCS Calculation Templates!")
+    st.write('# Welcome to OCS Calculation Templates!')
     st.markdown(
         """
         These calculation sets are developed by Brett Tharp and
@@ -56,5 +56,5 @@ df = pd.DataFrame({
 'Updated On': ['3/2/2024' ,'3/3/2024' ,'3/4/20243', '3/5/2024']
 })
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     run()
