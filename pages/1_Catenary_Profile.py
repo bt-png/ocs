@@ -105,6 +105,12 @@ def Outputelasticity(df) -> None:
 def convert_df(df):
    return df.to_csv(index=False).encode('utf-8')
 
+def SPTID(num):
+    st.markdown(
+        'Pole: ' + str(wr.loc[num,'PoleID']) + 
+        ', STA: ' + str(wr.loc[num, 'STA'])
+        )
+
 st.set_page_config(page_title="CAT SAG", page_icon="📹")
 st.markdown("# Simple Catenary Sag")
 st.sidebar.header("CAT SAG")
@@ -182,17 +188,27 @@ with tab2:
 with tab3:
     if ddfile is not None and wrfile is not None and st.session_state['elasticity']:
         ec = None
-        with st.form('Input values'):
-            pUplift = st.number_input(label='Uplift Force (lbf)', value=25)
-            stepSize = st.number_input(label='Resolution (ft)', min_value = 1, step=1, value=1)
-            startSPT = st.number_input(label='Starting structure', value=1)
-            endSPT = st.number_input(label='Ending structure', value=2)
-            submit_form = st.form_submit_button('Calculate')
-            if submit_form:
-                if st.session_state['altConductors']:
-                    ec = elasticityalt(_df_cd, _df_acd, Nom, pUplift, stepSize, startSPT, endSPT)
-                else:
-                    ec = elasticity(_df_cd, Nom, pUplift, stepSize, startSPT, endSPT)
+        startSPT = st.number_input(label='Starting structure', value=1, min_value=0, max_value=len(wr)-2)
+        SPTID(startSPT)
+        endSPT = st.number_input(label='Ending structure', value=startSPT+1, min_value=1, max_value=len(wr)-1)
+        SPTID(endSPT)
+        stepSize = st.number_input(label='Resolution (ft)', min_value = 1, step=1, value=1)
+        pUplift = st.number_input(label='Uplift Force (lbf)', value=25)
+        conditions = 1+len(_df_acd)*st.session_state['altConductors']
+        steps = (wr.loc[endSPT, 'STA']-wr.loc[startSPT, 'STA'])/stepSize
+        estCalcTime = 0.789 * conditions * steps
+        m, s = divmod(estCalcTime, 60)
+        if m>1:
+            st.warning('###### This could take up to ' + '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s))
+        else:
+            st.markdown('###### This could take up to ' + '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s))
+        submit_form = st.button('Calculate', key="calcElasticity")
+        if submit_form:
+            if st.session_state['altConductors']:
+                ec = elasticityalt(_df_cd, _df_acd, Nom, pUplift, stepSize, startSPT, endSPT)
+            else:
+                ec = elasticity(_df_cd, Nom, pUplift, stepSize, startSPT, endSPT)
+            st.success('Done!') 
         if ec is not None:
             Plotelasticity(ec)
 

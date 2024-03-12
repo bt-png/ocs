@@ -306,6 +306,7 @@ class AltCondition():
         self._loops = 0
         self._sr = None
         self._srdf = None
+        self._df_cw = None
         self._cwdiffdf = None
         self.updateconductor(altconductor)
 
@@ -341,6 +342,7 @@ class AltCondition():
             'type': 'CW',
             'cable': 'CW'
             })
+        self._df_cw = _df_cw
         _df_mw = pd.DataFrame({
             'Stationing': self._catenarysag.get('Stationing'),
             'Elevation': self._catenarysag.get('LoadedSag_MW'),

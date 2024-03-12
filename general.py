@@ -164,9 +164,7 @@ def CWSupportELDifference(Stationing, OriginalCWSag, NewCWSag, SupportStationing
 
 def CWELDifference(dforiginal, dfuplift):
     oSTA = dforiginal['Stationing']
-    print('oSTA', oSTA)
     oCWEL = dforiginal['Elevation']
-    print('oCWEL', oCWEL)
     nSTA = dfuplift['Stationing']
     nCWEL = dfuplift['Elevation']
     oSPTEL = oCWEL[np.in1d(oSTA, nSTA)]
