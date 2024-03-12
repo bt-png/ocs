@@ -11,7 +11,7 @@ st.session_state.accesskey = st.session_state.accesskey
 def plotdimensions(staList,elList,yscale):
     max_x = max(staList) - min(staList)
     max_y = max(elList) - min(elList)
-    width = 1000
+    width = 1200
     widthratio = width/max_x
     height = widthratio*yscale*max_y
     return int(width), int(height)
@@ -107,9 +107,8 @@ def PlotSagSample(_BASE, yscale) -> None:
     st.write(chart)
 
 @st.cache_data()
-def PlotSagaltCond(_BASE, yscale) -> None:
-    LC = altSagData(_df_cd, _df_acd, _BASE)
-    dfa = LC.dataframe()
+def PlotSagaltCond(_Alt, _BASE, yscale) -> None:
+    dfa = _Alt.dataframe()
     pwidth, pheight = plotdimensions(dfa['Stationing'],dfa['Elevation'],yscale)
     #dfa.Elevation *= yscale
     st.write('### Alternate Condition Sag Plot')
@@ -141,10 +140,11 @@ def OutputSag(_BASE) -> None:
     st.write('#### HA Data', _BASE.dataframe_ha())
 
 @st.cache_data()
-def OutputAltCond(_BASE) -> None:
-    LC = altSagData(_df_acd, _BASE)
-    dfa = LC.dataframe()
+def OutputAltCond(_Ref, _BASE) -> None:
+    #LC = altSagData(_df_cd, _df_acd, _BASE)
+    dfa = _Ref.dataframe()
     st.write('#### Alternate Conductor Data', dfa)
+    st.write('#### HA Data', _BASE.dataframe_ha())
 
 @st.cache_data()
 def Outputelasticity(df) -> None:
@@ -232,7 +232,8 @@ with tab2:
     if ddfile is not None and wrfile is not None:
         Nom = SagData(_dd, wr)
         if st.session_state['altConductors']:       
-            PlotSagaltCond(Nom, yExagg)
+            Ref = altSagData(_df_cd, _df_acd, Nom)
+            PlotSagaltCond(Ref, Nom, yExagg)
         else:
             PlotSag(Nom, yExagg)
     elif wrfile is None and ddfile is None:
@@ -267,9 +268,10 @@ with tab3:
 
 with tab4:
     if ddfile is not None and wrfile is not None:
-        OutputSag(Nom)
         if st.session_state['altConductors']:
-            OutputAltCond(Nom)
+            OutputAltCond(Ref, Nom)
+        else:
+            OutputSag(Nom)
         if st.session_state['elasticity'] and ec is not None:
             Outputelasticity(ec)
 
