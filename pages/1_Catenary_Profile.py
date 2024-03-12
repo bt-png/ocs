@@ -70,20 +70,40 @@ def PlotSagst(_BASE, yscale) -> None:
         )
 
 @st.cache_data()
-def PlotSag(_BASE, yscale) -> None:
-    df = _BASE.dataframe()
+def PlotSag(_REF, yscale) -> None:
+    df = _REF.dataframe()
     pwidth, pheight = plotdimensions(df['Stationing'],df['Elevation'],yscale)
-    #df.Elevation *= yscale
-    st.write('### Catenary Wire Sag Plot')
+    selection = alt.selection_point(fields=['type'], bind='legend')
     chart = alt.Chart(df).mark_line().encode(
         alt.X('Stationing:Q').scale(zero=False), 
-        alt.Y('Elevation:Q').scale(zero=False, type='linear'),
-        alt.Detail('cable')
-        ).properties(
+        alt.Y('Elevation:Q').scale(zero=False),
+        alt.Detail('cable'),
+        alt.Color('type'),
+        opacity=alt.condition(selection, alt.value(1), alt.value(0.1))
+        ).add_params(selection).properties(
             width=pwidth,
             height=pheight
         )
     st.write(chart)
+
+@st.cache_data()
+def PlotSagaltCond(_REF, yscale) -> None:
+    dfa = _REF.dataframe()
+    pwidth, pheight = plotdimensions(dfa['Stationing'],dfa['Elevation'],yscale)
+    st.write('### Catenary Wire Sag Plot')
+    selection = alt.selection_point(fields=['type'], bind='legend')
+    chart = alt.Chart(dfa).mark_line().encode(
+        alt.X('Stationing:Q').scale(zero=False), 
+        alt.Y('Elevation:Q').scale(zero=False),
+        alt.Detail('cable'),
+        alt.Color('type'),
+        opacity=alt.condition(selection, alt.value(1), alt.value(0.1))
+        ).add_params(selection).properties(
+            width=pwidth,
+            height=pheight
+        )
+    st.write(chart)
+    st.write(_df_acd)
 
 @st.cache_data()
 def PlotSagSample(_BASE, yscale) -> None:
@@ -107,32 +127,19 @@ def PlotSagSample(_BASE, yscale) -> None:
     st.write(chart)
 
 @st.cache_data()
-def PlotSagaltCond(_Alt, _BASE, yscale) -> None:
-    dfa = _Alt.dataframe()
-    pwidth, pheight = plotdimensions(dfa['Stationing'],dfa['Elevation'],yscale)
-    #dfa.Elevation *= yscale
-    st.write('### Alternate Condition Sag Plot')
-    #chart = st.line_chart(
-    #    data = dfa, x='Stationing', y='Elevation', color ='type'
-    #)
-    chart = alt.Chart(dfa).mark_line().encode(
-        alt.X('Stationing:Q').scale(zero=False), 
-        alt.Y('Elevation:Q').scale(zero=False),
-        alt.Detail('cable'),
-        alt.Color('type')
-        ).properties(
-            width=pwidth,
-            height=pheight
-        )
-    st.write(chart)
-    st.write(_df_acd)
-
-@st.cache_data()
 def Plotelasticity(df) -> None:
     st.write('### Elasticity')
-    chart = st.line_chart(
-        data = df, x='Stationing', y='Rise (in)', color ='type'
-    )
+    #chart = st.line_chart(
+    #    data = df, x='Stationing', y='Rise (in)', color ='type'
+    #)
+    selection = alt.selection_point(fields=['type'], bind='legend')
+    chart = alt.Chart(df).mark_line().encode(
+        alt.X('Stationing:Q').scale(zero=False), 
+        alt.Y('Rise (in):Q').scale(zero=False),
+        alt.Color('type'),
+        opacity=alt.condition(selection, alt.value(1), alt.value(0.1))
+        ).add_params(selection)
+    st.write(chart)
 
 @st.cache_data()
 def OutputSag(_BASE) -> None:
@@ -237,7 +244,7 @@ with tab2:
         Nom = SagData(_dd, wr)
         if st.session_state['altConductors']:       
             Ref = altSagData(_df_cd, _df_acd, Nom)
-            PlotSagaltCond(Ref, Nom, yExagg)
+            PlotSagaltCond(Ref, yExagg)
         else:
             PlotSag(Nom, yExagg)
     elif wrfile is None and ddfile is None:
