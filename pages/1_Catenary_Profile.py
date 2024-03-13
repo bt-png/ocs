@@ -301,4 +301,3 @@ with tab4:
             )
         if st.session_state['elasticity'] and ec is not None:
             Outputelasticity(ec)
-        st.write(acadScript)
