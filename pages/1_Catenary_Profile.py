@@ -192,7 +192,6 @@ if st.session_state['accesskey'] != st.secrets['accesskey']:
 
 tab1, tab2, tab3, tab4 = st.tabs(['Input', 'Sag Plot', 'Elasticity', 'Output'])
 
-st.sidebar.checkbox('Pause Calculation', key='pauseCalc', value=False)
 st.sidebar.checkbox('Consider Alt Conductors', key='altConductors', value=False)
 st.sidebar.checkbox('Perform Elasticity Check', key='elasticity', value=False)
 
