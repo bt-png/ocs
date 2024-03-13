@@ -189,7 +189,7 @@ def _pad_scr(txt) -> str:
     val = '(setq oldsnap (getvar "osmode"))\n'
     val += '(setvar "osmode" 0)\n'
     val += txt
-    val += '\n' + '(setvar "osmode" oldsnap)\n'
+    val += '(setvar "osmode" oldsnap)\n'
     return val
     
 def SagtoCAD(ref) -> str:
