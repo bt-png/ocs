@@ -293,7 +293,7 @@ with tab4:
                 acadScript2 = OCS.SagtoCAD(Nom, yExagg)
         with cdd2:
             st.markdown('#### Download CAD Scripts')
-            with st.container(border=True)
+            with st.container(border=True):
                 st.write('Cable Profile')
                 st.download_button(
                     label="### press for 1:1 scale",
@@ -307,7 +307,7 @@ with tab4:
                     file_name="_sag_.scr",
                     mime="text/scr"
                 )
-            with st.container(border=True)
+            with st.container(border=True):
                 st.write('Text labels')
         if st.session_state['elasticity'] and ec is not None:
             Outputelasticity(ec)
