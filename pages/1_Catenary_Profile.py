@@ -258,7 +258,7 @@ with tab3:
         SPTID(startSPT)
         endSPT = st.number_input(label='Ending structure', value=startSPT+1, min_value=1, max_value=len(wr)-1)
         SPTID(endSPT)
-        stepSize = st.number_input(label='Resolution (ft)', min_value = 1, step=1, value=1)
+        stepSize = st.number_input(label='Resolution (ft)', min_value = 1, step=1, value=10)
         pUplift = st.number_input(label='Uplift Force (lbf)', value=25)
         conditions = 1+len(_df_acd)*st.session_state['altConductors']
         steps = (wr.loc[endSPT, 'STA']-wr.loc[startSPT, 'STA'])/stepSize
