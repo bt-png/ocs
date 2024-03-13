@@ -183,8 +183,8 @@ def SagtoCAD(ref):
     df = ref.dataframe()
     df.drop(['type', 'cable'], axis=1, inplace=True)
     dfh =ref.dataframe_ha()
-    txt_df = df.to_csv(index=False).encode('utf-8')
-    txt_df = bytes('pline') + txt_df
+    txt_df = df.to_csv(index=False)
+    txt_df = 'pline' + txt_df
     txt_dfh = dfh.to_csv(index=False).encode('utf-8')
     return txt_df
     
