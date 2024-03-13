@@ -108,7 +108,7 @@ def PlotCWDiff(_REF) -> None:
     selection = alt.selection_point(fields=['type'], bind='legend')
     chart = alt.Chart(df).mark_line().encode(
         alt.X('Stationing:Q').scale(zero=False), 
-        alt.Y('Elevation:Q').scale(zero=False),
+        alt.Y('Elevation:Q', title='EL Difference (in)').scale(zero=False),
         alt.Detail('cable'),
         alt.Color('type'),
         opacity=alt.condition(selection, alt.value(1), alt.value(0.1))
