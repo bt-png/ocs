@@ -120,7 +120,7 @@ def PlotCWDiff(_REF) -> None:
     points = line.mark_point().encode(opacity=alt.condition(nearest, alt.value(1), alt.value(0)))
     text = line.mark_text(align='left', dx=5, dy=-5).encode(text=alt.condition(nearest, 'Elevation:Q', alt.value(' ')))
     rules = alt.Chart(df).mark_rule(color='gray').encode(x='Stationing:Q').transform_filter(nearest)
-    chart = alt.layer(line + selectors + points + rules + text).properties(width=pwidth, height=300).interactive()
+    chart = alt.layer(line + selectors + points + rules + text).properties(width=pwidth, height=300)
     st.write(chart)
 
     #selection = alt.selection_point(fields=['type'], bind='legend')
