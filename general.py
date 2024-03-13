@@ -73,7 +73,7 @@ def sag(l,H,G,h,a):
 # SPAN GEOMETRY
 def x_SPAN_LIST(WR, STA_Step, STARound):
     STAStart = RoundVal(WR['STA'].iloc[0],STARound)
-    STAEnd = RoundVal(WR['STA'].iloc[-1],STARound
+    STAEnd = RoundVal(WR['STA'].iloc[-1],STARound)
     #TotalElements=int((STAEnd-STAStart)/STA_Step)
     #val = np.linspace(STAStart,STAEnd,num=TotalElements, endpoint=True)
     val = np.range(STAStart, STAEnd, RoundVal(STA_Step,STARound))
