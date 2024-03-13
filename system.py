@@ -199,7 +199,8 @@ def ha_scr(_df) -> str:
         str(x) + "'," + str(z)
         for x, y, z in
         zip(df['Stationing'], df['CW Elevation'], df['MW Elevation'])])
-    val = df.to_csv(columns=['hastr'], index=False, header=False, quoting=2, encoding='UTF-8')
+    val = df.to_csv(columns=['hastr'], index=False, header=False, encoding='UTF-8')
+    val = val.strip('"')
     return val
 
 def _pad_scr(txt) -> str:
