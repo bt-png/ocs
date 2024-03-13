@@ -190,7 +190,19 @@ def sag_scr(_df) -> str:
     val += _df.to_csv(columns=['Stationing', 'Elevation'], index=False, header=False, encoding='UTF-8')
     val += '\n'
     return val
-    
+
+def ha_scr(_df) -> str:
+    df = _df.copy()
+    df = df.assign(hastr=[
+        'line ' + 
+        str(x) + "'," + str(y) + "' " +
+        str(x) + "'," + str(z) + ","
+        for x, y, z in
+        zip(df['Stationing'], df['CW Elevation'], df['MW Elevation'])])
+    val = df.to_csv(columns=['hastr'], index=False, header=False, encoding='UTF-8')
+    val += '\n'
+    return val
+
 def _pad_scr(txt) -> str:
     val = '(setq oldsnap (getvar "osmode"))\n'
     val += '(setvar "osmode" 0)\n'
@@ -206,6 +218,10 @@ def SagtoCAD(ref, yscale=1) -> str:
     txt = sag_scr(df_mw)
     df_cw = df[df.cable == 'CW']
     txt += sag_scr(df_cw)
+    _df = ref.dataframe_ha()
+    _df['CW Elevation'] = _df['CW Elevation'] * yscale
+    _df['MW Elevation'] = _df['MW Elevation'] * yscale
+    txt += ha_scr(_df)
     val = _pad_scr(txt)
     return val
     
