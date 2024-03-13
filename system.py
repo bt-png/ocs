@@ -181,7 +181,7 @@ def wire_run(path, first=None, last=None):
 
 def sag_scr(_df) -> str:
     val = 'pline\n'
-    val += _df.to_csv(columns=['Stationing', 'Elevation'], index=False, heade=False, encoding='UTF-8')
+    val += _df.to_csv(columns=['Stationing', 'Elevation'], index=False, header=False, encoding='UTF-8')
     val += '\n'
     return val
 
