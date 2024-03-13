@@ -179,6 +179,12 @@ def wire_run(path, first=None, last=None):
     _df.iloc[:,1:] = _df.iloc[:,1:].astype(float)
     return _df
 
+def df_ft(_df):
+    df = _df.copy()
+    df['Stationing'] = (df['Stationing'].astype(str) + "'")
+    df['Elevation'] = (df['Elevation'].astype(str) + "'")
+    return df
+    
 def sag_scr(_df) -> str:
     val = 'pline\n'
     val += _df.to_csv(columns=['Stationing', 'Elevation'], index=False, header=False, encoding='UTF-8')
@@ -194,10 +200,11 @@ def _pad_scr(txt) -> str:
     
 def SagtoCAD(ref) -> str:
     _df = ref.dataframe()
-    _df_mw = _df[_df.cable == 'MW']
-    txt = sag_scr(_df_mw)
-    _df_cw = _df[_df.cable == 'CW']
-    txt += sag_scr(_df_cw)
+    df = df_ft(_df)
+    df_mw = df[df.cable == 'MW']
+    txt = sag_scr(df_mw)
+    df_cw = df[df.cable == 'CW']
+    txt += sag_scr(df_cw)
     val = _pad_scr(txt)
     return val
     
