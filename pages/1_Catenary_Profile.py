@@ -102,7 +102,7 @@ def PlotSagaltCond(_REF, yscale) -> None:
 @st.cache_data()
 def PlotCWDiff(_REF) -> None:
     df = _REF.dataframe_cwdiff()
-    pwidth, pheight = plotdimensions(df['Stationing'],df['Elevation'],yscale)
+    pwidth, pheight = plotdimensions(df['Stationing'],df['Elevation'])
     st.write('### CW Elevation Difference')
     selection = alt.selection_point(fields=['type'], bind='legend')
     chart = alt.Chart(df).mark_line().encode(
