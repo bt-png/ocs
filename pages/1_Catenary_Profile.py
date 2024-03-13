@@ -298,14 +298,14 @@ with tab4:
                 with a1:
                     st.write('Cable Profile')
                 with b1:
-                    st.download_button(
+                    bt1 = st.download_button(
                         label="### 1:1 scale",
                         data=acadScript1,
                         file_name="_sag_.scr",
                         mime="text/scr"
                     )
                 with c1:
-                    st.download_button(
+                    bt2 = st.download_button(
                         label="### yExaggeration",
                         data=acadScript2,
                         file_name="_sag_.scr",
@@ -316,14 +316,14 @@ with tab4:
                 with a2:
                     st.write('Text Labels')
                 with b2:
-                    st.download_button(
+                    bt3 = st.download_button(
                         label="### 1:1 scale",
                         data=acadScript1,
                         file_name="_sag_.scr",
                         mime="text/scr"
                     )
                 with c2:
-                    st.download_button(
+                    bt4 = st.download_button(
                         label="### yExaggeration",
                         data=acadScript2,
                         file_name="_sag_.scr",
