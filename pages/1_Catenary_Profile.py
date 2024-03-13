@@ -314,7 +314,7 @@ with tab4:
             with st.container(border=True):
                 a, b, c = st.columns([0.4, 0.3, 0.3])
                 with a:
-                    st.write('Cable Profile')
+                    st.write('Text Labels')
                 with b:
                     st.download_button(
                         label="### 1:1 scale",
