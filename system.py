@@ -184,13 +184,21 @@ def sag_scr(_df) -> str:
     val += _df.to_csv(columns=['Stationing', 'Elevation'], index=False, header=False, encoding='UTF-8')
     val += '\n'
     return val
-
+    
+def _pad_scr(txt) -> str:
+    val = '(setq oldsnap (getvar "osmode"))\n'
+    val += '(setvar "osmode" 0)\n'
+    val += txt
+    val += '\n' + '(setvar "osmode" oldsnap)\n'
+    return val
+    
 def SagtoCAD(ref) -> str:
     _df = ref.dataframe()
     _df_mw = _df[_df.cable == 'MW']
-    val = sag_scr(_df_mw)
+    txt = sag_scr(_df_mw)
     _df_cw = _df[_df.cable == 'CW']
-    val += sag_scr(_df_cw)
+    txt += sag_scr(_df_cw)
+    val = _pad_scr(txt)
     return val
     
 class CatenaryFlexible():
