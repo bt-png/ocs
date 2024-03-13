@@ -181,6 +181,7 @@ def wire_run(path, first=None, last=None):
     
 def SagtoCAD(ref):
     df = ref.dataframe()
+    df.drop(['type', 'cable'], axis=1, inplace=True)
     dfh =ref.dataframe_ha()
     txt_df = df.to_csv(index=False).encode('utf-8')
     txt_dfh = dfh.to_csv(index=False).encode('utf-8')
