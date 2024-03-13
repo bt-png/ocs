@@ -113,7 +113,7 @@ def PlotCWDiff(_REF) -> None:
         opacity=alt.condition(selection, alt.value(1), alt.value(0.1))
         ).add_params(selection).properties(
             width=pwidth,
-            height=150
+            height=300
         ).interactive()
     st.write(chart)
     
