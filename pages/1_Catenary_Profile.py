@@ -296,18 +296,20 @@ with tab4:
             with st.container(border=True):
                 st.write('Cable Profile')
                 a, b = st.columns([0.5, 0.5])
-                a.st.download_button(
-                    label="### 1:1 scale",
-                    data=acadScript1,
-                    file_name="_sag_.scr",
-                    mime="text/scr"
-                )
-                b.st.download_button(
-                    label="### yExaggeration",
-                    data=acadScript2,
-                    file_name="_sag_.scr",
-                    mime="text/scr"
-                )
+                with a:
+                    st.download_button(
+                        label="### 1:1 scale",
+                        data=acadScript1,
+                        file_name="_sag_.scr",
+                        mime="text/scr"
+                    )
+                with b:
+                    st.download_button(
+                        label="### yExaggeration",
+                        data=acadScript2,
+                        file_name="_sag_.scr",
+                        mime="text/scr"
+                    )
             with st.container(border=True):
                 st.write('Text labels')
         if st.session_state['elasticity'] and ec is not None:
