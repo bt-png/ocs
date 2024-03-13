@@ -484,8 +484,8 @@ class AltCondition_Series():
                 _df_sr_tmp = ALT.dataframe_sr()
                 #_df_tmp.type += '_' + row['Load Condition']
                 _df_tmp.type = row['Load Condition']
-                _df_cwdiff_tmp.type += '_' + row['Load Condition']
-                _df_sr_tmp.type += '_' + row['Load Condition']
+                _df_cwdiff_tmp.type = row['Load Condition']
+                _df_sr_tmp.type = row['Load Condition']
                 _df = pd.concat([_df, _df_tmp], ignore_index=False)
                 _df_cw = pd.concat([_df_cw, _df_cw_tmp], ignore_index=False)
                 _df_cwdiff = pd.concat([_df_cwdiff, _df_cwdiff_tmp], ignore_index=False)
