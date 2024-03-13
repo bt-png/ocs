@@ -76,7 +76,7 @@ def x_SPAN_LIST(WR, STA_Step, STARound):
     STAEnd = RoundVal(WR['STA'].iloc[-1],STARound
     #TotalElements=int((STAEnd-STAStart)/STA_Step)
     #val = np.linspace(STAStart,STAEnd,num=TotalElements, endpoint=True)
-    val = range(STAStart, STAEnd, RoundVal(STA_Step,STARound))
+    val = np.range(STAStart, STAEnd, RoundVal(STA_Step,STARound))
     val = np.unique(RoundVal(val,STARound))
     return val
 
