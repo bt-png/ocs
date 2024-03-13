@@ -108,7 +108,7 @@ def PlotCWDiff(_REF) -> None:
     nearest = alt.selection_point(nearest=True, on='mouseover', fields=['Stationing'], empty=False)
     line = alt.Chart(df).mark_line().encode(
         alt.X('Stationing:Q').scale(zero=False), 
-        alt.Y('Elevation:Q').scale(zero=False),
+        alt.Y('Elevation:Q', title='CW Diff (in)').scale(zero=False),
         alt.Detail('cable'),
         alt.Color('type')
     )
