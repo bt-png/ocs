@@ -61,15 +61,6 @@ def preview_wrfile(wrfile) -> None:
         st.dataframe(wr, hide_index=True)  
 
 @st.cache_data()
-def PlotSagst(_BASE, yscale) -> None:
-    df = _BASE.dataframe()
-    df.Elevation *= yscale
-    st.write('### Catenary Wire Sag Plot')
-    chart = st.line_chart(
-            data = df, x='Stationing', y='Elevation', color='cable'
-        )
-
-@st.cache_data()
 def PlotSag(_REF, yscale) -> None:
     df = _REF.dataframe()
     pwidth, pheight = plotdimensions(df['Stationing'],df['Elevation'],yscale)
@@ -112,21 +103,19 @@ def PlotSagaltCond(_REF, yscale) -> None:
 def PlotSagSample(_BASE, yscale) -> None:
     df = _BASE.dataframe()
     pwidth, pheight = plotdimensions(df['Stationing'],df['Elevation'],yscale)
-    #df.Elevation *= yscale
     st.markdown('### SAMPLE DATA')
     st.write('### Catenary Wire Sag Plot')
-    #chart = st.line_chart(
-    #        data = df, x='Stationing', y='Elevation', color='cable'
-    #    )
-    #st.write(chart)
+    selection = alt.selection_point(fields=['type'], bind='legend')
     chart = alt.Chart(df).mark_line().encode(
         alt.X('Stationing:Q').scale(zero=False), 
         alt.Y('Elevation:Q').scale(zero=False, type='linear'),
-        alt.Detail('cable')
-        ).properties(
+        alt.Detail('cable'),
+        alt.Color('type'),
+        opacity=alt.condition(selection, alt.value(1), alt.value(0.1))
+        ).add_params(selection).properties(
             width=pwidth,
             height=pheight
-        )
+        ).interactive()
     st.write(chart)
 
 @st.cache_data()
