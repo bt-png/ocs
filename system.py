@@ -176,7 +176,7 @@ def wire_run(path, first=None, last=None):
     _df = pd.read_csv(path)
     _df = _df.truncate(before=first, after=last, copy=False)
     _df.reset_index(drop=True, inplace=True)
-    _df.iloc[:,1:] = _df.iloc[:,1:].astype(np.float16)
+    _df.iloc[:,1:] = _df.iloc[:,1:].astype(float)
     return _df
 
 def sag_scr(_df) -> str:
