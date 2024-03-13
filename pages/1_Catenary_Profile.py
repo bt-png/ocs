@@ -104,7 +104,9 @@ def PlotSagaltCond(_REF, yscale) -> None:
             height=pheight
         )
     st.write(chart)
-    st.write(_df_acd)
+    #st.write(_df_acd)
+    st.write('###### Loaded alternate conductor particulars data:')
+    st.dataframe(_df_acd, hide_index=True)
 
 @st.cache_data()
 def PlotSagSample(_BASE, yscale) -> None:
