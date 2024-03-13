@@ -178,7 +178,11 @@ def wire_run(path, first=None, last=None):
     _df.reset_index(drop=True, inplace=True)
     _df.iloc[:,1:] = _df.iloc[:,1:].astype(float)
     return _df
-
+    
+def SagtoCAD(ref):
+    df = ref.dataframe()
+    dfh =ref.dataframe_ha()
+    
 class CatenaryFlexible():
     """ A simple container for the catenary system containing all design data
     """
