@@ -311,23 +311,5 @@ with tab4:
                         file_name="_sag_.scr",
                         mime="text/scr"
                     )
-            with st.container(border=True):
-                a2, b2, c2 = st.columns([0.4, 0.3, 0.3])
-                with a2:
-                    st.write('Text Labels')
-                with b2:
-                    bt3 = st.download_button(
-                        label="### 1:1 scale",
-                        data=acadScript1,
-                        file_name="_sag_.scr",
-                        mime="text/scr"
-                    )
-                with c2:
-                    bt4 = st.download_button(
-                        label="### yExaggeration",
-                        data=acadScript2,
-                        file_name="_sag_.scr",
-                        mime="text/scr"
-                    )   
         if st.session_state['elasticity'] and ec is not None:
             Outputelasticity(ec)
