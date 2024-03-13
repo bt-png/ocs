@@ -185,7 +185,8 @@ def sag_scr(_df) -> str:
     val += '\n'
     return val
 
-def SagtoCAD(_df) -> str:
+def SagtoCAD(ref) -> str:
+    _df = ref.dataframe()
     _df_mw = _df[_df.cable == 'MW']
     val = sag_scr(_df_mw)
     _df_cw = _df[_df.cable == 'CW']
