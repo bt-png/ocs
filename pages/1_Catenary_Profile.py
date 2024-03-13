@@ -107,13 +107,12 @@ def PlotCWDiff(_REF) -> None:
     st.write('### CW Elevation Difference')
     
     nearest = alt.selection_point(nearest=True, on='mouseover', fields=['Stationing'], empty=False)
-    selection = alt.selection_point(fields=['type'], bind='legend')
     line = alt.Chart(df).mark_line().encode(
         alt.X('Stationing:Q').scale(zero=False), 
         alt.Y('Elevation:Q').scale(zero=False),
         alt.Detail('cable'),
         alt.Color('type')
-    ).add_params(selection)
+    )
     selectors = alt.Chart(df).mark_point().encode(
         alt.X('Stationing:Q'),
         opacity=alt.value(0)
