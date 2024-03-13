@@ -178,15 +178,19 @@ def wire_run(path, first=None, last=None):
     _df.reset_index(drop=True, inplace=True)
     _df.iloc[:,1:] = _df.iloc[:,1:].astype(float)
     return _df
-    
-def SagtoCAD(ref):
-    df = ref.dataframe()
-    df.drop(['type', 'cable'], axis=1, inplace=True)
-    dfh =ref.dataframe_ha()
-    txt_df = df.to_csv(index=False)
-    txt_df = 'pline' + txt_df
-    txt_dfh = dfh.to_csv(index=False).encode('utf-8')
-    return txt_df
+
+def sag_scr(_df) -> str:
+    val = 'pline\n'
+    val += _df.to_csv(columns=['Stationing', 'Elevation'], index=False, heade=False, encoding='UTF-8')
+    val += '\n'
+    return val
+
+def SagtoCAD(_df) -> str:
+    _df_mw = _df[_df.cable == 'MW']
+    val = sag_scr(_df_mw)
+    _df_cw = _df[_df.cable == 'CW']
+    val += sag_scr(_df_cw)
+    return val
     
 class CatenaryFlexible():
     """ A simple container for the catenary system containing all design data
