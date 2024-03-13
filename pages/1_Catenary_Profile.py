@@ -297,14 +297,7 @@ with tab4:
                 a, b, c = st.columns([0.4, 0.3, 0.3])
                 with a:
                     st.write('Cable Profile')
-                    st.write('Text labels')
                 with b:
-                    st.download_button(
-                        label="### 1:1 scale",
-                        data=acadScript1,
-                        file_name="_sag_.scr",
-                        mime="text/scr"
-                    )
                     st.download_button(
                         label="### 1:1 scale",
                         data=acadScript1,
@@ -318,11 +311,23 @@ with tab4:
                         file_name="_sag_.scr",
                         mime="text/scr"
                     )
+            with st.container(border=True):
+                a, b, c = st.columns([0.4, 0.3, 0.3])
+                with a:
+                    st.write('Cable Profile')
+                with b:
+                    st.download_button(
+                        label="### 1:1 scale",
+                        data=acadScript1,
+                        file_name="_sag_.scr",
+                        mime="text/scr"
+                    )
+                with c:
                     st.download_button(
                         label="### yExaggeration",
                         data=acadScript2,
                         file_name="_sag_.scr",
                         mime="text/scr"
-                    )               
+                    )   
         if st.session_state['elasticity'] and ec is not None:
             Outputelasticity(ec)
