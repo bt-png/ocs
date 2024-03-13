@@ -73,6 +73,7 @@ def PlotSagst(_BASE, yscale) -> None:
 def PlotSag(_REF, yscale) -> None:
     df = _REF.dataframe()
     pwidth, pheight = plotdimensions(df['Stationing'],df['Elevation'],yscale)
+    st.write('### Catenary Wire Sag Plot')
     selection = alt.selection_point(fields=['type'], bind='legend')
     chart = alt.Chart(df).mark_line().encode(
         alt.X('Stationing:Q').scale(zero=False), 
