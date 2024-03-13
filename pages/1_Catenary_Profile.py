@@ -105,6 +105,7 @@ def PlotCWDiff(_REF) -> None:
     df['Elevation'] *= 12
     pwidth, pheight = plotdimensions(df['Stationing'],df['Elevation'])
     st.write('### CW Elevation Difference')
+    
     nearest = alt.selection(type='single', nearest=True, on='mouseover', fields=['Stationing'], empty='none')
     line = alt.Chart(df).mark_line().encode(
         alt.X('Stationing:Q').scale(zero=False), 
@@ -120,7 +121,9 @@ def PlotCWDiff(_REF) -> None:
     text = line.mark_text(align='left', dx=5, dy=-5).encode(text=alt.condition(nearest, 'Elevation:Q', alt.value(' ')))
     rules = alt.Chart(df).mark_rule(color='gray').encode(x='Stationing:Q').transform_filter(nearest.ref())
     chart = (line + selectors + points + rules + text).properties(width=pwidth, height=300)
-    chart
+    #chart
+    line
+    selectors
     #selection = alt.selection_point(fields=['type'], bind='legend')
     #chart = alt.Chart(df).mark_line().encode(
     #    alt.X('Stationing:Q').scale(zero=False), 
