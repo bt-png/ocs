@@ -105,7 +105,7 @@ def PlotCWDiff(_REF) -> None:
     df['Elevation'] *= 12
     pwidth, pheight = plotdimensions(df['Stationing'],df['Elevation'])
     st.write('### CW Elevation Difference')
-    nearest = alt.selection(type='single', nearest=True, on='mouseover', fields=('Stationing:Q', empty='none')
+    nearest = alt.selection(type='single', nearest=True, on='mouseover', fields=['Stationing'], empty='none')
     line = alt.Chart(df).mark_line().encode(
         alt.X('Stationing:Q').scale(zero=False), 
         alt.Y('Elevation:Q', title='EL Difference (in)').scale(zero=False),
