@@ -17,12 +17,12 @@ def plotdimensions(staList,elList,yscale):
     return int(width), int(height)
 
 @st.cache_data()
-def SagData(data, wirerun) -> None:
-    return OCS.CatenaryFlexible(data, wirerun)
+def SagData(_df_cd, wirerun) -> None:
+    return OCS.CatenaryFlexible(_df_cd, wirerun)
 
 @st.cache_data()
-def altSagData(bcd, data, _ORIG) -> None:
-    return OCS.AltCondition_Series(bcd, data, _ORIG)
+def altSagData(_df_cd, _df_acd, _ORIG) -> None:
+    return OCS.AltCondition_Series(_df_cd, _df_acd, _ORIG)
 
 @st.cache_data()
 def elasticity(_df_cd, _BASE, pUplift, stepSize, startSPT, endSPT) -> None:
