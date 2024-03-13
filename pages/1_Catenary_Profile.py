@@ -294,17 +294,17 @@ with tab4:
         with cdd2:
             st.markdown('#### Download CAD Scripts')
             with st.container(border=True):
-                a, b, c = st.columns([0.4, 0.3, 0.3])
-                with a:
+                a1, b1, c1 = st.columns([0.4, 0.3, 0.3])
+                with a1:
                     st.write('Cable Profile')
-                with b:
+                with b1:
                     st.download_button(
                         label="### 1:1 scale",
                         data=acadScript1,
                         file_name="_sag_.scr",
                         mime="text/scr"
                     )
-                with c:
+                with c1:
                     st.download_button(
                         label="### yExaggeration",
                         data=acadScript2,
@@ -312,17 +312,17 @@ with tab4:
                         mime="text/scr"
                     )
             with st.container(border=True):
-                a, b, c = st.columns([0.4, 0.3, 0.3])
-                with a:
+                a2, b2, c2 = st.columns([0.4, 0.3, 0.3])
+                with a2:
                     st.write('Text Labels')
-                with b:
+                with b2:
                     st.download_button(
                         label="### 1:1 scale",
                         data=acadScript1,
                         file_name="_sag_.scr",
                         mime="text/scr"
                     )
-                with c:
+                with c2:
                     st.download_button(
                         label="### yExaggeration",
                         data=acadScript2,
