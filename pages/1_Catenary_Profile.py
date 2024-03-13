@@ -295,14 +295,15 @@ with tab4:
             st.markdown('#### Download CAD Scripts')
             with st.container(border=True):
                 st.write('Cable Profile')
-                st.download_button(
-                    label="### press for 1:1 scale",
+                a, b = st.columns([0.5, 0.5])
+                a.st.download_button(
+                    label="### 1:1 scale",
                     data=acadScript1,
                     file_name="_sag_.scr",
                     mime="text/scr"
                 )
-                st.download_button(
-                    label="### press for yExaggeration",
+                b.st.download_button(
+                    label="### yExaggeration",
                     data=acadScript2,
                     file_name="_sag_.scr",
                     mime="text/scr"
