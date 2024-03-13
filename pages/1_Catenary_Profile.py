@@ -120,8 +120,8 @@ def PlotCWDiff(_REF) -> None:
     text = line.mark_text(align='left', dx=5, dy=-5).encode(text=alt.condition(nearest, 'Elevation:Q', alt.value(' ')))
     rules = alt.Chart(df).mark_rule(color='gray').encode(x='Stationing:Q').transform_filter(nearest.ref())
     chart = (line + selectors + points + rules + text).properties(width=pwidth, height=300)
-        
-    selection = alt.selection_point(fields=['type'], bind='legend')
+    chart
+    #selection = alt.selection_point(fields=['type'], bind='legend')
     #chart = alt.Chart(df).mark_line().encode(
     #    alt.X('Stationing:Q').scale(zero=False), 
     #    alt.Y('Elevation:Q', title='EL Difference (in)').scale(zero=False),
@@ -132,7 +132,7 @@ def PlotCWDiff(_REF) -> None:
     #        width=pwidth,
     #        height=300
     #    ).interactive()
-    st.write(chart)
+    #st.write(chart)
     
 @st.cache_data()
 def PlotSagSample(_BASE, yscale) -> None:
