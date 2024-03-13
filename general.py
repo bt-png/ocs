@@ -31,7 +31,7 @@ def df_pad(_df_original, name):
     _df.insert(0,0,0)
     _df.loc[-1] = (_df.columns.values)
     _df.loc[-2] = (0)
-    _df.loc[-2,0] = name
+    _df.loc[-2,0] = str(name)
     _df.columns = range(_df.shape[1])
     _df = _df.sort_index().reset_index(drop=True)
     _df[0] = _df[0].replace(0,np.NaN)
