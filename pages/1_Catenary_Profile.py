@@ -290,11 +290,12 @@ with tab4:
                 OutputAltCond(Ref, Nom)
             else:
                 OutputSag(Nom)
+                acadScript = OCS.SagtoCAD(Nom)
         with cdd2:
             st.write('Download Sag Data')
             st.download_button(
                 label="### press to download script",
-                data=sample_wr_csv,
+                data=acadScript,
                 file_name="_sag_.scr",
                 mime="text/scr"
             )
