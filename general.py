@@ -27,7 +27,7 @@ def shift(arr, num, fill_value=np.nan):
     return val
 
 def df_pad(_df_original, name):
-    _df = _df_original.copy()
+    _df = _df_original.copy().astype(str)
     _df.insert(0,0,0)
     _df.loc[-1] = (_df.columns.values)
     _df.loc[-2] = (0)
