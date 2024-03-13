@@ -203,7 +203,7 @@ with tab1:
     cwr = st.container(border=True)
     cwr_val = st.container(border=False)
     with cbd:
-        yExagg = st.number_input(label='Y Scale Exageration', value=20, min_value=1, step=1)
+        yExagg = st.number_input(label='Y Scale Exaggeration', value=20, min_value=1, step=1)
     with cdd:
         ##Design Data
         st.markdown("#### Load catenary system design data")
@@ -290,12 +290,19 @@ with tab4:
                 OutputAltCond(Ref, Nom)
             else:
                 OutputSag(Nom)
-                acadScript = OCS.SagtoCAD(Nom)
+                acadScript1 = OCS.SagtoCAD(Nom, 1)
+                acadScript2 = OCS.SagtoCAD(Nom, yExagg)
         with cdd2:
-            st.write('Download Sag Data')
+            st.markdown('#### Download CAD Script')
             st.download_button(
-                label="### press to download script",
-                data=acadScript,
+                label="### press for 1:1 scale",
+                data=acadScript1,
+                file_name="_sag_.scr",
+                mime="text/scr"
+            )
+            st.download_button(
+                label="### press for yExaggeration",
+                data=acadScript2,
                 file_name="_sag_.scr",
                 mime="text/scr"
             )
