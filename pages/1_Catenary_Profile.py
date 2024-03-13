@@ -283,7 +283,7 @@ with tab3:
 
 with tab4:
     if ddfile is not None and wrfile is not None:
-        cdd0, cdd1, cdd2 = st.columns([0.1, 0.6, 0.3])
+        cdd0, cdd1, cdd2 = st.columns([0.1, 0.5, 0.4])
         with cdd1:
             if st.session_state['altConductors']:
                 OutputAltCond(Ref, Nom)
