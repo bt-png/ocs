@@ -148,17 +148,8 @@ def Plotelasticity(df) -> None:
 
 @st.cache_data()
 def OutputSag(_BASE) -> None:
-    cdd0, cdd1, cdd2 = st.columns([0.1, 0.6, 0.3])
-    with cdd1:
-        st.write('#### Sag Data ', _BASE.dataframe())
-        st.write('#### HA Data', _BASE.dataframe_ha())
-    with cdd2:
-        st.download_button(
-                label="### press to download script",
-                data=sample_wr_csv,
-                file_name="_sag_.scr",
-                mime="text/scr"
-            )
+    st.write('#### Sag Data ', _BASE.dataframe())
+    st.write('#### HA Data', _BASE.dataframe_ha())
 
 @st.cache_data()
 def OutputAltCond(_Ref, _BASE) -> None:
@@ -293,10 +284,19 @@ with tab3:
 
 with tab4:
     if ddfile is not None and wrfile is not None:
-        if st.session_state['altConductors']:
-            OutputAltCond(Ref, Nom)
-        else:
-            OutputSag(Nom)
+        cdd0, cdd1, cdd2 = st.columns([0.1, 0.6, 0.3])
+        with cdd1:
+            if st.session_state['altConductors']:
+                OutputAltCond(Ref, Nom)
+            else:
+                OutputSag(Nom)
+        with cdd2:
+            st.download_button(
+                label="### press to download script",
+                data=sample_wr_csv,
+                file_name="_sag_.scr",
+                mime="text/scr"
+            )
         if st.session_state['elasticity'] and ec is not None:
             Outputelasticity(ec)
 
