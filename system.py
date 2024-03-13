@@ -198,8 +198,9 @@ def _pad_scr(txt) -> str:
     val += '(setvar "osmode" oldsnap)\n'
     return val
     
-def SagtoCAD(ref) -> str:
+def SagtoCAD(ref, yscale=1) -> str:
     _df = ref.dataframe()
+    _df['Elevation'] = _df['Elevation'] * yscale
     df = df_ft(_df)
     df_mw = df[df.cable == 'MW']
     txt = sag_scr(df_mw)
