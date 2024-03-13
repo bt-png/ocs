@@ -17,22 +17,22 @@ def plotdimensions(staList,elList,yscale):
     return int(width), int(height)
 
 @st.cache_data()
-def SagData(_df_cd, wirerun) -> None:
-    return OCS.CatenaryFlexible(_df_cd, wirerun)
+def SagData(val, wirerun) -> None:
+    return OCS.CatenaryFlexible(val, wirerun)
 
 @st.cache_data()
-def altSagData(_df_cd, _df_acd, _ORIG) -> None:
-    return OCS.AltCondition_Series(_df_cd, _df_acd, _ORIG)
+def altSagData(val1, val2, _ORIG) -> None:
+    return OCS.AltCondition_Series(val1, val2, _ORIG)
 
 @st.cache_data()
-def elasticity(_df_cd, _BASE, pUplift, stepSize, startSPT, endSPT) -> None:
-    EL = OCS.Elasticity(_df_cd, _BASE, pUplift, stepSize, startSPT, endSPT)
+def elasticity(val1, _BASE, pUplift, stepSize, startSPT, endSPT) -> None:
+    EL = OCS.Elasticity(val1, _BASE, pUplift, stepSize, startSPT, endSPT)
     df = EL.dataframe()
     return df
 
 @st.cache_data()
-def elasticityalt(_df_cd, _df_acd, _BASE, pUplift, stepSize, startSPT, endSPT) -> None:
-    EL = OCS.Elasticity_series(_df_cd, _df_acd, _BASE, pUplift, stepSize, startSPT, endSPT)
+def elasticityalt(val1, val2, _BASE, pUplift, stepSize, startSPT, endSPT) -> None:
+    EL = OCS.Elasticity_series(val1, val2, _BASE, pUplift, stepSize, startSPT, endSPT)
     df = EL.dataframe()
     return df
 
