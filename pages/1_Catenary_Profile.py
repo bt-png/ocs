@@ -105,17 +105,33 @@ def PlotCWDiff(_REF) -> None:
     df['Elevation'] *= 12
     pwidth, pheight = plotdimensions(df['Stationing'],df['Elevation'])
     st.write('### CW Elevation Difference')
-    selection = alt.selection_point(fields=['type'], bind='legend')
-    chart = alt.Chart(df).mark_line().encode(
+    nearest = alt.selection(type='single', nearest=True, on='mouseover', fields=df['Stationing'], empty='none')
+    line = alt.Chart(df).mark_line(interpolate = 'basis).encode(
         alt.X('Stationing:Q').scale(zero=False), 
         alt.Y('Elevation:Q', title='EL Difference (in)').scale(zero=False),
         alt.Detail('cable'),
-        alt.Color('type'),
-        opacity=alt.condition(selection, alt.value(1), alt.value(0.1))
-        ).add_params(selection).properties(
-            width=pwidth,
-            height=300
-        ).interactive()
+        alt.Color('type')
+    )
+    selectors = alt.Chart(df).mark_point().encode(
+        alt.X('Stationing:Q'),
+        opacity=alt.value(0)
+    ).properties(selection=nearest).copy()
+    points = line.mark_point().encode(opacity=alt.condition(nearest, alt.value(1), alt.value(0)))
+    text = line.mark_text(align='left', dx=5, dy=-5).encode(text=alt.condition(nearest, 'y:Q', alt.value(' ')))
+    rules = alt.Chart(df).mark_rule(color='gray').encode(x="x:Q").transform_filter(nearest.ref())
+    chart = (line + selectors + points + rules + text).properties(width=pwidth, height=300)
+        
+    selection = alt.selection_point(fields=['type'], bind='legend')
+    #chart = alt.Chart(df).mark_line().encode(
+    #    alt.X('Stationing:Q').scale(zero=False), 
+    #    alt.Y('Elevation:Q', title='EL Difference (in)').scale(zero=False),
+    #    alt.Detail('cable'),
+    #    alt.Color('type'),
+    #    opacity=alt.condition(selection, alt.value(1), alt.value(0.1))
+    #    ).add_params(selection).properties(
+    #        width=pwidth,
+    #        height=300
+    #    ).interactive()
     st.write(chart)
     
 @st.cache_data()
