@@ -143,6 +143,8 @@ def Plotelasticity(df) -> None:
         opacity=alt.condition(selection, alt.value(1), alt.value(0.1))
         ).add_params(selection)
     st.write(chart)
+    st.write('###### Loaded alternate conductor particulars data:')
+    st.dataframe(_df_acd, hide_index=True)
 
 @st.cache_data()
 def OutputSag(_BASE) -> None:
