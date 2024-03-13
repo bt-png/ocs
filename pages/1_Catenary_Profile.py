@@ -8,7 +8,7 @@ import general as GenFun
 
 st.session_state.accesskey = st.session_state.accesskey
 
-def plotdimensions(staList,elList,yscale):
+def plotdimensions(staList,elList,yscale=1):
     max_x = max(staList) - min(staList)
     max_y = max(elList) - min(elList)
     width = 1200
