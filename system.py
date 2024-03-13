@@ -194,9 +194,9 @@ def sag_scr(_df) -> str:
 def ha_scr(_df) -> str:
     df = _df.copy()
     df = df.assign(hastr=[
-        'line ' + 
+        '_line ' + 
         str(x) + "'," + str(y) + "' " +
-        str(x) + "'," + str(z)
+        str(x) + "'," + str(z) + "' "
         for x, y, z in
         zip(df['Stationing'], df['CW Elevation'], df['MW Elevation'])])
     val = df.to_csv(columns=['hastr'], index=False, header=False, encoding='UTF-8')
