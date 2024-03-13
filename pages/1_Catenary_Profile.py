@@ -105,15 +105,13 @@ def PlotCWDiff(_REF) -> None:
     df['Elevation'] *= 12
     pwidth, pheight = plotdimensions(df['Stationing'],df['Elevation'])
     st.write('### CW Elevation Difference')
-    
     nearest = alt.selection_point(nearest=True, on='mouseover', fields=['Stationing'], empty=False)
-    selection = alt.selection_point(fields=['type'], bind='legend')
     line = alt.Chart(df).mark_line().encode(
         alt.X('Stationing:Q').scale(zero=False), 
         alt.Y('Elevation:Q').scale(zero=False),
         alt.Detail('cable'),
         alt.Color('type')
-    ).add_params(selection)
+    )
     selectors = alt.Chart(df).mark_point().encode(
         alt.X('Stationing:Q'),
         opacity=alt.value(0)
@@ -123,19 +121,6 @@ def PlotCWDiff(_REF) -> None:
     rules = alt.Chart(df).mark_rule(color='gray').encode(x='Stationing:Q').transform_filter(nearest)
     chart = alt.layer(line + selectors + points + rules + text).properties(width=pwidth, height=300)
     st.write(chart)
-
-    #selection = alt.selection_point(fields=['type'], bind='legend')
-    #chart = alt.Chart(df).mark_line().encode(
-    #    alt.X('Stationing:Q').scale(zero=False), 
-    #    alt.Y('Elevation:Q', title='EL Difference (in)').scale(zero=False),
-    #    alt.Detail('cable'),
-    #    alt.Color('type'),
-    #    opacity=alt.condition(selection, alt.value(1), alt.value(0.1))
-    #    ).add_params(selection).properties(
-    #        width=pwidth,
-    #        height=300
-    #    ).interactive()
-    #st.write(chart)
     
 @st.cache_data()
 def PlotSagSample(_BASE, yscale) -> None:
