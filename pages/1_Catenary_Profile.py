@@ -100,6 +100,24 @@ def PlotSagaltCond(_REF, yscale) -> None:
     st.dataframe(_df_acd, hide_index=True)
 
 @st.cache_data()
+def PlotCWDiff(_REF) -> None:
+    df = _REF.dataframe_cwdiff()
+    pwidth, pheight = plotdimensions(df['Stationing'],df['Elevation'],yscale)
+    st.write('### CW Elevation Difference')
+    selection = alt.selection_point(fields=['type'], bind='legend')
+    chart = alt.Chart(df).mark_line().encode(
+        alt.X('Stationing:Q').scale(zero=False), 
+        alt.Y('Elevation:Q').scale(zero=False),
+        alt.Detail('cable'),
+        alt.Color('type'),
+        opacity=alt.condition(selection, alt.value(1), alt.value(0.1))
+        ).add_params(selection).properties(
+            width=pwidth,
+            height=150
+        ).interactive()
+    st.write(chart)
+    
+@st.cache_data()
 def PlotSagSample(_BASE, yscale) -> None:
     df = _BASE.dataframe()
     pwidth, pheight = plotdimensions(df['Stationing'],df['Elevation'],yscale)
@@ -235,6 +253,7 @@ with tab2:
         if st.session_state['altConductors']:       
             Ref = altSagData(_df_cd, _df_acd, Nom)
             PlotSagaltCond(Ref, yExagg)
+            PlotCWDiff(Ref)
         else:
             PlotSag(Nom, yExagg)
     elif wrfile is None and ddfile is None:
