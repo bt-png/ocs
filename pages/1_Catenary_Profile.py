@@ -280,22 +280,23 @@ with tab4:
         with cdd2:
             st.markdown('#### Download CAD Scripts')
             with st.container(border=True):
-                a1, b1, c1 = st.columns([0.4, 0.3, 0.3])
-                with a1:
-                    st.write('Cable Profile')
-                with b1:
-                    bt1 = st.download_button(
-                        label="### 1:1 scale",
-                        data=acadScript1,
-                        file_name="_sag_.scr",
-                        mime="text/scr"
-                    )
-                with c1:
-                    bt2 = st.download_button(
-                        label="### yExaggeration",
-                        data=acadScript2,
-                        file_name="_sag_.scr",
-                        mime="text/scr"
-                    )
+                if not st.session_state['altConductors']:
+                    a1, b1, c1 = st.columns([0.4, 0.3, 0.3])
+                    with a1:
+                        st.write('Cable Profile')
+                    with b1:
+                        bt1 = st.download_button(
+                            label="### 1:1 scale",
+                            data=acadScript1,
+                            file_name="_sag_.scr",
+                            mime="text/scr"
+                        )
+                    with c1:
+                        bt2 = st.download_button(
+                            label="### yExaggeration",
+                            data=acadScript2,
+                            file_name="_sag_.scr",
+                            mime="text/scr"
+                        )
         if st.session_state['elasticity'] and ec is not None:
             Outputelasticity(ec)
