@@ -152,7 +152,7 @@ def Plotelasticity(df) -> None:
     #    opacity=alt.condition(selection, alt.value(1), alt.value(0.1))
     #    ).add_params(selection).interactive()
     #st.write(chart)
-    pwidth, pheight = plotdimensions(df['Stationing'],dfa['Rise (in)'],1)
+    pwidth, pheight = plotdimensions(df['Stationing'],df['Rise (in)'],1)
     nearest = alt.selection_point(nearest=True, on='mouseover', fields=['Stationing'], empty=False)
     line = alt.Chart(df).mark_line().encode(
         alt.X('Stationing:Q').scale(zero=False), 
