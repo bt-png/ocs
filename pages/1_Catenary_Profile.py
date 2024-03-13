@@ -107,12 +107,13 @@ def PlotCWDiff(_REF) -> None:
     st.write('### CW Elevation Difference')
     
     nearest = alt.selection_point(nearest=True, on='mouseover', fields=['Stationing'], empty=False)
+    selection = alt.selection_point(fields=['type'], bind='legend')
     line = alt.Chart(df).mark_line().encode(
         alt.X('Stationing:Q').scale(zero=False), 
         alt.Y('Elevation:Q').scale(zero=False),
         alt.Detail('cable'),
         alt.Color('type')
-    )
+    ).add_params(selection)
     selectors = alt.Chart(df).mark_point().encode(
         alt.X('Stationing:Q'),
         opacity=alt.value(0)
@@ -120,7 +121,7 @@ def PlotCWDiff(_REF) -> None:
     points = line.mark_point().encode(opacity=alt.condition(nearest, alt.value(1), alt.value(0)))
     text = line.mark_text(align='left', dx=5, dy=-5).encode(text=alt.condition(nearest, 'Elevation:Q', alt.value(' ')))
     rules = alt.Chart(df).mark_rule(color='gray').encode(x='Stationing:Q').transform_filter(nearest)
-    chart = alt.layer(line + selectors + points + rules + text).properties(width=pwidth, height=300)
+    chart = alt.layer(line + selectors + points + rules + text).properties(width=pwidth, height=300).interactive()
     st.write(chart)
 
     #selection = alt.selection_point(fields=['type'], bind='legend')
