@@ -75,7 +75,7 @@ def PlotSag(_REF, yscale) -> None:
         ).add_params(selection).properties(
             width=pwidth,
             height=pheight
-        )
+        ).interactive()
     st.write(chart)
 
 @st.cache_data()
@@ -93,7 +93,7 @@ def PlotSagaltCond(_REF, yscale) -> None:
         ).add_params(selection).properties(
             width=pwidth,
             height=pheight
-        )
+        ).interactive()
     st.write(chart)
     #st.write(_df_acd)
     st.write('###### Loaded alternate conductor particulars data:')
@@ -121,16 +121,13 @@ def PlotSagSample(_BASE, yscale) -> None:
 @st.cache_data()
 def Plotelasticity(df) -> None:
     st.write('### Elasticity')
-    #chart = st.line_chart(
-    #    data = df, x='Stationing', y='Rise (in)', color ='type'
-    #)
     selection = alt.selection_point(fields=['type'], bind='legend')
     chart = alt.Chart(df).mark_line().encode(
         alt.X('Stationing:Q').scale(zero=False), 
         alt.Y('Rise (in):Q').scale(zero=False),
         alt.Color('type'),
         opacity=alt.condition(selection, alt.value(1), alt.value(0.1))
-        ).add_params(selection)
+        ).add_params(selection).interactive()
     st.write(chart)
     st.write('###### Loaded alternate conductor particulars data:')
     st.dataframe(_df_acd, hide_index=True)
