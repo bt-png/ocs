@@ -59,7 +59,7 @@ def preview_wrfile(wrfile) -> None:
     cwr0, cwr1 = st.columns([0.1, 0.9])
     with cwr1:
         st.write('###### First several rows of input file:')
-        st.dataframe(wr, hide_index=True)  
+        st.dataframe(wr.head(), hide_index=True)  
 
 @st.cache_data()
 def PlotSag(_REF, yscale) -> None:
