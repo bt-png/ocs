@@ -75,7 +75,7 @@ def ELDiff_FreeSag_NegativeLoadedHA_Simple(Cycle_Stationing, Cycle_P_SpanWeight,
     return ELStep
 
 def CatenarySag_Flexible(WireRun, L_Weight, L_Tension, L_SpanLoading, L_DesignHA, L_DesignBase):
-    P_DiscreteLoad_CW, STA_DiscreteLoad_CW, P_DiscreteLoad_MW, STA_DiscreteLoad_MW = [tuple(L_SpanLoading.iloc[:,i].tolist()) for i in (2,1,3,1)]
+    P_DiscreteLoad_CW, STA_DiscreteLoad_CW, P_DiscreteLoad_MW, STA_DiscreteLoad_MW = np.array([L_SpanLoading.iloc[:,i].tolist() for i in (2,1,3,1)])
     #P_DiscreteLoad_CW, STA_DiscreteLoad_CW, P_DiscreteLoad_MW, STA_DiscreteLoad_MW = [L_SpanLoading[i] for i in (0,1,2,3)]
     MaxHASpacing, minCW_P, MinHALength, HA_Accuracy = [L_DesignHA.iloc[i,1] for i in (0,1,2,3)]
     xStep, xRound, xMultiplier, yMultiplier, SteadyArmLength = [L_DesignBase.iloc[i,1] for i in (0,1,2,3,4)]
@@ -87,8 +87,8 @@ def CatenarySag_Flexible(WireRun, L_Weight, L_Tension, L_SpanLoading, L_DesignHA
     P_SpanWeight = GenFun.LoadSpanWeight(Stationing, L_Weight[1]*yMultiplier/xMultiplier)
     P_SpanWeight = GenFun.AddDiscreteLoadstoSpan(P_SpanWeight, 
                                                 Stationing,
-                                                tuple(yMultiplier/xMultiplier * x for x in P_DiscreteLoad_CW),
-                                                tuple(xMultiplier * x for x in STA_DiscreteLoad_CW),
+                                                np.array([yMultiplier/xMultiplier * x for x in P_DiscreteLoad_CW]),
+                                                np.array([xMultiplier * x for x in STA_DiscreteLoad_CW]),
                                                 xRound)
     H_SpanTension = GenFun.LoadSpanTension(Stationing,L_Tension[1]*xMultiplier)
     subLoop = 1
@@ -111,8 +111,8 @@ def CatenarySag_Flexible(WireRun, L_Weight, L_Tension, L_SpanLoading, L_DesignHA
                                                  SupportLoad_CW[SupportLoad_CW>0], HA_STA[SupportLoad_CW>0],xRound)
     P_SpanWeight_MW = GenFun.AddDiscreteLoadstoSpan(P_SpanWeight_MW,
                                                     Stationing,
-                                                    tuple(yMultiplier/xMultiplier * x for x in P_DiscreteLoad_MW), 
-                                                    tuple(xMultiplier * x for x in STA_DiscreteLoad_MW),
+                                                    np.array([yMultiplier/xMultiplier * x for x in P_DiscreteLoad_MW]), 
+                                                    np.array([xMultiplier * x for x in STA_DiscreteLoad_MW]),
                                                     xRound)
     H_SpanTension_MW = GenFun.LoadSpanTension(Stationing,L_Tension[0]*xMultiplier)
     SupportLoad_MW = GenFun.SupportLoad(Stationing, P_SpanWeight_MW, H_SpanTension_MW, np.array(WR['STA']), np.array(WR['Rail EL']+WR['MW Height']), xRound)
