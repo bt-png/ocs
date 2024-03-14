@@ -21,18 +21,18 @@ def SagData(val, wirerun) -> None:
     return OCS.CatenaryFlexible(val, wirerun)
 
 @st.cache_data()
-def altSagData(val1, val2, _ORIG) -> None:
-    return OCS.AltCondition_Series(val1, val2, _ORIG)
+def altSagData(val,  _ORIG) -> None:
+    return OCS.AltCondition_Series(val, _ORIG)
 
 @st.cache_data()
-def elasticity(val1, _BASE, pUplift, stepSize, startSPT, endSPT) -> None:
-    EL = OCS.Elasticity(val1, _BASE, pUplift, stepSize, startSPT, endSPT)
+def elasticity(val, _BASE, pUplift, stepSize, startSPT, endSPT) -> None:
+    EL = OCS.Elasticity(val, _BASE, pUplift, stepSize, startSPT, endSPT)
     df = EL.dataframe()
     return df
 
 @st.cache_data()
-def elasticityalt(val1, val2, _BASE, pUplift, stepSize, startSPT, endSPT) -> None:
-    EL = OCS.Elasticity_series(val1, val2, _BASE, pUplift, stepSize, startSPT, endSPT)
+def elasticityalt(val, _BASE, pUplift, stepSize, startSPT, endSPT) -> None:
+    EL = OCS.Elasticity_series(val, _BASE, pUplift, stepSize, startSPT, endSPT)
     df = EL.dataframe()
     return df
 
@@ -42,9 +42,10 @@ def preview_ddfile(ddfile) -> None:
     with cdd1:
         #st.write(_dd)
         st.write('###### Loaded conductor particulars data:')
-        st.dataframe(_df_cd, hide_index=True)
-        st.write('###### Loaded alternate conductor particulars data:')
-        st.dataframe(_df_acd, hide_index=True)
+        if st.session_state['altConductors']:
+            st.dataframe(_df_acd, hide_index=True)
+        else:
+            st.dataframe(_df_cd, hide_index=True)
         st.write('###### Loaded span point loads:')
         st.dataframe(_df_sl, hide_index=True)
     with cdd2:
@@ -182,7 +183,7 @@ def OutputSag(_BASE) -> None:
 def OutputAltCond(_Ref, _BASE) -> None:
     #LC = altSagData(_df_cd, _df_acd, _BASE)
     dfa = _Ref.dataframe()
-    st.write('#### Alternate Conductor Data', dfa)
+    st.write('#### Conductor Data', dfa)
     st.write('#### HA Data', _BASE.dataframe_ha())
 
 @st.cache_data()
@@ -274,7 +275,7 @@ with tab2:
     if ddfile is not None and wrfile is not None:
         Nom = SagData(_dd, wr)
         if st.session_state['altConductors']:       
-            Ref = altSagData(_df_cd, _df_acd, Nom)
+            Ref = altSagData(_df_acd, Nom)
             PlotSagaltCond(Ref, yExagg)
             PlotCWDiff(Ref)
         else:
@@ -291,7 +292,7 @@ with tab3:
         SPTID(endSPT)
         stepSize = st.number_input(label='Resolution (ft)', min_value = 1, step=1, value=10)
         pUplift = st.number_input(label='Uplift Force (lbf)', value=25)
-        conditions = 1+len(_df_acd)*st.session_state['altConductors']
+        conditions = 1+(len(_df_acd)-1)*st.session_state['altConductors']
         steps = (wr.loc[endSPT, 'STA']-wr.loc[startSPT, 'STA'])/stepSize
         estCalcTime = 0.789 * conditions * steps
         m, s = divmod(estCalcTime, 60)
@@ -302,7 +303,7 @@ with tab3:
         submit_form = st.button('Calculate', key="calcElasticity")
         if submit_form:
             if st.session_state['altConductors']:
-                ec = elasticityalt(_df_cd, _df_acd, Nom, pUplift, stepSize, startSPT, endSPT)
+                ec = elasticityalt(_df_acd, Nom, pUplift, stepSize, startSPT, endSPT)
             else:
                 ec = elasticity(_df_cd, Nom, pUplift, stepSize, startSPT, endSPT)
             st.success('Done!') 
