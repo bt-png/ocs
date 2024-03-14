@@ -37,7 +37,7 @@ def elasticityalt(val, _BASE, pUplift, stepSize, startSPT, endSPT) -> None:
     return df
 
 @st.cache_data()
-def preview_ddfile(ddfile, bool) -> None:
+def preview_ddfile(ddfile) -> None:
     cdd0, cdd1, cdd2 = st.columns([0.1, 0.6, 0.3])
     with cdd1:
         #st.write(_dd)
@@ -251,7 +251,7 @@ with tab1:
         if ddfile is not None:
             _dd = pd.read_csv(ddfile)
             _df_cd, _df_acd, _df_hd, _df_bd, _df_sl = OCS.create_df_dd(_dd)
-            preview_ddfile(ddfile, st.session_state['altConductors'])
+            preview_ddfile(ddfile)
     with cwr:
         ##Wire Run Data
         st.markdown("#### Load layout design data for wire run")
