@@ -16,29 +16,29 @@ def plotdimensions(staList,elList,yscale=1):
     height = widthratio*yscale*max_y
     return int(width), int(height)
 
-#@st.cache_data()
+@st.cache_data()
 def ddData(dd):
     return OCS.create_df_dd(dd)
 
-#@st.cache_data()
+@st.cache_data()
 def wrData(wr):
     return OCS.wire_run(wr)
 
-@st.cache_data()
+#@st.cache_data()
 def SagData(val, wirerun) -> None:
     return OCS.CatenaryFlexible(val, wirerun)
     
-@st.cache_data()
+#@st.cache_data()
 def altSagData(val,  _ORIG) -> None:
     return OCS.AltCondition_Series(val, _ORIG)
 
-@st.cache_data()
+#@st.cache_data()
 def elasticity(val, _BASE, pUplift, stepSize, startSPT, endSPT) -> None:
     EL = OCS.Elasticity(val, _BASE, pUplift, stepSize, startSPT, endSPT)
     df = EL.dataframe()
     return df
 
-@st.cache_data()
+#@st.cache_data()
 def elasticityalt(val, _BASE, pUplift, stepSize, startSPT, endSPT) -> None:
     EL = OCS.Elasticity_series(val, _BASE, pUplift, stepSize, startSPT, endSPT)
     df = EL.dataframe()
