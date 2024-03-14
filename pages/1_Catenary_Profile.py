@@ -36,7 +36,7 @@ def elasticityalt(val, _BASE, pUplift, stepSize, startSPT, endSPT) -> None:
     df = EL.dataframe()
     return df
 
-@st.cache_data()
+#@st.cache_data()
 def preview_ddfile(ddfile, bool) -> None:
     cdd0, cdd1, cdd2 = st.columns([0.1, 0.6, 0.3])
     with cdd1:
@@ -54,14 +54,14 @@ def preview_ddfile(ddfile, bool) -> None:
         st.write('###### Loaded calculation constants:')
         st.dataframe(_df_bd, hide_index=True)
 
-@st.cache_data()
+#@st.cache_data()
 def preview_wrfile(wrfile) -> None:
     cwr0, cwr1 = st.columns([0.1, 0.9])
     with cwr1:
         st.write('###### First several rows of input file:')
         st.dataframe(wr, hide_index=True)  
 
-@st.cache_data()
+#@st.cache_data()
 def PlotSag(_REF, yscale) -> None:
     df = _REF.dataframe()
     pwidth, pheight = plotdimensions(df['Stationing'],df['Elevation'],yscale)
@@ -79,7 +79,7 @@ def PlotSag(_REF, yscale) -> None:
         ).interactive()
     st.write(chart)
 
-@st.cache_data()
+#@st.cache_data()
 def PlotSagaltCond(_REF, yscale) -> None:
     dfa = _REF.dataframe()
     pwidth, pheight = plotdimensions(dfa['Stationing'],dfa['Elevation'],yscale)
