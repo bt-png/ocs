@@ -190,7 +190,7 @@ def OutputAltCond(_Ref, _BASE) -> None:
 def Outputelasticity(df) -> None:
     st.write('#### Elasticity', df)
 
-@st.cache_data()
+#@st.cache_data()
 def convert_df(df):
    return df.to_csv(index=False).encode('utf-8')
 
