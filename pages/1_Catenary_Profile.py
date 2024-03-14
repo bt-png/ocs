@@ -21,6 +21,14 @@ def SagData(val, wirerun) -> None:
     return OCS.CatenaryFlexible(val, wirerun)
 
 @st.cache_data()
+def ddData(dd):
+    return OCS.create_df_dd(dd)
+
+@st.cache_data()
+def wrData(wr):
+    return OCS.wire_run(wr)
+
+@st.cache_data()
 def altSagData(val,  _ORIG) -> None:
     return OCS.AltCondition_Series(val, _ORIG)
 
@@ -250,7 +258,7 @@ with tab1:
                 )
         if ddfile is not None:
             _dd = pd.read_csv(ddfile)
-            _df_cd, _df_acd, _df_hd, _df_bd, _df_sl = OCS.create_df_dd(_dd)
+            _df_cd, _df_acd, _df_hd, _df_bd, _df_sl = ddData(_dd)
             preview_ddfile(ddfile)
     with cwr:
         ##Wire Run Data
@@ -269,7 +277,7 @@ with tab1:
                 key='_wrfile'
                 )
         if wrfile is not None:
-            wr = OCS.wire_run(wrfile)
+            wr = wrData(wrfile)
             preview_wrfile(wrfile)
 with tab2:
     if ddfile is not None and wrfile is not None:
@@ -286,7 +294,6 @@ with tab2:
             PlotSag(Nom, yExagg)
             calc2 = st.button('ReCalc')
             if calc2:
-                wr = OCS.wire_run(wrfile)
                 Nom = SagData(_dd, wr)
     elif wrfile is None and ddfile is None:
         Nom = SagData(OCS.sample_df_dd(), OCS.sample_df_wr())
