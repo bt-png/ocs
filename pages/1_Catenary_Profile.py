@@ -24,7 +24,7 @@ def ddData(dd):
 def wrData(wr):
     return OCS.wire_run(wr)
 
-#@st.cache_data()
+@st.cache_data()
 def SagData(val, wirerun) -> None:
     return OCS.CatenaryFlexible(val, wirerun)
     
@@ -69,7 +69,7 @@ def preview_wrfile(wrfile) -> None:
         st.write('###### First several rows of input file:')
         st.dataframe(wr.head(), hide_index=True)  
 
-@st.cache_data()
+#@st.cache_data()
 def PlotSag(_REF, yscale) -> None:
     df = _REF.dataframe()
     pwidth, pheight = plotdimensions(df['Stationing'],df['Elevation'],yscale)
