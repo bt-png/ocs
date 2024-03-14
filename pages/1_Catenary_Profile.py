@@ -17,10 +17,6 @@ def plotdimensions(staList,elList,yscale=1):
     return int(width), int(height)
 
 @st.cache_data()
-def SagData(val, wirerun) -> None:
-    return OCS.CatenaryFlexible(val, wirerun)
-
-@st.cache_data()
 def ddData(dd):
     return OCS.create_df_dd(dd)
 
@@ -28,6 +24,10 @@ def ddData(dd):
 def wrData(wr):
     return OCS.wire_run(wr)
 
+#@st.cache_data()
+def SagData(val, wirerun) -> None:
+    return OCS.CatenaryFlexible(val, wirerun)
+    
 @st.cache_data()
 def altSagData(val,  _ORIG) -> None:
     return OCS.AltCondition_Series(val, _ORIG)
