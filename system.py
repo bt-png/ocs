@@ -582,18 +582,11 @@ class Elasticity():
             _upliftsag = _elastic.dataframe_cw()
             #_eldiff = _elastic.dataframe_cwdiff().Elevation
             _eldiff = GenFun.CWELDifference(_originalsag, _upliftsag)
-            _diffmin[i] = np.nanmin(_eldiff)
             _diffmax[i] = np.nanmax(_eldiff)
             _cycleloops[i] = _elastic.getloops()
             _cet = time.time()
             _cycletime[i] = _cet - _cst
             i += 1
-        _df_min = pd.DataFrame({
-            'Stationing': _staval,
-            'Rise (in)': _diffmin*12,
-            'type': 'DiffMIN',
-            'cable': 'DiffMIN'
-            })
         _df_max = pd.DataFrame({
             'Stationing': _staval,
             'Rise (in)': _diffmax*12,
