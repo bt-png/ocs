@@ -286,6 +286,7 @@ with tab2:
             PlotSag(Nom, yExagg)
             calc2 = st.button('ReCalc')
             if calc2:
+                wr = OCS.wire_run(wrfile)
                 Nom = SagData(_dd, wr)
     elif wrfile is None and ddfile is None:
         Nom = SagData(OCS.sample_df_dd(), OCS.sample_df_wr())
