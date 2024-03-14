@@ -285,16 +285,9 @@ with tab2:
         if st.session_state['altConductors']:       
             Ref = altSagData(_df_acd, Nom)
             PlotSagaltCond(Ref, yExagg)
-            calc1 = st.button('ReCalc')
-            if calc1:
-                Ref = altSagData(_df_acd, Nom)
-                PlotSagaltCond(Ref, yExagg)
             PlotCWDiff(Ref)
         else:
             PlotSag(Nom, yExagg)
-            calc2 = st.button('ReCalc')
-            if calc2:
-                Nom = SagData(_dd, wr)
     elif wrfile is None and ddfile is None:
         Nom = SagData(OCS.sample_df_dd(), OCS.sample_df_wr())
         PlotSagSample(Nom, yExagg)
