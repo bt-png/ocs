@@ -36,7 +36,7 @@ def elasticityalt(val, _BASE, pUplift, stepSize, startSPT, endSPT) -> None:
     df = EL.dataframe()
     return df
 
-@st.cache_data()
+#@st.cache_data()
 def preview_ddfile(ddfile) -> None:
     cdd0, cdd1, cdd2 = st.columns([0.1, 0.6, 0.3])
     with cdd1:
