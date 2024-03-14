@@ -16,11 +16,11 @@ def plotdimensions(staList,elList,yscale=1):
     height = widthratio*yscale*max_y
     return int(width), int(height)
 
-@st.cache_data()
+#@st.cache_data()
 def ddData(dd):
     return OCS.create_df_dd(dd)
 
-@st.cache_data()
+#@st.cache_data()
 def wrData(wr):
     return OCS.wire_run(wr)
 
