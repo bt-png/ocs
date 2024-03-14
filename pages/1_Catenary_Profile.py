@@ -284,7 +284,7 @@ with tab2:
         Nom = SagData(OCS.sample_df_dd(), OCS.sample_df_wr())
         PlotSagSample(Nom, yExagg)
     else:
-        st.markdown('Provide both "System Design" and "Layout Design" files to run calculation.')
+        st.warning('Provide both "System Design" and "Layout Design" files to run calculation.')
 with tab3:
     if ddfile is not None and wrfile is not None and st.session_state['elasticity']:
         ec = None
