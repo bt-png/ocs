@@ -79,7 +79,7 @@ def PlotSag(_REF, yscale) -> None:
         ).interactive()
     st.write(chart)
 
-@st.cache_data()
+#@st.cache_data()
 def PlotSagaltCond(_REF, yscale) -> None:
     dfa = _REF.dataframe()
     pwidth, pheight = plotdimensions(dfa['Stationing'],dfa['Elevation'],yscale)
