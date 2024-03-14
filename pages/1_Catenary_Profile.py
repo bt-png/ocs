@@ -36,13 +36,13 @@ def elasticityalt(val, _BASE, pUplift, stepSize, startSPT, endSPT) -> None:
     df = EL.dataframe()
     return df
 
-#@st.cache_data()
-def preview_ddfile(ddfile) -> None:
+@st.cache_data()
+def preview_ddfile(ddfile, bool) -> None:
     cdd0, cdd1, cdd2 = st.columns([0.1, 0.6, 0.3])
     with cdd1:
         #st.write(_dd)
         st.write('###### Loaded conductor particulars data:')
-        if st.session_state['altConductors']:
+        if bool:
             st.dataframe(_df_acd, hide_index=True)
         else:
             st.dataframe(_df_cd, hide_index=True)
@@ -251,7 +251,7 @@ with tab1:
         if ddfile is not None:
             _dd = pd.read_csv(ddfile)
             _df_cd, _df_acd, _df_hd, _df_bd, _df_sl = OCS.create_df_dd(_dd)
-            preview_ddfile(ddfile)
+            preview_ddfile(ddfile, st.session_state['altConductors'])
     with cwr:
         ##Wire Run Data
         st.markdown("#### Load layout design data for wire run")
