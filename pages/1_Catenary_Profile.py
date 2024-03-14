@@ -87,7 +87,7 @@ def PlotSag(_REF, yscale) -> None:
         ).interactive()
     st.write(chart)
 
-@st.cache_data()
+#@st.cache_data()
 def PlotSagaltCond(_REF, yscale) -> None:
     dfa = _REF.dataframe()
     pwidth, pheight = plotdimensions(dfa['Stationing'],dfa['Elevation'],yscale)
@@ -108,7 +108,7 @@ def PlotSagaltCond(_REF, yscale) -> None:
     st.write('###### Loaded alternate conductor particulars data:')
     st.dataframe(_df_acd, hide_index=True)
 
-@st.cache_data()
+#@st.cache_data()
 def PlotCWDiff(_REF) -> None:
     df = _REF.dataframe_cwdiff()
     df['Elevation'] *= 12
@@ -131,7 +131,7 @@ def PlotCWDiff(_REF) -> None:
     chart = alt.layer(line + selectors + points + rules + text).properties(width=pwidth, height=300)
     st.write(chart)
     
-@st.cache_data()
+#@st.cache_data()
 def PlotSagSample(_BASE, yscale) -> None:
     df = _BASE.dataframe()
     pwidth, pheight = plotdimensions(df['Stationing'],df['Elevation'],yscale)
@@ -150,7 +150,7 @@ def PlotSagSample(_BASE, yscale) -> None:
         ).interactive()
     st.write(chart)
 
-@st.cache_data()
+#@st.cache_data()
 def Plotelasticity(df) -> None:
     st.write('### Elasticity')
     #selection = alt.selection_point(fields=['type'], bind='legend')
@@ -182,23 +182,23 @@ def Plotelasticity(df) -> None:
     st.write('###### Loaded alternate conductor particulars data:')
     st.dataframe(_df_acd, hide_index=True)
 
-@st.cache_data()
+#@st.cache_data()
 def OutputSag(_BASE) -> None:
     st.write('#### Sag Data ', _BASE.dataframe())
     st.write('#### HA Data', _BASE.dataframe_ha())
 
-@st.cache_data()
+#@st.cache_data()
 def OutputAltCond(_Ref, _BASE) -> None:
     #LC = altSagData(_df_cd, _df_acd, _BASE)
     dfa = _Ref.dataframe()
     st.write('#### Conductor Data', dfa)
     st.write('#### HA Data', _BASE.dataframe_ha())
 
-@st.cache_data()
+#@st.cache_data()
 def Outputelasticity(df) -> None:
     st.write('#### Elasticity', df)
 
-@st.cache_data()
+#@st.cache_data()
 def convert_df(df):
    return df.to_csv(index=False).encode('utf-8')
 
