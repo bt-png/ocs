@@ -119,6 +119,17 @@ def sample_df_dd():
     _df.reset_index(drop=True, inplace=True)
     return _df
 
+def add_base_acd(_cd, _acd):
+    _df = _acd.copy()
+    _df.loc[-1] = [
+        'BASE',
+        _cd.loc[0,'Weight'], _cd.loc[0,'Tension'],
+        _cd.loc[1,'Weight'], _cd.loc[1,'Tension'],
+        _cd.loc[2,'Weight']
+    ]
+    _df = _df.sort_index().reset_index(drop=True)
+    return _df
+
 def split_acd(_acd, row):
     _df = pd.DataFrame({
         'Cable': ['MW', 'CW', 'HA'],
@@ -147,6 +158,7 @@ def create_df_dd(_df):
     isl = int(np.where(_dd == 'Span Loading')[0])
     _df_cd = split_df(_dd, icp+1, iacp-2)
     _df_acd = split_df(_dd, iacp+1, ihd-2)
+    _df_acd = add_base_acd(_df_cd, _df_acd)
     _df_hd = split_df(_dd, ihd+1, ibd-2)
     _df_bd = split_df(_dd, ibd+1, isl-2)
     _df_sl = split_df(_dd, isl+1)
@@ -449,9 +461,8 @@ class AltCondition():
         return self._srdf
 
 class AltCondition_Series():
-    def __init__(self, baseconductor, altconductor, basedesign):
+    def __init__(self, altconductor, basedesign):
         basedesign._solve()
-        self._cp = baseconductor
         self._data = altconductor
         self._bd = basedesign
         self._df = None
@@ -461,19 +472,10 @@ class AltCondition_Series():
         self._solved = False
     
     def _solve(self):
-        ALT = AltCondition(self._cp,self._bd)
-        _df_tmp = ALT.dataframe()
-        _df_cw_tmp = ALT.dataframe_cw()
-        _df_cwdiff_tmp = ALT.dataframe_cwdiff()
-        _df_sr_tmp = ALT.dataframe_sr()
-        #_df_tmp.type += '_' + row['Load Condition']
-        _df_tmp.type = 'Base'
-        _df_cwdiff_tmp.type = 'Base'
-        _df_sr_tmp.type = 'Base'
-        _df = _df_tmp.copy()
-        _df_cw = _df_cw_tmp.copy()
-        _df_cwdiff = _df_cwdiff_tmp.copy()
-        _df_sr = _df_sr_tmp.copy()
+        _df = pd.DataFrame()
+        _df_cw = pd.DataFrame()
+        _df_cwdiff = pd.DataFrame()
+        _df_sr = pd.DataFrame()
         for index, row in self._data.iterrows():
             if np.isfinite(row['MW Weight']):
                 _acd = split_acd(self._data,index)
@@ -517,18 +519,14 @@ class AltCondition_Series():
         return self._df_sr
 
 class Elasticity_series():
-    def __init__(self, baseconductor, altconductor, basedesign, upliftforce, stepsize, startspt=0, endspt=None):
+    def __init__(self, altconductor, basedesign, upliftforce, stepsize, startspt=0, endspt=None):
         self._ref = basedesign
-        self._cp = baseconductor
         self._acp = altconductor
         self._df = None
         self._cycle(upliftforce, stepsize, startspt, endspt)
     
     def _cycle(self, upliftforce, stepsize, startspt, endspt):
-        EL = Elasticity(self._cp, self._ref, upliftforce, stepsize, startspt, endspt)
-        _df_tmp = EL.dataframe()
-        _df_tmp.type = 'Base'
-        _df = _df_tmp.copy()
+        _df = pd.DataFrame()
         for index, row in self._acp.iterrows():
             if np.isfinite(row['MW Weight']):
                 _acd = split_acd(self._acp,index)
