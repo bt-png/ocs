@@ -193,14 +193,15 @@ def AddDiscreteLoadstoSpan(ExistingLoading, ExistingSTA, NewLoad, NewLoadSTA, ST
     P = np.copy(ExistingLoading)
     STAList = np.copy(NewLoadSTA)
     STAList = RoundVal(STAList,STARound)
+    LOADList = np.copy(NewLoad)
     try:
         len(STAList)
     except TypeError:
         STAList = [STAList]
-        NewLoad = [NewLoad]
+        LOADList = [LOADList]
     
     for i in range(0,len(STAList)):
-        P += ((ExistingSTA == STAList[i])*NewLoad[i])
+        P += ((ExistingSTA == STAList[i])*LOADList[i])
     return P
 
 def SupportLoadRight(STAList, LoadList, TensionList, HangerStationing, HangerElevation, STARound):
