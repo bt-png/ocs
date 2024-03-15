@@ -395,7 +395,7 @@ with tab4:
             #    if submit_altCond:
             #        if not new_df_acd.empty:
             #            OutputAltCond(Ref, Nom)
-            if submit_altCond:
+            if Nom is not None:
                 OutputSag(Nom)
             elif ec is not None:
                 Outputelasticity(ec)
