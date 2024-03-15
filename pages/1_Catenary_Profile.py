@@ -88,7 +88,7 @@ def preview_wrfile(wrfile) -> None:
         st.write('###### First several rows of input file:')
         st.dataframe(wr.head(), hide_index=True)  
 
-#@st.cache_data()
+@st.cache_data()
 def PlotSag(_REF, yscale) -> None:
     df = _REF.dataframe()
     pwidth, pheight = plotdimensions(df['Stationing'],df['Elevation'],yscale)
@@ -106,7 +106,7 @@ def PlotSag(_REF, yscale) -> None:
         ).interactive()
     st.write(chart)
 
-#@st.cache_data()
+@st.cache_data()
 def PlotSagaltCond(_REF, yscale) -> None:
     dfa = _REF.dataframe()
     pwidth, pheight = plotdimensions(dfa['Stationing'],dfa['Elevation'],yscale)
@@ -124,7 +124,7 @@ def PlotSagaltCond(_REF, yscale) -> None:
         ).interactive()
     st.write(chart)
 
-#@st.cache_data()
+@st.cache_data()
 def PlotCWDiff(_REF) -> None:
     df = _REF.dataframe_cwdiff()
     df['Elevation'] *= 12
@@ -147,7 +147,7 @@ def PlotCWDiff(_REF) -> None:
     chart = alt.layer(line + selectors + points + rules + text).properties(width=pwidth, height=300)
     st.write(chart)
     
-#@st.cache_data()
+@st.cache_data()
 def PlotSagSample(_BASE, yscale) -> None:
     df = _BASE.dataframe()
     pwidth, pheight = plotdimensions(df['Stationing'],df['Elevation'],yscale)
@@ -166,7 +166,7 @@ def PlotSagSample(_BASE, yscale) -> None:
         ).interactive()
     st.write(chart)
 
-#@st.cache_data()
+@st.cache_data()
 def Plotelasticity(df) -> None:
     st.write('### Elasticity')
     #selection = alt.selection_point(fields=['type'], bind='legend')
@@ -195,23 +195,23 @@ def Plotelasticity(df) -> None:
     chart = alt.layer(line + selectors + points + rules + text).properties(width=pwidth, height=300)
     st.write(chart)
 
-#@st.cache_data()
+@st.cache_data()
 def OutputSag(_BASE) -> None:
     st.write('#### Sag Data ', _BASE.dataframe())
     st.write('#### HA Data', _BASE.dataframe_ha())
 
-#@st.cache_data()
+@st.cache_data()
 def OutputAltCond(_Ref, _BASE) -> None:
     #LC = altSagData(_df_cd, _df_acd, _BASE)
     dfa = _Ref.dataframe()
     st.write('#### Conductor Data', dfa)
     st.write('#### HA Data', _BASE.dataframe_ha())
 
-#@st.cache_data()
+@st.cache_data()
 def Outputelasticity(df) -> None:
     st.write('#### Elasticity', df)
 
-#@st.cache_data()
+@st.cache_data()
 def convert_df(df):
    return df.to_csv(index=False).encode('utf-8')
 
@@ -306,22 +306,21 @@ with tab2:
         steps = (max(wr.STA)-min(wr.STA))/stepSize
         estCalcTime = ((0.0116 * conditions) + (0.00063)) * steps #process time for iterative + base
         m, s = divmod(estCalcTime, 60)
-        if Nom is None:
-            if m>0:
-                st.warning('###### This could take ' + '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s))
-            else:
-                st.markdown('###### Estimated compute time is ' + '{:02.0f} seconds'.format(s))
+        if m > 0:
+            st.warning('###### This could take ' + '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s))
+        else:
+            st.markdown('###### Estimated compute time is ' + '{:02.0f} seconds'.format(s))
         submit_altCond = st.button('Calculate', key="calcAltCond")
         if submit_altCond:
             st_time = time.time()
-            Nom = SagData(_dd, wr)
+            Nom = SagData(_dd, wr).clear()
             #new_df_acd = _df_acd[e_df_acd.Calculate]
             if new_df_acd.empty:
-                PlotSag(Nom, yExagg)
+                PlotSag(Nom, yExagg).clear()
             else:
-                Ref = altSagData(new_df_acd, Nom)
-                PlotSagaltCond(Ref, yExagg)
-                PlotCWDiff(Ref)
+                Ref = altSagData(new_df_acd, Nom).clear()
+                PlotSagaltCond(Ref, yExagg).clear()
+                PlotCWDiff(Ref).clear()
                 et_time = time.time()
                 m, s = divmod(et_time-st_time, 60)
                 msg = 'Done!' + ' That took ' + '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s)
@@ -351,17 +350,17 @@ with tab3:
         estCalcTime = 0.789 * conditions * steps
         #estEndTime = time.localtime(time.mktime(time.localtime()) + estCalcTime)
         m, s = divmod(estCalcTime, 60)
-        if m>3:
+        if m > 3:
             st.warning('###### This could take ' + '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s), ', check back at', time.strftime("%H:%M", estEndTime))
         else:
             st.markdown('###### Estimated compute time is ' + '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s))
         submit_elastic = st.button('Calculate', key="calcElasticity")
         if submit_elastic:
             st_time = time.time()
-            Nom = SagData(_dd, wr)
+            Nom = SagData(_dd, wr).clear()
             #new_df_acd_elastic = _df_acd[elastic_df_acd.Calculate]
             if len(new_df_acd_elastic) > 0:
-                ec = elasticityalt(new_df_acd_elastic, Nom, pUplift, stepSize, startSPT, endSPT)
+                ec = elasticityalt(new_df_acd_elastic, Nom, pUplift, stepSize, startSPT, endSPT).clear()
                 et_time = time.time()
                 m, s = divmod(et_time-st_time, 60)
                 msg = 'Done!' + ' That took ' + '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s)
@@ -374,7 +373,7 @@ with tab3:
             #    ec = elasticity(_df_cd, Nom, pUplift, stepSize, startSPT, endSPT)
             
         if ec is not None:
-            Plotelasticity(ec)
+            Plotelasticity(ec).clear()
 
 with tab4:
     if ddfile is not None and wrfile is not None:
@@ -385,7 +384,7 @@ with tab4:
             #        if not new_df_acd.empty:
             #            OutputAltCond(Ref, Nom)
             if submit_altCond:
-                OutputSag(Nom)
+                OutputSag(Nom).clear()
             elif ec is not None:
                 Outputelasticity(ec)
             else:
