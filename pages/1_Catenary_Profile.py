@@ -300,6 +300,7 @@ with tab2:
         #e_df_acd = st.data_editor(_df_acd_ref, hide_index=True, key='1')
         #st.write(_df_acd_ref.iloc[0,:].transpose)
         conditions = len(new_df_acd)
+        st.write(conditions)
         stepSize = _df_bd.iloc[0,1]
         steps = (max(wr.STA)-min(wr.STA))/stepSize
         estCalcTime = ((0.0116 * conditions) + (0.00063)) * steps #process time for iterative + base
