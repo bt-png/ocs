@@ -307,7 +307,7 @@ with tab2:
         estEndTime = time.localtime(time.mktime(time.localtime()) + estCalcTime)
         m, s = divmod(estCalcTime, 60)
         if m>0:
-            st.warning('###### This could take ' + '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s), ', check back at', time.strftime("%H:%M", estEndTime))
+            st.warning('###### This could take ' + '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s), ', check back at', estEndTime)
         else:
             st.markdown('###### Estimated compute time is ' + '{:02.0f} seconds'.format(s))
         submit_altCond = st.button('Calculate', key="calcAltCond")
