@@ -13,4 +13,4 @@ st.write(
 if st.session_state['accesskey'] != st.secrets['accesskey']:
     st.stop()
 
-tab1, tab2, tab3 = st.tabs(['Conductor Tension', 'Wiring Plan', 'Cantilever Resetting Force'])
+weight, blowoff, tension, wiring, resetting = st.tabs(['Conductor Weight', 'Conductor BlowOff', 'Conductor Tension', 'Wiring Plan', 'Cantilever Resetting Force'])
