@@ -1,4 +1,5 @@
 import streamlit as st
+import system as OCS
 
 st.session_state.accesskey = st.session_state.accesskey
 
@@ -14,3 +15,5 @@ if st.session_state['accesskey'] != st.secrets['accesskey']:
     st.stop()
 
 conductor, wiring, resetting = st.tabs(['Conductor Data', 'Wiring Plan', 'Cantilever Resetting Force'])
+with conductor:
+    _df_c = OCS.sample_df_cp()
