@@ -315,6 +315,7 @@ with tab2:
             st.markdown('###### Estimated compute time is ' + '{:02.0f} seconds'.format(s))
         submit_altCond = st.button('Calculate', key="calcAltCond")
         if submit_altCond:
+            submit_altCond = False
             st_time = time.time()
             SagData.clear()
             Nom = SagData(_dd, wr)
@@ -365,6 +366,7 @@ with tab3:
             st.markdown('###### Estimated compute time is ' + '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s))
         submit_elastic = st.button('Calculate', key="calcElasticity")
         if submit_elastic:
+            submit_elastic = False
             st_time = time.time()
             SagData.clear()
             Nom = SagData(_dd, wr)
@@ -400,7 +402,7 @@ with tab4:
             else:
                 st.warning('Perform a calculation and the download data will be available.')
         with cdd2:
-            if submit_altCond:
+            if Nom is not None:
                 st.markdown('#### Download CAD Scripts')
                 acadScript1 = OCS.SagtoCAD(Nom, 1)
                 acadScript2 = OCS.SagtoCAD(Nom, yExagg)
