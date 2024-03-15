@@ -9,7 +9,7 @@ import general as GenFun
 
 st.session_state.accesskey = st.session_state.accesskey
 Nom = None
-
+st.cache_data.clear()
 def plotdimensions(staList,elList,yscale=1):
     max_x = max(staList) - min(staList)
     max_y = max(elList) - min(elList)
@@ -313,14 +313,14 @@ with tab2:
         submit_altCond = st.button('Calculate', key="calcAltCond")
         if submit_altCond:
             st_time = time.time()
-            Nom = SagData(_dd, wr).clear()
+            Nom = SagData(_dd, wr)
             #new_df_acd = _df_acd[e_df_acd.Calculate]
             if new_df_acd.empty:
-                PlotSag(Nom, yExagg).clear()
+                PlotSag(Nom, yExagg)
             else:
-                Ref = altSagData(new_df_acd, Nom).clear()
-                PlotSagaltCond(Ref, yExagg).clear()
-                PlotCWDiff(Ref).clear()
+                Ref = altSagData(new_df_acd, Nom)
+                PlotSagaltCond(Ref, yExagg)
+                PlotCWDiff(Ref)
                 et_time = time.time()
                 m, s = divmod(et_time-st_time, 60)
                 msg = 'Done!' + ' That took ' + '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s)
@@ -360,7 +360,7 @@ with tab3:
             Nom = SagData(_dd, wr).clear()
             #new_df_acd_elastic = _df_acd[elastic_df_acd.Calculate]
             if len(new_df_acd_elastic) > 0:
-                ec = elasticityalt(new_df_acd_elastic, Nom, pUplift, stepSize, startSPT, endSPT).clear()
+                ec = elasticityalt(new_df_acd_elastic, Nom, pUplift, stepSize, startSPT, endSPT)
                 et_time = time.time()
                 m, s = divmod(et_time-st_time, 60)
                 msg = 'Done!' + ' That took ' + '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s)
@@ -373,7 +373,7 @@ with tab3:
             #    ec = elasticity(_df_cd, Nom, pUplift, stepSize, startSPT, endSPT)
             
         if ec is not None:
-            Plotelasticity(ec).clear()
+            Plotelasticity(ec)
 
 with tab4:
     if ddfile is not None and wrfile is not None:
@@ -384,7 +384,7 @@ with tab4:
             #        if not new_df_acd.empty:
             #            OutputAltCond(Ref, Nom)
             if submit_altCond:
-                OutputSag(Nom).clear()
+                OutputSag(Nom)
             elif ec is not None:
                 Outputelasticity(ec)
             else:
