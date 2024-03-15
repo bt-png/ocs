@@ -305,7 +305,7 @@ with tab2:
         steps = (max(wr.STA)-min(wr.STA))/stepSize
         estCalcTime = ((0.0116 * conditions) + (0.00063)) * steps #process time for iterative + base
         m, s = divmod(estCalcTime, 60)
-        if m>1:
+        if m>0:
             st.warning('###### This could take ' + '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s))
         else:
             st.markdown('###### Estimated compute time is ' + '{:02.0f} seconds'.format(s))
