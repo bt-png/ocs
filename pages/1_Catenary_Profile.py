@@ -320,7 +320,7 @@ with tab2:
                 Ref = altSagData(new_df_acd, Nom)
                 et_time = time.time()
                 m, s = divmode(et_time-st_time, 60)
-                st.success('Done!', 'That took "+ '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s))
+                st.success('Done!', 'That took ' + '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s))
                 PlotSagaltCond(Ref, yExagg)
                 PlotCWDiff(Ref)
             
@@ -361,7 +361,7 @@ with tab3:
                 ec = elasticityalt(new_df_acd_elastic, Nom, pUplift, stepSize, startSPT, endSPT)
                 et_time = time.time()
                 m, s = divmode(et_time-st_time, 60)
-                st.success('Done!', 'That took "+ '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s))
+                st.success('Done!', 'That took ' + '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s))
             else:
                 st.error('Please select at least one load condition')
             #if st.session_state['altConductors']:
