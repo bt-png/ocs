@@ -9,6 +9,9 @@ import general as GenFun
 
 st.session_state.accesskey = st.session_state.accesskey
 Nom = None
+Ref = None
+ec = None
+
 st.cache_data.clear()
 def plotdimensions(staList,elList,yscale=1):
     max_x = max(staList) - min(staList)
@@ -313,20 +316,25 @@ with tab2:
         submit_altCond = st.button('Calculate', key="calcAltCond")
         if submit_altCond:
             st_time = time.time()
+            SagData.clear()
             Nom = SagData(_dd, wr)
-            #new_df_acd = _df_acd[e_df_acd.Calculate]
-            if new_df_acd.empty:
-                PlotSag(Nom, yExagg)
-            else:
-                Ref = altSagData(new_df_acd, Nom)
-                PlotSagaltCond(Ref, yExagg)
-                PlotCWDiff(Ref)
-                et_time = time.time()
-                m, s = divmod(et_time-st_time, 60)
-                msg = 'Done!' + ' That took ' + '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s)
-                st.success(msg)
-            
+            tmp = Nom._solve()
+            PlotSag.clear()
+            altSagData.clear()
+            Ref = altSagData(new_df_acd, Nom)
+            tmp = Ref._solve()
+            PlotSagaltCond.clear()
+            et_time = time.time()
+            m, s = divmod(et_time-st_time, 60)
+            msg = 'Done!' + ' That took ' + '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s)
+            st.success(msg)
+        if new_df_acd.empty and Nom is not None:
+            PlotSag(Nom, yExagg)
+        elif Ref is not None:
+            PlotSagaltCond(Ref, yExagg)
+            PlotCWDiff(Ref)
     elif wrfile is None and ddfile is None:
+        SagData.clear()
         Nom = SagData(OCS.sample_df_dd(), OCS.sample_df_wr())
         PlotSagSample(Nom, yExagg)
     else:
@@ -357,21 +365,22 @@ with tab3:
         submit_elastic = st.button('Calculate', key="calcElasticity")
         if submit_elastic:
             st_time = time.time()
-            Nom = SagData(_dd, wr).clear()
+            SagData.clear()
+            Nom = SagData(_dd, wr)
             #new_df_acd_elastic = _df_acd[elastic_df_acd.Calculate]
-            if len(new_df_acd_elastic) > 0:
-                ec = elasticityalt(new_df_acd_elastic, Nom, pUplift, stepSize, startSPT, endSPT)
-                et_time = time.time()
-                m, s = divmod(et_time-st_time, 60)
-                msg = 'Done!' + ' That took ' + '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s)
-                st.success(msg)
-            else:
-                st.error('Please select at least one load condition')
+        if len(new_df_acd_elastic) > 0:
+            elasticityalt.clear()
+            ec = elasticityalt(new_df_acd_elastic, Nom, pUplift, stepSize, startSPT, endSPT)
+            et_time = time.time()
+            m, s = divmod(et_time-st_time, 60)
+            msg = 'Done!' + ' That took ' + '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s)
+            st.success(msg)
+        else:
+            st.error('Please select at least one load condition')
             #if st.session_state['altConductors']:
             #    ec = elasticityalt(_df_acd, Nom, pUplift, stepSize, startSPT, endSPT)
             #else:
             #    ec = elasticity(_df_cd, Nom, pUplift, stepSize, startSPT, endSPT)
-            
         if ec is not None:
             Plotelasticity(ec)
 
