@@ -8,6 +8,7 @@ import system as OCS
 import general as GenFun
 
 st.session_state.accesskey = st.session_state.accesskey
+Nom = None
 
 def plotdimensions(staList,elList,yscale=1):
     max_x = max(staList) - min(staList)
