@@ -319,7 +319,7 @@ with tab2:
             else:
                 Ref = altSagData(new_df_acd, Nom)
                 et_time = time.time()
-                m, s = divmode(et_time-st_time, 60)
+                m, s = divmod(et_time-st_time, 60)
                 st.success('Done!', 'That took ' + '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s))
                 PlotSagaltCond(Ref, yExagg)
                 PlotCWDiff(Ref)
@@ -360,7 +360,7 @@ with tab3:
             if len(new_df_acd_elastic) > 0:
                 ec = elasticityalt(new_df_acd_elastic, Nom, pUplift, stepSize, startSPT, endSPT)
                 et_time = time.time()
-                m, s = divmode(et_time-st_time, 60)
+                m, s = divmod(et_time-st_time, 60)
                 st.success('Done!', 'That took ' + '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s))
             else:
                 st.error('Please select at least one load condition')
