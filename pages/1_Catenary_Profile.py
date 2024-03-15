@@ -368,19 +368,19 @@ with tab3:
             SagData.clear()
             Nom = SagData(_dd, wr)
             #new_df_acd_elastic = _df_acd[elastic_df_acd.Calculate]
-        if len(new_df_acd_elastic) > 0:
-            elasticityalt.clear()
-            ec = elasticityalt(new_df_acd_elastic, Nom, pUplift, stepSize, startSPT, endSPT)
-            et_time = time.time()
-            m, s = divmod(et_time-st_time, 60)
-            msg = 'Done!' + ' That took ' + '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s)
-            st.success(msg)
-        else:
-            st.error('Please select at least one load condition')
-            #if st.session_state['altConductors']:
-            #    ec = elasticityalt(_df_acd, Nom, pUplift, stepSize, startSPT, endSPT)
-            #else:
-            #    ec = elasticity(_df_cd, Nom, pUplift, stepSize, startSPT, endSPT)
+            if len(new_df_acd_elastic) > 0:
+                elasticityalt.clear()
+                ec = elasticityalt(new_df_acd_elastic, Nom, pUplift, stepSize, startSPT, endSPT)
+                et_time = time.time()
+                m, s = divmod(et_time-st_time, 60)
+                msg = 'Done!' + ' That took ' + '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s)
+                st.success(msg)
+            else:
+                st.error('Please select at least one load condition')
+                #if st.session_state['altConductors']:
+                #    ec = elasticityalt(_df_acd, Nom, pUplift, stepSize, startSPT, endSPT)
+                #else:
+                #    ec = elasticity(_df_cd, Nom, pUplift, stepSize, startSPT, endSPT)
         if ec is not None:
             Plotelasticity(ec)
 
