@@ -315,17 +315,17 @@ with tab2:
             st.markdown('###### Estimated compute time is ' + '{:02.0f} seconds'.format(s))
         submit_altCond = st.button('Calculate', key="calcAltCond")
         if submit_altCond:
-            submit_altCond = False
             st_time = time.time()
+            submit_altCond = False
             SagData.clear()
-            Nom = SagData(_dd, wr)
-            tmp = Nom._solve()
             PlotSag.clear()
             altSagData.clear()
-            Ref = altSagData(new_df_acd, Nom)
-            tmp = Ref._solve()
             PlotSagaltCond.clear()
             PlotCWDiff.clear()
+            Nom = SagData(_dd, wr)
+            tmp = Nom._solve()
+            Ref = altSagData(new_df_acd, Nom)
+            tmp = Ref._solve()
             et_time = time.time()
             m, s = divmod(et_time-st_time, 60)
             msg = 'Done!' + ' That took ' + '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s)
