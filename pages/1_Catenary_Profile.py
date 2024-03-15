@@ -292,8 +292,7 @@ with tab1:
             preview_wrfile(wrfile)
 with tab2:
     if ddfile is not None and wrfile is not None:
-        st.write('Hanger lengths are driven based on the BASE condition. \
-                 It will be included in all plots.')
+        st.write('Hanger lengths are driven based on the BASE condition.')
         new_df_acd = dataframe_with_selections(_df_acd, 'plotdataframe')
         #_df_acd_ref = _df_acd.copy()
         #_df_acd_ref.insert(0,'Calculate',False)
