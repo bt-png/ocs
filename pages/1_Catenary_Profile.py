@@ -303,9 +303,10 @@ with tab2:
         stepSize = _df_bd.iloc[0,1]
         steps = (max(wr.STA)-min(wr.STA))/stepSize
         estCalcTime = ((0.0116 * conditions) + (0.00063)) * steps #process time for iterative + base
+        estEndTime = time.localtime(time.mktime(time.localtime()) + estCalcTime)
         m, s = divmod(estCalcTime, 60)
         if m>0:
-            st.warning('###### This could take ' + '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s))
+            st.warning('###### This could take ' + '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s), ', check back at', time.strftime("%H:%M", estEndTime))
         else:
             st.markdown('###### Estimated compute time is ' + '{:02.0f} seconds'.format(s))
         submit_altCond = st.button('Calculate', key="calcAltCond")
@@ -342,9 +343,10 @@ with tab3:
         conditions = len(new_df_acd_elastic)
         steps = (wr.loc[endSPT, 'STA']-wr.loc[startSPT, 'STA'])/stepSize
         estCalcTime = 0.789 * conditions * steps
+        estEndTime = time.localtime(time.mktime(time.localtime()) + estCalcTime)
         m, s = divmod(estCalcTime, 60)
         if m>3:
-            st.warning('###### This could take ' + '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s))
+            st.warning('###### This could take ' + '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s), ', check back at', time.strftime("%H:%M", estEndTime))
         else:
             st.markdown('###### Estimated compute time is ' + '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s))
         submit_elastic = st.button('Calculate', key="calcElasticity")
@@ -353,7 +355,7 @@ with tab3:
             #new_df_acd_elastic = _df_acd[elastic_df_acd.Calculate]
             if len(new_df_acd_elastic) > 0:
                 ec = elasticityalt(new_df_acd_elastic, Nom, pUplift, stepSize, startSPT, endSPT)
-                st.success('Done!') 
+                st.success('Done!', 'Completed at', time.strftime("%H:%M", time.localtime()))
             else:
                 st.error('Please select at least one load condition')
             #if st.session_state['altConductors']:
