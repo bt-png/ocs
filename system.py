@@ -567,7 +567,7 @@ class Elasticity():
         #print('Checking elasticity from STA', _startsta, 'to STA', _endsta)
         _avgcycletime = 0.75
         #print(' | ', int(len(_staval)), 'total cycles estimating to take', 
-              round(_avgcycletime * int(len(_staval)),4), 'seconds')
+        #      round(_avgcycletime * int(len(_staval)),4), 'seconds')
         _diffmin = np.copy(_staval*0)
         _diffmax = np.copy(_staval*0)
         _cycleloops = np.copy(_staval*0)
