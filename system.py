@@ -564,9 +564,9 @@ class Elasticity():
             _endsta -= stepsize
         _staval = np.arange(_startsta, _endsta, stepsize, dtype=float)
         _staval = GenFun.RoundVal(_staval, 1)
-        print('Checking elasticity from STA', _startsta, 'to STA', _endsta)
+        #print('Checking elasticity from STA', _startsta, 'to STA', _endsta)
         _avgcycletime = 0.75
-        print(' | ', int(len(_staval)), 'total cycles estimating to take', 
+        #print(' | ', int(len(_staval)), 'total cycles estimating to take', 
               round(_avgcycletime * int(len(_staval)),4), 'seconds')
         _diffmin = np.copy(_staval*0)
         _diffmax = np.copy(_staval*0)
@@ -596,8 +596,8 @@ class Elasticity():
         _et = time.time()
         _totaltime = _et - _st
         _meantime = np.mean(_cycletime)
-        print(i, ' total loops processed in', round(_totaltime,4), 'seconds',
-              'with average cycle time of', round(_meantime*1000,4), 'milliseconds')
+        #print(i, ' total loops processed in', round(_totaltime,4), 'seconds',
+        #      'with average cycle time of', round(_meantime*1000,4), 'milliseconds')
 
     def savetocsv(self, path):
         """ Output wire data to CSV """

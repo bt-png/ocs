@@ -16,6 +16,23 @@ def plotdimensions(staList,elList,yscale=1):
     height = widthratio*yscale*max_y
     return int(width), int(height)
 
+def dataframe_with_selections(df, inputkey):
+    df_with_selections = df.copy()
+    df_with_selections.insert(0, "Select", False)
+    df_with_selections.iloc[0,0] = True
+    # Get dataframe row-selections from user with st.data_editor
+    edited_df = st.data_editor(
+        df_with_selections,
+        hide_index=True,
+        column_config={"Select": st.column_config.CheckboxColumn(required=True)},
+        disabled=df.columns,
+        key=inputkey
+    )
+
+    # Filter the dataframe using the temporary column, then drop the column
+    selected_rows = edited_df[edited_df.Select]
+    return selected_rows.drop('Select', axis=1)
+
 @st.cache_data()
 def ddData(dd):
     return OCS.create_df_dd(dd)
@@ -24,21 +41,21 @@ def ddData(dd):
 def wrData(wr):
     return OCS.wire_run(wr)
 
-#@st.cache_data()
+@st.cache_data()
 def SagData(val, wirerun) -> None:
     return OCS.CatenaryFlexible(val, wirerun)
     
-#@st.cache_data()
+@st.cache_data()
 def altSagData(val,  _ORIG) -> None:
     return OCS.AltCondition_Series(val, _ORIG)
 
-#@st.cache_data()
+@st.cache_data()
 def elasticity(val, _BASE, pUplift, stepSize, startSPT, endSPT) -> None:
     EL = OCS.Elasticity(val, _BASE, pUplift, stepSize, startSPT, endSPT)
     df = EL.dataframe()
     return df
 
-#@st.cache_data()
+@st.cache_data()
 def elasticityalt(val, _BASE, pUplift, stepSize, startSPT, endSPT) -> None:
     EL = OCS.Elasticity_series(val, _BASE, pUplift, stepSize, startSPT, endSPT)
     df = EL.dataframe()
@@ -104,16 +121,13 @@ def PlotSagaltCond(_REF, yscale) -> None:
             height=pheight
         ).interactive()
     st.write(chart)
-    #st.write(_df_acd)
-    st.write('###### Loaded alternate conductor particulars data:')
-    st.dataframe(_df_acd, hide_index=True)
 
 #@st.cache_data()
 def PlotCWDiff(_REF) -> None:
     df = _REF.dataframe_cwdiff()
     df['Elevation'] *= 12
     pwidth, pheight = plotdimensions(df['Stationing'],df['Elevation'])
-    st.write('### CW Elevation Difference')
+    st.write('### Difference from BASE')
     nearest = alt.selection_point(nearest=True, on='mouseover', fields=['Stationing'], empty=False)
     line = alt.Chart(df).mark_line().encode(
         alt.X('Stationing:Q').scale(zero=False), 
@@ -178,9 +192,6 @@ def Plotelasticity(df) -> None:
     rules = alt.Chart(df).mark_rule(color='gray').encode(x='Stationing:Q').transform_filter(nearest)
     chart = alt.layer(line + selectors + points + rules + text).properties(width=pwidth, height=300)
     st.write(chart)
-    
-    st.write('###### Loaded alternate conductor particulars data:')
-    st.dataframe(_df_acd, hide_index=True)
 
 #@st.cache_data()
 def OutputSag(_BASE) -> None:
@@ -281,13 +292,35 @@ with tab1:
             preview_wrfile(wrfile)
 with tab2:
     if ddfile is not None and wrfile is not None:
-        Nom = SagData(_dd, wr)
-        if st.session_state['altConductors']:       
-            Ref = altSagData(_df_acd, Nom)
-            PlotSagaltCond(Ref, yExagg)
-            PlotCWDiff(Ref)
+        st.write('Hanger lengths are driven based on the BASE condition. \
+                 It will be included in all plots.')
+        new_df_acd = dataframe_with_selections(_df_acd, 'plotdataframe')
+        #_df_acd_ref = _df_acd.copy()
+        #_df_acd_ref.insert(0,'Calculate',False)
+        #_df_acd_ref.loc[0,'Calculate'] = True
+        #e_df_acd = st.data_editor(_df_acd_ref, hide_index=True, key='1')
+        #st.write(_df_acd_ref.iloc[0,:].transpose)
+        conditions = len(new_df_acd)
+        stepSize = _df_bd.iloc[0,1]
+        steps = (max(wr.STA)-min(wr.STA))/stepSize
+        estCalcTime = ((0.0116 * conditions) + (0.00063)) * steps #process time for iterative + base
+        m, s = divmod(estCalcTime, 60)
+        if m>1:
+            st.warning('###### This could take ' + '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s))
         else:
-            PlotSag(Nom, yExagg)
+            st.markdown('###### Estimated compute time is ' + '{:02.0f} seconds'.format(s))
+        submit_altCond = st.button('Calculate', key="calcAltCond")
+        if submit_altCond:
+            Nom = SagData(_dd, wr)
+            #new_df_acd = _df_acd[e_df_acd.Calculate]
+            if new_df_acd.empty:
+                PlotSag(Nom, yExagg)
+            else:
+                Ref = altSagData(new_df_acd, Nom)
+                #st.success('Done!')
+                PlotSagaltCond(Ref, yExagg)
+                PlotCWDiff(Ref)
+            
     elif wrfile is None and ddfile is None:
         Nom = SagData(OCS.sample_df_dd(), OCS.sample_df_wr())
         PlotSagSample(Nom, yExagg)
@@ -296,27 +329,39 @@ with tab2:
 with tab3:
     if ddfile is not None and wrfile is not None and st.session_state['elasticity']:
         ec = None
+        #_df_acd_ref = _df_acd.copy()
+        #_df_acd_ref.insert(0,'Calculate',False)
+        st.write('Consider load conditions')
+        new_df_acd_elastic = dataframe_with_selections(_df_acd, 'elasticdf')
+        #elastic_df_acd = st.data_editor(_df_acd_ref, hide_index=True, key='2')
         startSPT = st.number_input(label='Starting structure', value=1, min_value=0, max_value=len(wr)-2)
         SPTID(startSPT)
         endSPT = st.number_input(label='Ending structure', value=startSPT+1, min_value=1, max_value=len(wr)-1)
         SPTID(endSPT)
         stepSize = st.number_input(label='Resolution (ft)', min_value = 1, step=1, value=10)
         pUplift = st.number_input(label='Uplift Force (lbf)', value=25)
-        conditions = 1+(len(_df_acd)-1)*st.session_state['altConductors']
+        conditions = len(new_df_acd_elastic)
         steps = (wr.loc[endSPT, 'STA']-wr.loc[startSPT, 'STA'])/stepSize
         estCalcTime = 0.789 * conditions * steps
         m, s = divmod(estCalcTime, 60)
-        if m>1:
-            st.warning('###### This could take up to ' + '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s))
+        if m>3:
+            st.warning('###### This could take ' + '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s))
         else:
-            st.markdown('###### This could take up to ' + '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s))
-        submit_form = st.button('Calculate', key="calcElasticity")
-        if submit_form:
-            if st.session_state['altConductors']:
-                ec = elasticityalt(_df_acd, Nom, pUplift, stepSize, startSPT, endSPT)
+            st.markdown('###### Estimated compute time is ' + '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s))
+        submit_elastic = st.button('Calculate', key="calcElasticity")
+        if submit_elastic:
+            Nom = SagData(_dd, wr)
+            #new_df_acd_elastic = _df_acd[elastic_df_acd.Calculate]
+            if len(new_df_acd_elastic) > 0:
+                ec = elasticityalt(new_df_acd_elastic, Nom, pUplift, stepSize, startSPT, endSPT)
+                st.success('Done!') 
             else:
-                ec = elasticity(_df_cd, Nom, pUplift, stepSize, startSPT, endSPT)
-            st.success('Done!') 
+                st.error('Please select at least one load condition')
+            #if st.session_state['altConductors']:
+            #    ec = elasticityalt(_df_acd, Nom, pUplift, stepSize, startSPT, endSPT)
+            #else:
+            #    ec = elasticity(_df_cd, Nom, pUplift, stepSize, startSPT, endSPT)
+            
         if ec is not None:
             Plotelasticity(ec)
 
@@ -324,32 +369,35 @@ with tab4:
     if ddfile is not None and wrfile is not None:
         cdd0, cdd1, cdd2 = st.columns([0.1, 0.5, 0.4])
         with cdd1:
-            if st.session_state['altConductors']:
-                OutputAltCond(Ref, Nom)
-            else:
+            #if st.session_state['altConductors']:
+            #    if submit_altCond:
+            #        if not new_df_acd.empty:
+            #            OutputAltCond(Ref, Nom)
+            if submit_altCond:
                 OutputSag(Nom)
+            elif ec is not None:
+                Outputelasticity(ec)
+            else:
+                st.warning('Perform a calculation and the download data will be available.')
+        with cdd2:
+            if submit_altCond:
+                st.markdown('#### Download CAD Scripts')
                 acadScript1 = OCS.SagtoCAD(Nom, 1)
                 acadScript2 = OCS.SagtoCAD(Nom, yExagg)
-        with cdd2:
-            st.markdown('#### Download CAD Scripts')
-            with st.container(border=True):
-                if not st.session_state['altConductors']:
-                    a1, b1, c1 = st.columns([0.4, 0.3, 0.3])
-                    with a1:
-                        st.write('Cable Profile')
-                    with b1:
-                        bt1 = st.download_button(
-                            label="### 1:1 scale",
-                            data=acadScript1,
-                            file_name="_sag_.scr",
-                            mime="text/scr"
-                        )
-                    with c1:
-                        bt2 = st.download_button(
-                            label="### yExaggeration",
-                            data=acadScript2,
-                            file_name="_sag_.scr",
-                            mime="text/scr"
-                        )
-        if st.session_state['elasticity'] and ec is not None:
-            Outputelasticity(ec)
+                a1, b1, c1 = st.columns([0.4, 0.3, 0.3])
+                with a1:
+                    st.write('Cable Profile')
+                with b1:
+                    bt1 = st.download_button(
+                        label="### 1:1 scale",
+                        data=acadScript1,
+                        file_name="_sag_.scr",
+                        mime="text/scr"
+                    )
+                with c1:
+                    bt2 = st.download_button(
+                        label="### yExaggeration",
+                        data=acadScript2,
+                        file_name="_sag_.scr",
+                        mime="text/scr"
+                    )
