@@ -318,12 +318,12 @@ with tab2:
                 PlotSag(Nom, yExagg)
             else:
                 Ref = altSagData(new_df_acd, Nom)
+                PlotSagaltCond(Ref, yExagg)
+                PlotCWDiff(Ref)
                 et_time = time.time()
                 m, s = divmod(et_time-st_time, 60)
                 msg = 'Done!' + ' That took ' + '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s)
                 st.success(msg)
-                PlotSagaltCond(Ref, yExagg)
-                PlotCWDiff(Ref)
             
     elif wrfile is None and ddfile is None:
         Nom = SagData(OCS.sample_df_dd(), OCS.sample_df_wr())
