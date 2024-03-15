@@ -165,7 +165,8 @@ def CatenarySag_FlexibleHA_Iterative(WireRun, L_WeightChange, L_Tension, L_Desig
             LoadDiff = Cycle_CWSupportReaction-PriorCWSupportReaction
             if max(np.nanmax(LoadDiff),abs(np.nanmin(LoadDiff))) <= loadTolerance:
                 break
-            PriorCWSupportReaction += 0.8*LoadDiff
+            mult1 = np.sin(np.radians(min(90,60+15*subLoop1)))
+            PriorCWSupportReaction += mult1*LoadDiff
             subLoop1 +=1
         TsubLoop1 += subLoop1
         #Resolve to the correct solution for Hangers without downforce
@@ -180,7 +181,8 @@ def CatenarySag_FlexibleHA_Iterative(WireRun, L_WeightChange, L_Tension, L_Desig
             #location until it reaches a point of equilibrium and is not/slightly loaded
             ELStep = ELDiff_FreeSag_NegativeLoadedHA_Simple(Stationing, Cycle_P_SpanWeight, H_SpanTension,
                                                                    HA_STA, Cycle_HA_EL, minCW_P, Cycle_SupportLoad_CW, xRound)
-            Cycle_HA_EL += 0.8*ELStep
+            mult2 = np.sin(np.radians(min(90,60+15*subLoop2)))
+            Cycle_HA_EL += mult2*ELStep
             subLoop2 += 1
         TsubLoop2 += subLoop2
         Cycle_P_SpanWeight_MW = GenFun.AddDiscreteLoadstoSpan(P_SpanWeight_MW, Stationing,
@@ -197,11 +199,12 @@ def CatenarySag_FlexibleHA_Iterative(WireRun, L_WeightChange, L_Tension, L_Desig
         if max(np.max(HA_L_Diff_grown),abs(np.min(HA_L_Diff_shrunk))) <= HA_Accuracy:
             if subLoop1 == 0 and subLoop2 == 0:
                 break
+        mult = np.sin(np.radians(min(90,45+15*loops)))
         #Since HA's are allowed to slack, stepping up slowly to an unloaded state without overshooting resolves the quickest
-        Cycle_HA_EL += 0.8*HA_L_Diff*(HA_L_Diff>0)
+        Cycle_HA_EL += mult*HA_L_Diff*(HA_L_Diff>0)
         #Slacking of hangers (shortening) is only allowed if the force is in uplift
         #HA_EL_Diff = GenFun.CWSupportELDifference(Stationing, ORIGINALDESIGN.get('LoadedSag'), Cycle_LoadedSag, HA_STA)
-        Cycle_HA_EL += 0.8*HA_L_Diff*(HA_L_Diff<0)*(Cycle_SupportLoad_CW>0)
+        Cycle_HA_EL += mult*HA_L_Diff*(HA_L_Diff<0)*(Cycle_SupportLoad_CW>0)
         loops += 1
     Cycle_SupportLoad_MW = GenFun.SupportLoad(Stationing, Cycle_P_SpanWeight_MW, H_SpanTension_MW,
                                               np.array(WR['STA']), np.array((WR['Rail EL']+WR['MW Height'])), xRound)
