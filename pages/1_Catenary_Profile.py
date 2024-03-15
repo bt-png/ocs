@@ -305,10 +305,11 @@ with tab2:
         steps = (max(wr.STA)-min(wr.STA))/stepSize
         estCalcTime = ((0.0116 * conditions) + (0.00063)) * steps #process time for iterative + base
         m, s = divmod(estCalcTime, 60)
-        if m>0:
-            st.warning('###### This could take ' + '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s))
-        else:
-            st.markdown('###### Estimated compute time is ' + '{:02.0f} seconds'.format(s))
+        if Nom is None:
+            if m>0:
+                st.warning('###### This could take ' + '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s))
+            else:
+                st.markdown('###### Estimated compute time is ' + '{:02.0f} seconds'.format(s))
         submit_altCond = st.button('Calculate', key="calcAltCond")
         if submit_altCond:
             st_time = time.time()
@@ -362,7 +363,8 @@ with tab3:
                 ec = elasticityalt(new_df_acd_elastic, Nom, pUplift, stepSize, startSPT, endSPT)
                 et_time = time.time()
                 m, s = divmod(et_time-st_time, 60)
-                st.success('Done!', 'That took ' + '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s))
+                msg = 'Done!' + ' That took ' + '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s)
+                st.success(msg)
             else:
                 st.error('Please select at least one load condition')
             #if st.session_state['altConductors']:
