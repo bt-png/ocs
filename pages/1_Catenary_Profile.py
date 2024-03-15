@@ -320,7 +320,8 @@ with tab2:
                 Ref = altSagData(new_df_acd, Nom)
                 et_time = time.time()
                 m, s = divmod(et_time-st_time, 60)
-                st.success('Done!', 'That took ' + '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s))
+                msg = 'Done!' + ' That took ' + '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s)
+                st.success(msg)
                 PlotSagaltCond(Ref, yExagg)
                 PlotCWDiff(Ref)
             
