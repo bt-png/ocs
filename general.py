@@ -9,6 +9,31 @@ import pandas as pd
 
 # GENERAL
 
+def FtIn(val):
+    if val < 0:
+        sign = '(-) '
+    else:
+        sign =''
+    _val = abs(val)
+    _roundIN = 16 #Round inches to 1/[]th of an inch
+    _ft = int(_val)
+    _in = (_val - _ft) * 12
+    _in = round(_in * _roundIN, 0) / _roundIN
+    if _ft > 0 and _in > 0:
+        _strFtIn = sign + str(_ft) + "'-" + str(_in) + '"'
+    elif _ft > 0:
+        _strFtIn = sign + str(_ft) + "'"
+    elif _in > 0:
+        _strFtIn = sign + str(_in) + '"'
+    elif _val == 0 or _in == 0:
+        _strFtIn = '0"'
+    else:
+        _strFtIn = 'Error'
+    return _ft, _in, _strFtIn
+
+def WindPressure(windspeed, shapecoefficient=1):
+    return windspeed ** 2 * 0.00256 * shapecoefficient
+
 def RoundVal(arr,num):
     if num == 0:
         return round(arr,0)
