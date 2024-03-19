@@ -75,6 +75,10 @@ def df_add(_df1, _df2):
     _df = pd.concat([_df1, _df_empty, _df2])
     return _df
 
+def ConductorTension(T0,w0,w1,dF,L,A):
+    T1 = T0
+    return T1
+
 # WIRE RUN GENERAL
 def WireRun_df(df, STARound):
     #expected DataFrame Headers [PoleID, STA, RailEL, MWHT, CWHT, PreSag, DeviationAngle
