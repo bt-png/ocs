@@ -1,5 +1,6 @@
 import streamlit as st
 import general as GenFun
+import numpy as np
 
 def dataframe_with_selections(df, inputkey):
     df_with_selections = df.copy()
