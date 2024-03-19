@@ -75,25 +75,25 @@ def df_add(_df1, _df2):
     _df = pd.concat([_df1, _df_empty, _df2])
     return _df
 
-def ConductorTension(T0,w0,w1,dF,L,A):
-    E = 1.7*10**7
-    alpha = 9.4*10**-6
-    Q = T0 - (alpha*E*A*dF) - ((E*A*w0**2*L**2)/(24*T0**2))
-    R = E*A*w1**2*L**2/24
-    T1=T0
+def ConductorTension(_T0,_w0,_w1,_dF,_L,_A):
+    _E = 1.7*10**7
+    _alpha = 9.4*10**-6
+    _Q = _T0 - (_alpha*_E*_A*_dF) - ((_E*_A*_w0**2*_L**2)/(24*_T0**2))
+    _R = _E*_A*_w1**2*_L**2/24
+    _T1=_T0
     while True:
-        T1_check = Q + R/T1**2
-        if int(T1) == int(T1_check):
+        T1_check = _Q + _R/_T1**2
+        if int(_T1) == int(T1_check):
             break
-        if T1 > 3*T0:
+        if _T1 > 3*_T0:
             break
-        if T1 < 0:
+        if _T1 < 0:
             break
-        if T1_check > T1:
-            T1 += 1
+        if T1_check > _T1:
+            _T1 += 1
         else:
-            T1 -= 1
-    return T1
+            _T1 -= 1
+    return _T1
 
 # WIRE RUN GENERAL
 def WireRun_df(df, STARound):
