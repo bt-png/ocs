@@ -53,7 +53,7 @@ with conductor:
             _c_area = st.number_input(label='Cross Sectional Area (square inches)', value = 0.276, min_value=0.0)
             _c_equiv_span = st.number_input(label='Equivalent Span', value = 160, min_value = 0)
             _c_temp_diff = st.number_input(label='Temperature Variation', value = 0)
-            _c_tension_final = GenFun.ConductorTension(_c_tension,_c_weight,_c_iced_weight,_c_temp_diff,_c_equiv_span,_c_area):
+            _c_tension_final = GenFun.ConductorTension(_c_tension,_c_weight,_c_iced_weight,_c_temp_diff,_c_equiv_span,_c_area)
             st.write('Calculated Final Tension = ', str(_c_tension_final), '(pounds)')
         with st.expander('Sag & Wind Blowoff'):
             _c_span = st.number_input(label='Span Length', value = 150.0, min_value=0.0, step = 10.0)
