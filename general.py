@@ -76,7 +76,23 @@ def df_add(_df1, _df2):
     return _df
 
 def ConductorTension(T0,w0,w1,dF,L,A):
-    T1 = T0
+    E = 1.7*10**7
+    alpha = 9.4*10**-6
+    L0 = L + (w0/T0)**2 * (L**3)/24
+    T1 = T0 * 0.5
+    while True:
+        L1 = L + (w1/T1)**2 * (L**3)/24
+        _dL_A = L1 - L0
+        _dL_Thermal = alpha * L0 * dF
+        _dL_Strain = (T1*L1/A - T0*L0/A)/E
+        _dL_Spring = 0 #(T1 - T0)/k
+        _dL_B = _dL_Thermal + _dL_Strain + _dL_Spring
+        _lengths_error = (_dL_A - _dL_B)*(10**6)
+        if _lengths_error < 10 and _lengths_error >-10:
+            break
+        if T1 > 3*T0:
+            break
+        T1 += 5
     return T1
 
 # WIRE RUN GENERAL
