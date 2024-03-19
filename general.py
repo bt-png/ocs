@@ -92,7 +92,7 @@ def ConductorTension(T0,w0,w1,dF,L,A):
             break
         if T1 > 3*T0:
             break
-        T1 += 5
+        T1 += 1
     return T1
 
 # WIRE RUN GENERAL
