@@ -38,7 +38,7 @@ with conductor:
     cdd0, cdd1 = st.columns([0.05, 0.95])
     with cdd1:
         with st.expander('Cable Dimensions'):
-            _c_weight = st.number_input(label='Cable Weight (pounds per foot)', value=1.06, min_value=0.1)
+            _c_weight = st.number_input(label='Cable Weight (pounds per foot)', value=1.063, min_value=0.1)
             _c_diameter = st.number_input(label='Cable Diameter (inches)', value=0.86, min_value=0.1)
             _c_iced_radius = st.number_input(label='Iced Radius (inches)', value=0.0, min_value=0.0)
             _c_iced_weight = GenFun.IcedWeight(_c_diameter, _c_iced_radius)
@@ -50,6 +50,11 @@ with conductor:
             st.write('Calculated Wind Pressure = ', str(_c_windpressure), '(pounds per square feet)')
         with st.expander('Cable Tension'):
             _c_tension = st.number_input(label='Nominal Tension (pounds)', value = 3000, min_value=0)
+            _c_area = st.number_input(label='Cross Sectional Area (square inches)', value = 0.276, min_value=0.0)
+            _c_equiv_span = st.number_input(label='Equivalent Span', value = 160, min_value = 0)
+            _c_temp_diff = st.number_input(label='Temperature Variation', value = 0)
+            _c_tension_final = GenFun.ConductorTension(_c_tension,_c_weight,_c_iced_weight,_c_temp_diff,_c_equiv_span,_c_area):
+            st.write('Calculated Final Tension = ', str(_c_tension_final), '(pounds)')
         with st.expander('Sag & Wind Blowoff'):
             _c_span = st.number_input(label='Span Length', value = 150.0, min_value=0.0, step = 10.0)
             _c_span_loc = st.slider('Location of interest in Span', min_value=0.0, max_value=_c_span, value=0.5*_c_span)
