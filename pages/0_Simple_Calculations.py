@@ -43,7 +43,7 @@ with conductor:
             _c_iced_area = np.pi() * (((_c_radius + _c_iced_radius)/12)**2 - (_c_radius/12)**2)
             _c_ice_density = 57 #lbf per cubic feet
             _c_iced_weight = _c_iced_area * _c_ice_density
-            st.write('Calculated Iced Weight = ', str(_c_iced_weight), '(pounds per foot)'
+            st.write('Calculated Iced Weight = ', str(_c_iced_weight), '(pounds per foot)')
         with st.expander('Wind Data'):
             _c_windspeed = st.number_input(label='Wind Speed (mph)', value=40, min_value=0)
             _c_shapecoeff = st.number_input('Conductor Shape Coefficient', value = 1.0, min_value=0.1)
