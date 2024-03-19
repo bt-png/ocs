@@ -78,7 +78,7 @@ def df_add(_df1, _df2):
 def ConductorTension(T0,w0,w1,dF,L,A):
     E = 1.7*10**7
     alpha = 9.4*10**-6
-    Q = T0 - (alpha*E*A*dF) - ((E*A*w0**2*L**2)/(24*T**2))
+    Q = T0 - (alpha*E*A*dF) - ((E*A*w0**2*L**2)/(24*T0**2))
     R = E*A*w1**2*L**2/24
     T1=T0
     while True:
