@@ -41,7 +41,7 @@ with conductor:
             _c_diameter = st.number_input(label='Cable Diameter (inches)', value=0.86, min_value=0.1)
             _c_radius = 0.5 * _c_diameter
             _c_iced_radius = st.number_input(label='Iced Radius (inches)', value=0.25, min_value=0.0)
-            _c_iced_area = np.pi() * (((_c_radius + _c_iced_radius)/12)**2 - (_c_radius/12)**2)
+            _c_iced_area = np.pi * (((_c_radius + _c_iced_radius)/12)**2 - (_c_radius/12)**2)
             _c_ice_density = 57 #lbf per cubic feet
             _c_iced_weight = _c_iced_area * _c_ice_density
             st.write('Calculated Iced Weight = ', str(_c_iced_weight), '(pounds per foot)')
