@@ -36,7 +36,7 @@ def WindPressure(windspeed, shapecoefficient=1):
 
 def IcedWeight(diameter, iced_radius):
     _c_radius = 0.5 * diameter
-    _c_iced_area = np.pi * (((_c_radius + iced_radius)/12)**2 - (radius/12)**2)
+    _c_iced_area = np.pi * (((_c_radius + iced_radius)/12)**2 - (_c_radius/12)**2)
     _c_ice_density = 57 #lbf per cubic feet
     _c_iced_weight = _c_iced_area * _c_ice_density
     return _c_iced_weight
