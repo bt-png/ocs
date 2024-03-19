@@ -36,8 +36,14 @@ with conductor:
     cdd0, cdd1 = st.columns([0.05, 0.95])
     with cdd1:
         with st.expander('Cable Dimensions'):
-            _c_weight = st.number_input(label='Cable Weight (inches)', value=1.06, min_value=0.1)
+            _c_weight = st.number_input(label='Cable Weight (pounds per foot)', value=1.06, min_value=0.1)
             _c_diameter = st.number_input(label='Cable Diameter (inches)', value=0.86, min_value=0.1)
+            _c_radius = 0.5 * _c_diameter
+            _c_iced_radius = st.number_input(label='Iced Radius (inches)', value=0.25, min_value=0.0)
+            _c_iced_area = np.pi() * (((_c_radius + _c_iced_radius)/12)**2 - (_c_radius/12)**2)
+            _c_ice_density = 57 #lbf per cubic feet
+            _c_iced_weight = _c_iced_area * _c_ice_density
+            st.write('Calculated Iced Weight = ', str(_c_iced_weight), '(pounds per foot)'
         with st.expander('Wind Data'):
             _c_windspeed = st.number_input(label='Wind Speed (mph)', value=40, min_value=0)
             _c_shapecoeff = st.number_input('Conductor Shape Coefficient', value = 1.0, min_value=0.1)
@@ -48,7 +54,7 @@ with conductor:
         with st.expander('Sag & Wind Blowoff'):
             _c_span = st.number_input(label='Span Length', value = 150.0, min_value=0.0, step = 10.0)
             _c_span_loc = st.slider('Location of interest in Span', min_value=0.0, max_value=_c_span, value=0.5*_c_span)
-            _c_sag = GenFun.sag(_c_span, _c_tension, _c_weight, 0, _c_span_loc)
+            _c_sag = GenFun.sag(_c_span, _c_tension, (_c_weight+_c_iced_weight), 0, _c_span_loc)
             _ft, _in , _ftin = GenFun.FtIn(_c_sag)
             st.write('Sag at location = ', _ftin)
             _c_blowoff = GenFun.sag(_c_span, _c_tension, _c_windpressure*(_c_diameter/12),0, _c_span_loc)
