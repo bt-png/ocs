@@ -34,6 +34,12 @@ def FtIn(val):
 def WindPressure(windspeed, shapecoefficient=1):
     return windspeed ** 2 * 0.00256 * shapecoefficient
 
+def IcedWeight(radius, iced_radius):
+    _c_iced_area = np.pi * (((radius + iced_radius)/12)**2 - (radius/12)**2)
+    _c_ice_density = 57 #lbf per cubic feet
+    _c_iced_weight = _c_iced_area * _c_ice_density
+    return _c_iced_weight
+
 def RoundVal(arr,num):
     if num == 0:
         return round(arr,0)
