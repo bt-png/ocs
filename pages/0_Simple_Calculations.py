@@ -9,6 +9,23 @@ def plotSag(df):
     nearest = alt.selection_point(nearest=True, on='mouseover', fields=['Span'], empty=False)
     line = alt.Chart(df).mark_line().encode(
         alt.X('Span:Q').scale(zero=False), 
+        alt.Y('Sag (in):Q').scale(zero=False),
+        alt.Color('type')
+    )
+    selectors = alt.Chart(df).mark_point().encode(
+        alt.X('Span:Q'),
+        opacity=alt.value(0)
+    ).add_params(nearest)
+    points = line.mark_point().encode(opacity=alt.condition(nearest, alt.value(1), alt.value(0)))
+    text = line.mark_text(align='left', dx=5, dy=-5).encode(text=alt.condition(nearest, 'Sag (in):Q', alt.value(' ')))
+    rules = alt.Chart(df).mark_rule(color='gray').encode(x='Span:Q').transform_filter(nearest)
+    chart = alt.layer(line + selectors + points + rules + text).properties(width=600, height=300)
+    st.write(chart)
+
+def plotBlowOff(df):
+    nearest = alt.selection_point(nearest=True, on='mouseover', fields=['Span'], empty=False)
+    line = alt.Chart(df).mark_line().encode(
+        alt.X('Span:Q').scale(zero=False), 
         alt.Y('Offset (in):Q').scale(zero=False),
         alt.Color('type')
     )
@@ -60,6 +77,7 @@ with conductor:
             _c_weight = st.number_input(label='Cable Weight (pounds per foot)', value=1.063, min_value=0.1)
             _c_diameter = st.number_input(label='Cable Diameter (inches)', value=0.86, min_value=0.1)
             _c_iced_radius = st.number_input(label='Iced Radius (inches)', value=0.0, min_value=0.0)
+            _c_area = st.number_input(label='Cross Sectional Area (square inches)', value = 0.276, min_value=0.0)
             _c_iced_weight = GenFun.IcedWeight(_c_diameter, _c_iced_radius)
             st.write('Calculated Iced Weight = ' + str(round(_c_iced_weight,2)) + ' (pounds per foot)')
         with st.expander('Wind Data'):
@@ -69,27 +87,32 @@ with conductor:
             st.write('Calculated Wind Pressure = ', str(_c_windpressure), '(pounds per square feet)')
         with st.expander('Cable Tension'):
             _c_tension = st.number_input(label='Nominal Tension (pounds)', value = 3000, min_value=0)
-            _c_area = st.number_input(label='Cross Sectional Area (square inches)', value = 0.276, min_value=0.0)
+            _c_chk_ice = st.checkbox(label='Include Iced Weight in Nominal Tension Condition', value=False)
+            _c_section_loss = st.number_input(label='Conductor Section Loss (%)', value = 0, min_value=0)
             _c_equiv_span = st.number_input(label='Equivalent Span', value = 160, min_value = 0)
             _c_temp_diff = st.number_input(label='Temperature Variation', value = 0)
-            _c_tension_final = GenFun.ConductorTension(_c_tension,_c_weight,_c_weight+_c_iced_weight,_c_temp_diff,_c_equiv_span,_c_area)
+            _c_tension_final = GenFun.ConductorTension(_c_tension,_c_weight+_c_chk_ice*_c_iced_weight,(_c_weight*(100-_c_section_loss)/100)+_c_iced_weight,_c_temp_diff,_c_equiv_span,_c_area, _c_area*(100-_c_section_loss)/100)
             st.write('Calculated Final Tension = ' + str(round(_c_tension_final,2)) + ' (pounds)')
         with st.expander('Sag & Wind Blowoff'):
             _c_span = st.number_input(label='Span Length', value = 150.0, min_value=0.0, step = 10.0)
             #_c_span_loc = st.slider('Location of interest in Span', min_value=0.0, max_value=_c_span, value=0.5*_c_span)
             _x = range(0, int(_c_span)+1, 1)
-            _c_sag = [-12 * GenFun.sag(_c_span, _c_tension_final, (_c_weight+_c_iced_weight), 0, x) for x in _x]
+            _c_sag = [-12 * GenFun.sag(_c_span, _c_tension_final, ((_c_weight*(100-_c_section_loss)/100)+_c_iced_weight), 0, x) for x in _x]
             _c_sag_bare = [-12 * GenFun.sag(_c_span, _c_tension, (_c_weight), 0, x) for x in _x]
             dfa = pd.DataFrame({
                 'Span': _x,
-                'Offset (in)': _c_sag,
+                'Sag (in)': _c_sag,
                 'type': 'Sag'
             })
+            st.write()
             dfa_bare = pd.DataFrame({
                 'Span': _x,
-                'Offset (in)': _c_sag_bare,
+                'Sag (in)': _c_sag_bare,
                 'type': 'Sag (Bare)'
             })
+            _ft, _in , _ftin = GenFun.FtIn(-min(_c_sag)/12)
+            st.write('Max Sag = ', _ftin)
+            plotSag(dfa)
             _c_blowoff = [12 * GenFun.sag(_c_span, _c_tension_final, _c_windpressure*((_c_diameter+2*_c_iced_radius)/12),0, x) for x in _x]
             _c_blowoff_bare = [12 * GenFun.sag(_c_span, _c_tension, _c_windpressure*((_c_diameter)/12),0, x) for x in _x]
             dfb = pd.DataFrame({
@@ -112,10 +135,8 @@ with conductor:
                 'Offset (in)': [-x for x in _c_blowoff_bare],
                 'type': 'BlowOff (-Bare)'
             })
-            df = pd.concat([dfa, dfb, dfc], ignore_index=True)
-            plotSag(df)
-            _ft, _in , _ftin = GenFun.FtIn(-min(_c_sag)/12)
-            st.write('Max Sag = ', _ftin)
+            df = pd.concat([dfb, dfc], ignore_index=True)
             _ft, _in , _ftin = GenFun.FtIn(max(_c_blowoff)/12)
             st.write('Max Blow-off = ', _ftin)
+            plotBlowOff(df)
             
