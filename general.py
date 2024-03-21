@@ -89,10 +89,7 @@ def ConductorTension(_T0,_w0,_w1,_dF,_L,_A):
             break
         if _T1 < 0:
             break
-        if T1_check > _T1:
-            _T1 += 1
-        else:
-            _T1 -= 1
+        _T1 += 0.5*(T1_check-_T1)
     return _T1
 
 # WIRE RUN GENERAL
