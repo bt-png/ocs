@@ -75,9 +75,7 @@ def df_add(_df1, _df2):
     _df = pd.concat([_df1, _df_empty, _df2])
     return _df
 
-def ConductorTension(_T0,_w0,_w1,_dF,_L,_A0, _A1):
-    _E = 1.7*10**7
-    _alpha = 9.4*10**-6
+def ConductorTension(_E, _alpha, _T0,_w0,_w1,_dF,_L,_A0, _A1):
     _Q = _T0 - (_alpha*_E*_A0*_dF) - ((_E*_A0*_w0**2*_L**2)/(24*_T0**2))
     _R = _E*_A1*_w1**2*_L**2/24
     _T1=_T0

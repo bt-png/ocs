@@ -7,7 +7,11 @@ import streamlit as st
 import system as OCS
 import general as GenFun
 
-st.session_state.accesskey = st.session_state.accesskey
+if 'accesskey' not in st.session_state:
+    st.session_state.accesskey = ''
+else:
+    st.session_state.accesskey = st.session_state.accesskey
+    
 Nom = None
 Ref = None
 ec = None
