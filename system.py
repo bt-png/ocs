@@ -342,6 +342,12 @@ class CatenaryFlexible():
             self._solve()
         return self._sag
 
+    def dataframe_w_ha(self):
+        """ return a pandas dataFrame of the wire """
+        if not self._solved:
+            self._solve()
+        return self._sag_w_ha
+
     def dataframe_ha(self):
         """ return a pandas dataFrame of the hangers """
         if not self._solved:
