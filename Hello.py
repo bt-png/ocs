@@ -45,7 +45,7 @@ def run():
         - Ask a question through email BrettT_OCS@outlook.com
     """
     )
-    st.sidebar.text_input('access key', key='accesskey')
+    st.sidebar.text_input('access key', key='accesskey', type='password')
     if st.session_state['accesskey'] == st.secrets['accesskey']:
         st.write('#### access granted')
     st.write(df.tail(2))
