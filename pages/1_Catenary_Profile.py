@@ -327,7 +327,7 @@ with tab2:
             PlotCWDiff.clear()
             Nom = SagData(_dd, wr)
             tmp = Nom._solve()
-            st.write(new_df_acd)
+            st.write(len(new_df_acd.index))
             if not new_df_acd.empty:
                 Ref = altSagData(new_df_acd, Nom)
                 tmp = Ref._solve()
