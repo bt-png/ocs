@@ -334,7 +334,7 @@ with tab2:
             else:
                 if len(new_df_acd.index) > 1:
                     verified_alt_conditions = True
-                elif 'BASE' in new_df_acd['Load Condition'].value:
+                elif 'BASE' in new_df_acd['Load Condition'].values:
                     verified_alt_conditions = False
                 else:
                     verified_alt_conditions = True
