@@ -328,14 +328,21 @@ with tab2:
             Nom = SagData(_dd, wr)
             tmp = Nom._solve()
             st.write(len(new_df_acd.index))
-            if not new_df_acd.empty:
+            if new_df_acd.empty:
+                verified_alt_conditions = False
+            else:
+                if len(new_df_acd.index) > 1:
+                    verified_alt_conditions = True
+                elif 'BASE' in new_df_acd['Load Condition'].value:
+                    verified_alt_conditions = False
+            if verified_alt_conditions:
                 Ref = altSagData(new_df_acd, Nom)
                 tmp = Ref._solve()
             et_time = time.time()
             m, s = divmod(et_time-st_time, 60)
             msg = 'Done!' + ' That took ' + '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s)
             st.success(msg)
-        if new_df_acd.empty and Nom is not None:
+        if not verified_alt_conditions and Nom is not None:
             PlotSag(Nom, yExagg)
         elif Ref is not None:
             PlotSagaltCond(Ref, yExagg)
