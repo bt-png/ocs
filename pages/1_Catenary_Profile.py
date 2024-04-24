@@ -16,7 +16,7 @@ Nom = None
 Ref = None
 ec = None
 
-#st.cache_data.clear()
+
 def plotdimensions(staList,elList,yscale=1):
     max_x = max(staList) - min(staList)
     max_y = max(elList) - min(elList)
