@@ -220,6 +220,11 @@ def CWELDifference(dforiginal, dfuplift):
     #print('lenSupportSTA', len(SupportStationing), 'lenSTA', len(Stationing), 'lenOrig', len(oSPTEL), 'lenNew', len(nSPTEL))
     return (nSPTEL - oSPTEL)
 
+def LoadedSagMW_wHanger(Stationing, CWSag, MWSag, HangerStationing):
+    new_sta = Stationing
+    new_mwel = MWSag
+    return new_sta, new_mwel
+
 # SPAN LOADING
 def LoadSpanWeight(StationList, UnitCableWeight):
     return UnitCableWeight*LoadTribSpan(StationList)
