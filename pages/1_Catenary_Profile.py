@@ -335,6 +335,8 @@ with tab2:
                     verified_alt_conditions = True
                 elif 'BASE' in new_df_acd['Load Condition'].value:
                     verified_alt_conditions = False
+                else:
+                    verified_alt_conditions = True
             if verified_alt_conditions:
                 Ref = altSagData(new_df_acd, Nom)
                 tmp = Ref._solve()
