@@ -101,7 +101,7 @@ with conductor:
     with cdd1:
         with st.expander('Cable Dimensions'):
             _c_weight = st.number_input(label='Cable Weight (pounds per foot)', value=1.063, min_value=0.1)
-            _c_diameter = st.number_input(label='Cable Diameter (inches)', value=0.86, min_value=0.1)
+            _c_diameter = st.number_input(label='Cable Diameter (inches)', value=0.62, min_value=0.1)
             _c_iced_radius = st.number_input(label='Iced Radius (inches)', value=0.25, min_value=0.0)
             _c_iced_weight = GenFun.IcedWeight(_c_diameter, _c_iced_radius)
             if _c_iced_radius > 0:
@@ -127,7 +127,7 @@ with conductor:
             _c_temp_diff = st.number_input(label='Temperature Variation', value = 0)
             _c_area = st.number_input(label='Cross Sectional Area (square inches)', value = 0.276, min_value=0.0)
             _c_section_loss = st.number_input(label='Conductor Section Loss (%)', value = 0, min_value=0)
-            _c_E = st.number_input(label='Modulus of Elasticity', value = 1.7*10**7, format='%2e')
+            _c_E = st.number_input(label='Modulus of Elasticity', value = 1.6*10**7, format='%2e')
             _c_alpha = st.number_input(label='Thermal Elongation Coefficient', value = 9.4*10**-6, format='%2e')
             _c_initialweight = _c_weight+_c_chk_ice*_c_iced_weight
             _c_initialwindweight = (_c_weight**2 + (_c_windload_bare*_c_chk_wind)**2)**0.5
