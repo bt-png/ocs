@@ -158,7 +158,7 @@ def create_df_dd(_df):
     isl = int(np.where(_dd == 'Span Loading')[0])
     _df_cd = split_df(_dd, icp+1, iacp-2)
     _df_acd = split_df(_dd, iacp+1, ihd-2)
-    _df_acd = add_base_acd(_df_cd, _df_acd)
+    #_df_acd = add_base_acd(_df_cd, _df_acd)
     _df_hd = split_df(_dd, ihd+1, ibd-2)
     _df_bd = split_df(_dd, ibd+1, isl-2)
     _df_sl = split_df(_dd, isl+1)
@@ -374,7 +374,7 @@ class AltCondition():
     """
     # pylint: disable=too-many-instance-attributes
     def __init__(self, altconductor, basedesign):
-        if not basedesign._solved
+        if not basedesign._solved:
             basedesign._solve()
         self._ref = basedesign
         self._cp = None
@@ -382,6 +382,7 @@ class AltCondition():
         self._solved = False
         self._catenarysag = None
         self._sag = None
+        self._sag_w_ha = None
         self._loops = 0
         self._sr = None
         self._srdf = None
@@ -428,7 +429,20 @@ class AltCondition():
             'type': 'MW',
             'cable': 'MW'
             })
+        _mw_ha_sta, _mw_ha_el = GenFun.LoadedSagMW_wHanger(
+            self._catenarysag.get('Stationing'), 
+            self._catenarysag.get('LoadedSag'), 
+            self._catenarysag.get('LoadedSag_MW'), 
+            self._catenarysag.get('HA_STA')
+        )
+        _df_mw_w_ha = pd.DataFrame({
+            'Stationing': _mw_ha_sta,
+            'Elevation': _mw_ha_el,
+            'type': 'MW',
+            'cable': 'MW'
+            })
         self._sag = pd.concat([_df_mw, _df_cw], ignore_index=False)
+        self._sag_w_ha = pd.concat([_df_mw_w_ha, _df_cw], ignore_index=False)
         # CW Support Resistance DataFrame
         self._srdf = pd.DataFrame({
             'Stationing': self._ref.getwr()['STA'],
@@ -463,6 +477,12 @@ class AltCondition():
             self._solve()
         return self._sag
 
+    def dataframe_w_ha(self):
+        """ return a pandas dataFrame of the wire """
+        if not self._solved:
+            self._solve()
+        return self._sag_w_ha
+
     def dataframe_cw(self):
         """ return a pandas dataFrame of the wire """
         if not self._solved:
@@ -483,7 +503,7 @@ class AltCondition():
 
 class AltCondition_Series():
     def __init__(self, altconductor, basedesign):
-        if not basedesign._solved
+        if not basedesign._solved:
             basedesign._solve()
         self._data = altconductor
         self._bd = basedesign
@@ -502,7 +522,8 @@ class AltCondition_Series():
             if np.isfinite(row['MW Weight']):
                 _acd = split_acd(self._data,index)
                 ALT = AltCondition(_acd,self._bd)
-                _df_tmp = ALT.dataframe()
+                #_df_tmp = ALT.dataframe()
+                _df_tmp = ALT.dataframe_w_ha()
                 _df_cw_tmp = ALT.dataframe_cw()
                 _df_cwdiff_tmp = ALT.dataframe_cwdiff()
                 _df_sr_tmp = ALT.dataframe_sr()

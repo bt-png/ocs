@@ -115,8 +115,11 @@ def PlotSag(_REF, yscale) -> None:
     st.write(chart)
 
 @st.cache_data()
-def PlotSagaltCond(_REF, yscale) -> None:
-    dfa = _REF.dataframe()
+def PlotSagaltCond(_REF_Base, _REF, yscale) -> None:
+    dfbase = _REF_Base.dataframe_w_ha()
+    dfbase.type = 'BASE'
+    dfalt = _REF.dataframe()
+    dfa = pd.concat([dfbase, dfalt], ignore_index=True)
     pwidth, pheight = plotdimensions(dfa['Stationing'],dfa['Elevation'],yscale)
     st.write('### Catenary Wire Sag Plot')
     selection = alt.selection_point(fields=['type'], bind='legend')
@@ -157,7 +160,8 @@ def PlotCWDiff(_REF) -> None:
     
 @st.cache_data()
 def PlotSagSample(_BASE, yscale) -> None:
-    df = _BASE.dataframe()
+    #df = _BASE.dataframe()
+    df = _BASE.dataframe_w_ha()
     pwidth, pheight = plotdimensions(df['Stationing'],df['Elevation'],yscale)
     st.markdown('### SAMPLE DATA')
     st.write('### Catenary Wire Sag Plot')
@@ -228,6 +232,27 @@ def SPTID(num):
         'Pole: ' + str(wr.loc[num,'PoleID']) + 
         ', STA: ' + str(wr.loc[num, 'STA'])
         )
+    
+def SPTID_range(num1, num2):
+    st.markdown(
+        'Calculation range is ' + str(abs(wr.loc[num2, 'STA']-wr.loc[num1, 'STA'])) +
+        '\' from ' +
+        'Pole: ' + str(wr.loc[num1,'PoleID']) + 
+        '(STA: ' + str(wr.loc[num1, 'STA']) + ')'
+        ' to ' +
+        'Pole: ' + str(wr.loc[num2,'PoleID']) + 
+        '(STA: ' + str(wr.loc[num2, 'STA']) + ')'
+        )
+
+@st.experimental_fragment
+def show_download_CAD_Script(_Ref, _yExag):
+    acadScript1 = OCS.SagtoCAD(_Ref, _yExag)
+    st.download_button(
+                        label="### " + str(_yExag) + ":1 scale",
+                        data=acadScript1,
+                        file_name="_sag_" + str(_yExag) + ".1.scr",
+                        mime="text/scr"
+                    )
 
 st.set_page_config(
     page_title="CAT SAG", 
@@ -278,6 +303,7 @@ with tab1:
                 )
         if ddfile is not None:
             _dd = pd.read_csv(ddfile)
+            ddData.clear()
             _df_cd, _df_acd, _df_hd, _df_bd, _df_sl = ddData(_dd)
             preview_ddfile(ddfile)
     with cwr:
@@ -303,21 +329,24 @@ with tab2:
     if ddfile is not None and wrfile is not None:
         st.write('Hanger lengths are driven based on the BASE condition.')
         new_df_acd = dataframe_with_selections(_df_acd, 'plotdataframe')
-        #_df_acd_ref = _df_acd.copy()
-        #_df_acd_ref.insert(0,'Calculate',False)
-        #_df_acd_ref.loc[0,'Calculate'] = True
-        #e_df_acd = st.data_editor(_df_acd_ref, hide_index=True, key='1')
-        #st.write(_df_acd_ref.iloc[0,:].transpose)
-        conditions = len(new_df_acd)
+        startSPT, endSPT = st.slider(label='Portion of the full span to investigate', min_value=0, max_value=len(wr)-1, value = (2,4), key='spanslider')
+        SPTID_range(startSPT, endSPT)
+        conditions = len(new_df_acd)+1
         stepSize = _df_bd.iloc[0,1]
-        steps = (max(wr.STA)-min(wr.STA))/stepSize
-        estCalcTime = ((0.0116 * conditions) + (0.00063)) * steps #process time for iterative + base
-        m, s = divmod(estCalcTime, 60)
-        if m > 0:
-            st.warning('###### This could take ' + '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s))
+        range = endSPT-startSPT
+        calcspan=False
+        if range == 0:
+            st.warning('You need to include a minimum of one support')
+            calcspan = True
         else:
-            st.markdown('###### Estimated compute time is ' + '{:02.0f} seconds'.format(s))
-        submit_altCond = st.button('Calculate', key="calcAltCond")
+            steps = (abs(wr.loc[endSPT, 'STA']-wr.loc[startSPT, 'STA']))/stepSize
+            estCalcTime = ((0.0116 * conditions) + (0.00063)) * steps #process time for iterative + base
+            m, s = divmod(estCalcTime, 60)
+            if m > 0:
+                st.warning('###### This could take ' + '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s))
+            else:
+                st.markdown('###### Estimated compute time is ' + '{:02.0f} seconds'.format(s))
+        submit_altCond = st.button('Calculate', key="calcAltCond", disabled=calcspan)
         verified_alt_conditions = False
         if submit_altCond:
             st_time = time.time()
@@ -327,18 +356,12 @@ with tab2:
             altSagData.clear()
             PlotSagaltCond.clear()
             PlotCWDiff.clear()
-            Nom = SagData(_dd, wr)
+            tmp_wr = wr.iloc[startSPT:endSPT+1]
+            tmp_wr = tmp_wr.reset_index(drop=True)
+            Nom = SagData(_dd, tmp_wr)
             tmp = Nom._solve()
-            if new_df_acd.empty:
-                verified_alt_conditions = False
-            else:
-                if len(new_df_acd.index) > 1:
-                    verified_alt_conditions = True
-                elif 'BASE' in new_df_acd['Load Condition'].values:
-                    verified_alt_conditions = False
-                else:
-                    verified_alt_conditions = True
-            if verified_alt_conditions:
+            if not new_df_acd.empty:
+                verified_alt_conditions = True
                 Ref = altSagData(new_df_acd, Nom)
                 tmp = Ref._solve()
             et_time = time.time()
@@ -348,7 +371,7 @@ with tab2:
         if not verified_alt_conditions and Nom is not None:
             PlotSag(Nom, yExagg)
         elif Ref is not None:
-            PlotSagaltCond(Ref, yExagg)
+            PlotSagaltCond(Nom, Ref, yExagg)
             PlotCWDiff(Ref)
     elif wrfile is None and ddfile is None:
         SagData.clear()
@@ -359,27 +382,27 @@ with tab2:
 with tab3:
     if ddfile is not None and wrfile is not None and st.session_state['elasticity']:
         ec = None
-        #_df_acd_ref = _df_acd.copy()
-        #_df_acd_ref.insert(0,'Calculate',False)
         st.write('Consider load conditions')
-        new_df_acd_elastic = dataframe_with_selections(_df_acd, 'elasticdf')
-        #elastic_df_acd = st.data_editor(_df_acd_ref, hide_index=True, key='2')
-        startSPT = st.number_input(label='Starting structure', value=1, min_value=0, max_value=len(wr)-2)
-        SPTID(startSPT)
-        endSPT = st.number_input(label='Ending structure', value=startSPT+1, min_value=1, max_value=len(wr)-1)
-        SPTID(endSPT)
+        new_df_acd_elastic = dataframe_with_selections(OCS.add_base_acd(_df_cd, _df_acd), 'elasticdf')
+        startSPT, endSPT = st.slider(label='Portion of the full span to investigate', min_value=0, max_value=len(wr)-1, value = (2,4), key='elasticslider')
+        SPTID_range(startSPT, endSPT)
         stepSize = st.number_input(label='Resolution (ft)', min_value = 1, step=1, value=10)
         pUplift = st.number_input(label='Uplift Force (lbf)', value=25)
         conditions = len(new_df_acd_elastic)
-        steps = (wr.loc[endSPT, 'STA']-wr.loc[startSPT, 'STA'])/stepSize
-        estCalcTime = 0.789 * conditions * steps
-        #estEndTime = time.localtime(time.mktime(time.localtime()) + estCalcTime)
-        m, s = divmod(estCalcTime, 60)
-        if m > 3:
-            st.warning('###### This could take ' + '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s), ', check back at', time.strftime("%H:%M", estEndTime))
+        range = endSPT-startSPT
+        calcspan=False
+        if range == 0:
+            st.warning('You need to include a minimum of one support')
+            calcspan = True
         else:
-            st.markdown('###### Estimated compute time is ' + '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s))
-        submit_elastic = st.button('Calculate', key="calcElasticity")
+            steps = (wr.loc[endSPT, 'STA']-wr.loc[startSPT, 'STA'])/stepSize
+            estCalcTime = 0.789 * conditions * steps
+            m, s = divmod(estCalcTime, 60)
+            if m > 3:
+                st.warning('###### This could take ' + '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s), ', check back at', time.strftime("%H:%M", estEndTime))
+            else:
+                st.markdown('###### Estimated compute time is ' + '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s))
+        submit_elastic = st.button('Calculate', key="calcElasticity", disabled=calcspan)
         if submit_elastic:
             submit_elastic = False
             st_time = time.time()
@@ -419,22 +442,18 @@ with tab4:
         with cdd2:
             if Nom is not None:
                 st.markdown('#### Download CAD Scripts')
-                acadScript1 = OCS.SagtoCAD(Nom, 1)
-                acadScript2 = OCS.SagtoCAD(Nom, yExagg)
+                
+                #acadScript2 = OCS.SagtoCAD(Nom, yExagg)
                 a1, b1, c1 = st.columns([0.4, 0.3, 0.3])
                 with a1:
                     st.write('Cable Profile')
                 with b1:
-                    bt1 = st.download_button(
-                        label="### 1:1 scale",
-                        data=acadScript1,
-                        file_name="_sag_.scr",
-                        mime="text/scr"
-                    )
+                    show_download_CAD_Script(Nom, 1)
                 with c1:
-                    bt2 = st.download_button(
-                        label="### yExaggeration",
-                        data=acadScript2,
-                        file_name="_sag_.scr",
-                        mime="text/scr"
-                    )
+                    show_download_CAD_Script(Nom, yExagg)
+                    #st.download_button(
+                    #    label="### yExaggeration",
+                    #    data=acadScript2,
+                    #    file_name="_sag_.scr",
+                    #    mime="text/scr"
+                    #)
