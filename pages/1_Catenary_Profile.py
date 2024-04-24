@@ -399,7 +399,7 @@ with tab3:
             estCalcTime = 0.789 * conditions * steps
             m, s = divmod(estCalcTime, 60)
             if m > 3:
-                st.warning('###### This could take ' + '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s), ', check back at', time.strftime("%H:%M", estEndTime))
+                st.warning('###### This could take ' + '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s)) #, ', check back at', time.strftime("%H:%M", estEndTime))
             else:
                 st.markdown('###### Estimated compute time is ' + '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s))
         submit_elastic = st.button('Calculate', key="calcElasticity", disabled=calcspan)
