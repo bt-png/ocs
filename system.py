@@ -252,6 +252,7 @@ class CatenaryFlexible():
         self._solved = False
         self._catenarysag = None
         self._sag = None
+        self._sag_w_ha = None
 
     def _solve(self):
         """ Solve catenary system and cache results"""
@@ -274,7 +275,20 @@ class CatenaryFlexible():
             'type': 'MW',
             'cable': 'MW'
             })
+        _mw_ha_sta, _mw_ha_el = GenFun.LoadedSagMW_wHanger(
+            self._catenarysag.get('Stationing'), 
+            self._catenarysag.get('LoadedSag'), 
+            self._catenarysag.get('LoadedSag_MW'), 
+            self._catenarysag.get('HA_STA')
+        )
+        _df_mw_w_ha = pd.DataFrame({
+            'Stationing': _mw_ha_sta,
+            'Elevation': _mw_ha_el,
+            'type': 'MW',
+            'cable': 'MW'
+            })
         self._sag = pd.concat([_df_mw, _df_cw], ignore_index=False)
+        self._sag_w_ha = pd.concat([_df_mw_w_ha, _df_cw], ignore_index=False)
         self._solved = True
 
     def resetloads(self, loadlist):
