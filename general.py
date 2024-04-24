@@ -221,9 +221,19 @@ def CWELDifference(dforiginal, dfuplift):
     return (nSPTEL - oSPTEL)
 
 def LoadedSagMW_wHanger(Stationing, CWSag, MWSag, HangerStationing):
-    new_sta = Stationing
-    new_mwel = MWSag
-    return new_sta, new_mwel
+    newSTA = Stationing.copy()
+    newMWSag = MWSag.copy()
+    for sta in HangerStationing:
+        #find the index within Stationing/CWSag/MWSag
+        n, = np.where(Stationing == sta)
+        j, = np.where(newSTA == sta)
+        if n.size == 1 and j.size == 1:
+            #insert into Stationing/MWSag the additional HA points
+            newSTA = np.insert(newSTA, j[0], [sta, sta])
+            newMWSag = np.insert(newMWSag, j[0], [MWSag[n[0]], CWSag[n[0]]])
+        else:
+            print(f'did not find a match for {sta}')
+    return newSTA, newMWSag
 
 # SPAN LOADING
 def LoadSpanWeight(StationList, UnitCableWeight):
