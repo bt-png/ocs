@@ -328,7 +328,6 @@ with tab2:
             PlotCWDiff.clear()
             Nom = SagData(_dd, wr)
             tmp = Nom._solve()
-            st.write(len(new_df_acd.index))
             if new_df_acd.empty:
                 verified_alt_conditions = False
             else:
