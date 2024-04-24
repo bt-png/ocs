@@ -269,7 +269,6 @@ with tab1:
             file_name="_dd_Data.csv",
             mime="text/csv"
         )
-
         ddfile = st.file_uploader(
                 'Upload a properly formatted csv file containing Design data',
                 type={'csv', 'txt'},
@@ -328,6 +327,7 @@ with tab2:
             PlotCWDiff.clear()
             Nom = SagData(_dd, wr)
             tmp = Nom._solve()
+            st.write(new_df_acd)
             if not new_df_acd.empty:
                 Ref = altSagData(new_df_acd, Nom)
                 tmp = Ref._solve()
