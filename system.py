@@ -374,7 +374,8 @@ class AltCondition():
     """
     # pylint: disable=too-many-instance-attributes
     def __init__(self, altconductor, basedesign):
-        basedesign._solve()
+        if not basedesign._solved
+            basedesign._solve()
         self._ref = basedesign
         self._cp = None
         self._ld = np.array([0,0])
@@ -482,7 +483,8 @@ class AltCondition():
 
 class AltCondition_Series():
     def __init__(self, altconductor, basedesign):
-        basedesign._solve()
+        if not basedesign._solved
+            basedesign._solve()
         self._data = altconductor
         self._bd = basedesign
         self._df = None
