@@ -317,6 +317,7 @@ with tab2:
         else:
             st.markdown('###### Estimated compute time is ' + '{:02.0f} seconds'.format(s))
         submit_altCond = st.button('Calculate', key="calcAltCond")
+        verified_alt_conditions = False
         if submit_altCond:
             st_time = time.time()
             submit_altCond = False
@@ -344,7 +345,7 @@ with tab2:
             m, s = divmod(et_time-st_time, 60)
             msg = 'Done!' + ' That took ' + '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s)
             st.success(msg)
-        if (verified_alt_conditions == False) and Nom is not None:
+        if not verified_alt_conditions and Nom is not None:
             PlotSag(Nom, yExagg)
         elif Ref is not None:
             PlotSagaltCond(Ref, yExagg)
