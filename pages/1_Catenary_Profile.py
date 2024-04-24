@@ -97,7 +97,8 @@ def preview_wrfile(wrfile) -> None:
 
 @st.cache_data()
 def PlotSag(_REF, yscale) -> None:
-    df = _REF.dataframe()
+    #df = _REF.dataframe()
+    df = _REF.dataframe_w_ha
     pwidth, pheight = plotdimensions(df['Stationing'],df['Elevation'],yscale)
     st.write('### Catenary Wire Sag Plot')
     selection = alt.selection_point(fields=['type'], bind='legend')
