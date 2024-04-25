@@ -62,7 +62,8 @@ def df_pad(_df_original, name):
     _df = _df_original.copy()
     _df.insert(0,0,0)
     _df.loc[-1] = (_df.columns.values)
-    _df.loc[-2] = (0)
+    _df.loc[-2] = ('0')
+    #_df.loc[-2,0] = _df.loc[-2,0].astype('str')
     _df.loc[-2,0] = str(name)
     _df.columns = range(_df.shape[1])
     _df = _df.sort_index().reset_index(drop=True)
@@ -92,6 +93,12 @@ def ConductorTension(_E, _alpha, _T0,_w0,_w1,_dF,_L,_A0, _A1):
         _T1 += 0.5*(T1_check-_T1)
     return _T1
 
+def EquivalentSpan(spanlist):
+    nom = np.nansum(np.power(spanlist,3))
+    denom = np.nansum(spanlist)
+    val = nom/denom
+    return val**0.5
+    
 # WIRE RUN GENERAL
 def WireRun_df(df, STARound):
     #expected DataFrame Headers [PoleID, STA, RailEL, MWHT, CWHT, PreSag, DeviationAngle
@@ -238,7 +245,7 @@ def CWELDifference(dforiginal, dfuplift):
 def LoadedSagMW_wHanger(Stationing, CWSag, MWSag, HangerStationing):
     newSTA = Stationing.copy()
     newMWSag = MWSag.copy()
-    for sta in HangerStationing:
+    for sta in HangerStationing[1:len(HangerStationing)-1]:
         #find the index within Stationing/CWSag/MWSag
         n, = np.where(Stationing == sta)
         j, = np.where(newSTA == sta)

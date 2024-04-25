@@ -428,6 +428,7 @@ class CatenaryFlexible():
             'type': 'HA',
             'cable': 'HA'
             })
+        _haL_df = _haL_df.loc[1:len(_haL_df)-2] #Remove the first and last record, as these are not actually hangers
         return _haL_df
 
 class AltCondition():
