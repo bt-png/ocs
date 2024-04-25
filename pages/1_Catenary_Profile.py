@@ -97,9 +97,14 @@ def preview_wrfile(wrfile) -> None:
         st.dataframe(wr.head(), hide_index=True)  
 
 @st.cache_data()
-def PlotSag(_REF, yscale) -> None:
-    #df = _REF.dataframe()
-    df = _REF.dataframe_w_ha()
+def PlotSag(_REF_Base, _REF=pd.DataFrame(), yscale=1) -> None:
+    if _REF.empty:
+        df = _REF_Base.dataframe_w_ha()
+    else:
+        dfbase = _REF_Base.dataframe_w_ha()
+        dfbase.type = 'BASE'
+        dfalt = _REF.dataframe()
+        df = pd.concat([dfbase, dfalt], ignore_index=True)
     pwidth, pheight = plotdimensions(df['Stationing'],df['Elevation'],yscale)
     st.write('### Catenary Wire Sag Plot')
     nearest = alt.selection_point(nearest=True, on='mouseover', fields=['Stationing'], empty=False)
@@ -116,31 +121,6 @@ def PlotSag(_REF, yscale) -> None:
     points = line.mark_point().encode(opacity=alt.condition(nearest, alt.value(1), alt.value(0)))
     text = line.mark_text(align='left', dx=5, dy=-5).encode(text=alt.condition(nearest, 'Elevation:Q', alt.value(' ')))
     rules = alt.Chart(df).mark_rule(color='gray').encode(x='Stationing:Q').transform_filter(nearest)
-    chart = alt.layer(line + selectors + points + rules + text).properties(width=pwidth, height=pheight).interactive()
-    st.write(chart)
-
-@st.cache_data()
-def PlotSagaltCond(_REF_Base, _REF, yscale) -> None:
-    dfbase = _REF_Base.dataframe_w_ha()
-    dfbase.type = 'BASE'
-    dfalt = _REF.dataframe()
-    dfa = pd.concat([dfbase, dfalt], ignore_index=True)
-    pwidth, pheight = plotdimensions(dfa['Stationing'],dfa['Elevation'],yscale)
-    st.write('### Catenary Wire Sag Plot')
-    nearest = alt.selection_point(nearest=True, on='mouseover', fields=['Stationing'], empty=False)
-    line = alt.Chart(dfa).mark_line().encode(
-        alt.X('Stationing:Q').scale(zero=False), 
-        alt.Y('Elevation:Q').scale(zero=False),
-        alt.Detail('cable'),
-        alt.Color('type'),
-    )
-    selectors = alt.Chart(dfa).mark_point().encode(
-        alt.X('Stationing:Q'),
-        opacity=alt.value(0)
-    ).add_params(nearest)
-    points = line.mark_point().encode(opacity=alt.condition(nearest, alt.value(1), alt.value(0)))
-    text = line.mark_text(align='left', dx=5, dy=-5).encode(text=alt.condition(nearest, 'Elevation:Q', alt.value(' ')))
-    rules = alt.Chart(dfa).mark_rule(color='gray').encode(x='Stationing:Q').transform_filter(nearest)
     chart = alt.layer(line + selectors + points + rules + text).properties(width=pwidth, height=pheight).interactive()
     st.write(chart)
 
@@ -165,41 +145,88 @@ def PlotHALength(_REF) -> None:
     rules = alt.Chart(df).mark_rule(color='gray').encode(x='Stationing:Q').transform_filter(nearest)
     chart = alt.layer(line + selectors + points + rules + text).properties(width=pwidth, height=300).interactive()
     st.write(chart)
-    
-@st.cache_data()
-def PlotCWDiff(_REF) -> None:
-    df = _REF.dataframe_cwdiff()
-    df['Elevation'] *= 12
-    pwidth, pheight = plotdimensions(df['Stationing'],df['Elevation'])
-    st.write('### CW Elevation difference from BASE')
-    nearest = alt.selection_point(nearest=True, on='mouseover', fields=['Stationing'], empty=False)
-    line = alt.Chart(df).mark_line().encode(
-        alt.X('Stationing:Q').scale(zero=False), 
-        alt.Y('Elevation:Q', title='CW Diff (in)').scale(zero=False),
-        alt.Detail('cable'),
-        alt.Color('type')
-    )
-    selectors = alt.Chart(df).mark_point().encode(
-        alt.X('Stationing:Q'),
-        opacity=alt.value(0)
-    ).add_params(nearest)
-    points = line.mark_point().encode(opacity=alt.condition(nearest, alt.value(1), alt.value(0)))
-    text = line.mark_text(align='left', dx=5, dy=-5).encode(text=alt.condition(nearest, 'Elevation:Q', alt.value(' ')))
-    rules = alt.Chart(df).mark_rule(color='gray').encode(x='Stationing:Q').transform_filter(nearest)
-    chart = alt.layer(line + selectors + points + rules + text).properties(width=pwidth, height=300).interactive()
-    st.write(chart)
 
 @st.cache_data()
-def PlotSupportLoad(_REF) -> None:
-    df_temp = _REF.dataframe()
-    df = _REF.dataframe_spt()
+def ShowHATable(_REF) -> None:
+    df = Nom.dataframe_ha()
+    st.write('### BASE Design: Hanger Table')
+    st.dataframe(df)
+    a, b, minHAL = GenFun.FtIn(min(df['HA Length']))
+    a, b, maxHAL = GenFun.FtIn(max(df['HA Length']))
+    spans = df.iloc[:,0].diff(periods=1).abs()
+    st.caption(f"Min/Max HA Lengths (ft-in)= {minHAL}/{maxHAL} \
+               \n  Min/Max HA Load (lb)= {format(min(df['HA Load']),'n')}/{format(max(df['HA Load']),'n')} \
+               \n  Min/Max HA Spacing (ft) = {np.nanmin(spans)}/{np.nanmax(spans)}")
+
+@st.cache_data()
+def ShowResults(_REF_Base, _REF=pd.DataFrame()):
+    if _REF.empty:
+        df = _REF_Base.dataframe_spt()
+        df.type = 'BASE'
+    else:
+        dfbase = _REF_Base.dataframe_spt()
+        dfbase.type = 'BASE'
+        dfalt = _REF.dataframe_spt()
+        df = pd.concat([dfbase, dfalt], ignore_index=True)
+    sindex = ['Load Condition', 'MW Max (lb)', 'MW Min (lb)', 'HA Max (lb)', 'HA Min (lb)']
+    df_results = pd.DataFrame({
+        'Load Condition': [],
+        'MW Max (lb)': [],
+        'MW Min (lb)': [],
+        'HA Max (lb)': [],
+        'HA Min (lb)': [],})
+    for ty in df['type'].unique():
+        ser = pd.DataFrame(np.array([[
+            ty, 
+            format(max(df.loc[(df['type'] == ty) & (df['cable'] == 'MW'), 'Load']),'n'), 
+            format(min(df.loc[(df['type'] == ty) & (df['cable'] == 'MW'), 'Load']),'n'), 
+            format(max(df.loc[(df['type'] == ty) & (df['cable'] == 'HA'), 'Load']),'n'), 
+            format(min(df.loc[(df['type'] == ty) & (df['cable'] == 'HA'), 'Load']),'n'), 
+            ]]), columns=sindex)
+        df_results = pd.concat([df_results, ser], ignore_index=False)
+    st.dataframe(df_results, hide_index=True)
+        
+@st.cache_data()
+def PlotCWDiff(_REF) -> None:
+    if not _REF.empty:
+        df = _REF.dataframe_cwdiff()
+        df['Elevation'] *= 12
+        pwidth, pheight = plotdimensions(df['Stationing'],df['Elevation'])
+        st.write('### CW Elevation difference from BASE')
+        nearest = alt.selection_point(nearest=True, on='mouseover', fields=['Stationing'], empty=False)
+        line = alt.Chart(df).mark_line().encode(
+            alt.X('Stationing:Q').scale(zero=False), 
+            alt.Y('Elevation:Q', title='CW Diff (in)').scale(zero=False),
+            alt.Detail('cable'),
+            alt.Color('type')
+        )
+        selectors = alt.Chart(df).mark_point().encode(
+            alt.X('Stationing:Q'),
+            opacity=alt.value(0)
+        ).add_params(nearest)
+        points = line.mark_point().encode(opacity=alt.condition(nearest, alt.value(1), alt.value(0)))
+        text = line.mark_text(align='left', dx=5, dy=-5).encode(text=alt.condition(nearest, 'Elevation:Q', alt.value(' ')))
+        rules = alt.Chart(df).mark_rule(color='gray').encode(x='Stationing:Q').transform_filter(nearest)
+        chart = alt.layer(line + selectors + points + rules + text).properties(width=pwidth, height=300).interactive()
+        st.write(chart)
+
+@st.cache_data()
+def PlotSupportLoad(_REF_Base, _REF=pd.DataFrame()) -> None:
+    df_temp = _REF_Base.dataframe()
+    if _REF.empty:
+        df = _REF_Base.dataframe_spt()
+    else:
+        dfbase = _REF_Base.dataframe_spt()
+        dfbase.type = 'BASE'
+        dfalt = _REF.dataframe_spt()
+        df = pd.concat([dfbase, dfalt], ignore_index=True)
     pwidth, pheight = plotdimensions(df['Stationing'],df_temp['Elevation'])
     st.write('### Support Loading')
     
     nearest = alt.selection_point(nearest=True, on='mouseover', fields=['Stationing'], empty=False)
     line = alt.Chart(df).mark_point().encode(
         alt.X('Stationing:Q').scale(zero=False), 
-        alt.Y('Load:Q', title='Loading (lb)').scale(zero=False),
+        alt.Y('Load:Q').scale(zero=False),
         alt.Detail('cable'),
         alt.Color('type')
     )
@@ -211,53 +238,6 @@ def PlotSupportLoad(_REF) -> None:
     text = line.mark_text(align='left', dx=5, dy=-5).encode(text=alt.condition(nearest, 'Load:Q', alt.value(' ')))
     rules = alt.Chart(df).mark_rule(color='gray').encode(x='Stationing:Q').transform_filter(nearest)
     chart = alt.layer(line + selectors + points + rules + text).properties(width=pwidth, height=300).interactive()
-    st.write(chart)
-
-@st.cache_data()
-def PlotSupportLoad_alt(_REF_Base, _REF) -> None:
-    df_temp = _REF.dataframe()
-    dfbase = _REF_Base.dataframe_spt()
-    dfbase.type = 'BASE'
-    dfalt = _REF.dataframe_spt()
-    dfa = pd.concat([dfbase, dfalt], ignore_index=True)
-    pwidth, pheight = plotdimensions(dfa['Stationing'],df_temp['Elevation'])
-    st.write('### Support Loading')
-    
-    nearest = alt.selection_point(nearest=True, on='mouseover', fields=['Stationing'], empty=False)
-    line = alt.Chart(dfa).mark_point().encode(
-        alt.X('Stationing:Q').scale(zero=False), 
-        alt.Y('Load:Q').scale(zero=False),
-        alt.Detail('cable'),
-        alt.Color('type')
-    )
-    selectors = alt.Chart(dfa).mark_point().encode(
-        alt.X('Stationing:Q'),
-        opacity=alt.value(0)
-    ).add_params(nearest)
-    points = line.mark_point().encode(opacity=alt.condition(nearest, alt.value(1), alt.value(0)))
-    text = line.mark_text(align='left', dx=5, dy=-5).encode(text=alt.condition(nearest, 'Load:Q', alt.value(' ')))
-    rules = alt.Chart(dfa).mark_rule(color='gray').encode(x='Stationing:Q').transform_filter(nearest)
-    chart = alt.layer(line + selectors + points + rules + text).properties(width=pwidth, height=300).interactive()
-    st.write(chart)
-    
-@st.cache_data()
-def PlotSagSample(_BASE, yscale) -> None:
-    #df = _BASE.dataframe()
-    df = _BASE.dataframe_w_ha()
-    pwidth, pheight = plotdimensions(df['Stationing'],df['Elevation'],yscale)
-    st.markdown('### SAMPLE DATA')
-    st.write('### Catenary Wire Sag Plot')
-    selection = alt.selection_point(fields=['type'], bind='legend')
-    chart = alt.Chart(df).mark_line().encode(
-        alt.X('Stationing:Q').scale(zero=False), 
-        alt.Y('Elevation:Q').scale(zero=False, type='linear'),
-        alt.Detail('cable'),
-        alt.Color('type'),
-        opacity=alt.condition(selection, alt.value(1), alt.value(0.1))
-        ).add_params(selection).properties(
-            width=pwidth,
-            height=pheight
-        ).interactive()
     st.write(chart)
 
 @st.cache_data()
@@ -433,15 +413,16 @@ with tab2:
             SagData.clear()
             PlotSag.clear()
             PlotSupportLoad.clear()
+            ShowResults.clear()
             PlotHALength.clear()
+            ShowHATable.clear()
             altSagData.clear()
-            PlotSagaltCond.clear()
-            PlotSupportLoad_alt.clear()
             PlotCWDiff.clear()
             tmp_wr = wr.iloc[startSPT:endSPT+1]
             tmp_wr = tmp_wr.reset_index(drop=True)
             Nom = SagData(_dd, tmp_wr)
             tmp = Nom._solve()
+            Ref = pd.DataFrame() # Placeholder for 
             if not new_df_acd.empty:
                 verified_alt_conditions = True
                 Ref = altSagData(new_df_acd, Nom)
@@ -450,19 +431,20 @@ with tab2:
             m, s = divmod(et_time-st_time, 60)
             msg = 'Done!' + ' That took ' + '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s)
             st.success(msg)
-            if not verified_alt_conditions and Nom is not None:
-                PlotSag(Nom, yExagg)
-                PlotSupportLoad(Nom)
-                PlotHALength(Nom)
-            elif Ref is not None:
-                PlotSagaltCond(Nom, Ref, yExagg)
-                PlotSupportLoad_alt(Nom, Ref)
+            if Nom is not None:
+                PlotSag(_REF_Base=Nom, _REF=Ref, yscale=yExagg)
+                PlotSupportLoad(_REF_Base=Nom, _REF=Ref)
+                ShowResults(Nom, Ref)
                 PlotHALength(Nom,)
                 PlotCWDiff(Ref)
+                ShowHATable(Nom)
     elif wrfile is None and ddfile is None:
         SagData.clear()
         Nom = SagData(OCS.sample_df_dd(), OCS.sample_df_wr())
-        PlotSagSample(Nom, yExagg)
+        PlotSag(_REF_Base=Nom, yscale=yExagg)
+        PlotSupportLoad(_REF_Base=Nom)
+        PlotHALength(Nom)
+        ShowHATable(Nom)
     else:
         st.warning('Provide both "System Design" and "Layout Design" files to run calculation.')
 with tab3:
