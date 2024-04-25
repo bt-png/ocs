@@ -95,7 +95,7 @@ def loop(_T1, _Q, _R, precision):
             else:
                 _T1 += .01/precision
         loops += 1
-        if loops > 50000:
+        if loops > 500000:
             break
     return (_T1, _try, loops)
 
