@@ -119,6 +119,21 @@ def sample_df_dd():
     _df.reset_index(drop=True, inplace=True)
     return _df
 
+def empty_df_sl():
+    #[P_DiscreteLoad_CW, STA_DiscreteLoad_CW,
+    # P_DiscreteLoad_MW, STA_DiscreteLoad_MW]
+    #_sl = (
+    #    (0, 0, 0), (0, 0, 0),
+    #    (0, 0, 0), (0, 0, 0)
+    #    )
+    _df = pd.DataFrame({
+        'Description': ['none'],
+        'Stationing': [0],
+        'CW Loading': [0],
+        'MW Loading': [0]
+    })
+    return _df
+
 def add_base_acd(_cd, _acd):
     _df = _acd.copy()
     _df.loc[-1] = [
@@ -147,8 +162,15 @@ def split_df(_df, first=None, last=None):
     _dfc = _dfc[1:]
     _dfc.reset_index(drop=True, inplace=True)
     _dfc.iloc[:,1:] = _dfc.iloc[:,1:].astype(float)
+    _dfc = _dfc.loc[:, _dfc.ne(0).any()]
     return _dfc
 
+def check_df_sl(_df):
+    if _df.empty:
+        return empty_df_sl()
+    else:
+        return _df
+    
 def create_df_dd(_df):
     _dd = _df.copy()
     icp = int(np.where(_dd == 'Conductor Particulars')[0])
@@ -156,12 +178,14 @@ def create_df_dd(_df):
     ihd = int(np.where(_dd == 'Hanger Design Data')[0])
     ibd = int(np.where(_dd == 'Calculation Constants')[0])
     isl = int(np.where(_dd == 'Span Loading')[0])
+    _dd.drop(columns=_dd.columns[0], inplace=True)
     _df_cd = split_df(_dd, icp+1, iacp-2)
     _df_acd = split_df(_dd, iacp+1, ihd-2)
     #_df_acd = add_base_acd(_df_cd, _df_acd)
     _df_hd = split_df(_dd, ihd+1, ibd-2)
     _df_bd = split_df(_dd, ibd+1, isl-2)
     _df_sl = split_df(_dd, isl+1)
+    _df_sl = check_df_sl(_df_sl)
     return _df_cd, _df_acd, _df_hd, _df_bd, _df_sl  
 
 def sample_df_wr():

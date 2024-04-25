@@ -59,20 +59,22 @@ def shift(arr, num, fill_value=np.nan):
     return val
 
 def df_pad(_df_original, name):
-    _df = _df_original.copy().astype(str)
+    _df = _df_original.copy()
     _df.insert(0,0,0)
     _df.loc[-1] = (_df.columns.values)
     _df.loc[-2] = (0)
     _df.loc[-2,0] = str(name)
     _df.columns = range(_df.shape[1])
     _df = _df.sort_index().reset_index(drop=True)
-    _df[0] = _df[0].replace(0,np.NaN)
-    _df.iloc[0] = _df.iloc[0].replace(0,np.NaN)
+    #_df[0] = _df[0].replace(0,np.NaN)
+    #_df.iloc[0] = _df.iloc[0].replace(0,np.NaN)
     return _df
 
 def df_add(_df1, _df2):
     _df_empty = pd.DataFrame(data=None, columns=[0], index=[0])
     _df = pd.concat([_df1, _df_empty, _df2])
+    _df = _df.replace(np.NaN,0)
+    _df = _df.astype(str)
     return _df
 
 def ConductorTension(_E, _alpha, _T0,_w0,_w1,_dF,_L,_A0, _A1):
