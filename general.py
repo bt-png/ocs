@@ -78,20 +78,34 @@ def df_add(_df1, _df2):
     _df = _df.astype(str)
     return _df
 
+def loop(_T1, _Q, _R, precision):
+    loops = 0
+    while True:
+        _try = _Q + _R/_T1**2
+        if int(_T1*precision) == int(_try*precision):
+            break
+        if _try < _T1:
+            if _try < 0:
+                _T1 *= 0.5
+            else:
+                _T1 -= 0.01/precision
+        else:
+            if _try > (1.33 * _T1):
+                _T1 += 10/precision
+            else:
+                _T1 += .01/precision
+        loops += 1
+        if loops > 5000000:
+            break
+    return (_T1, _try, loops)
+
 def ConductorTension(_E, _alpha, _T0,_w0,_w1,_dF,_L,_A0, _A1):
     _Q = _T0 - (_alpha*_E*_A0*_dF) - ((_E*_A0*_w0**2*_L**2)/(24*_T0**2))
     _R = _E*_A1*_w1**2*_L**2/24
-    _T1=_T0
-    while True:
-        T1_check = _Q + _R/_T1**2
-        if int(_T1) == int(T1_check):
-            break
-        if _T1 > 3*_T0:
-            break
-        if _T1 < 0:
-            break
-        _T1 += 0.5*(T1_check-_T1)
-    return _T1
+    val = loop(_T0, _Q, _R, 1)
+    val1 = loop(val[0], _Q, _R, 10)
+    val2 = loop(val1[0], _Q, _R, 100)
+    return val2[0]
 
 def EquivalentSpan(spanlist):
     nom = np.nansum(np.power(spanlist,3))
