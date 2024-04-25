@@ -239,3 +239,22 @@ with conductor:
             df2 = pd.concat([dfi[::-1],dfh])
             df = pd.concat([df1,df2])
             plotSection(df)
+#with resetting:
+    #data = pd.DataFrame({
+    #'latitude': [37.7749, 34.0522, 40.7128],
+    #'longitude': [-122.4194, -118.2437, -74.0060]
+    #})
+    #data['info'] = ['San Francisco', 'Los Angeles', 'New York']
+    #highlight = pd.DataFrame({
+    #'latitude': [37.7749],
+    #'longitude': [-122.4194]
+    #})
+    #st.map(data) #, highlight)
+    
+    #import folium
+ 
+    # Create a Folium map
+    #m = folium.Map(location=[37.7749, -122.4194], zoom_start=10)
+     
+    # Display the map in Streamlit
+    #st.pydeck_chart(m)
