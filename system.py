@@ -367,6 +367,42 @@ class CatenaryFlexible():
             'HA Load': self._catenarysag.get('SupportLoad_CW')
             })
         return _df_ha
+    
+    def dataframe_spt(self):
+        """ return a seaborn plot of the wire """
+        if not self._solved:
+            self._solve()
+        _sptL_cw = pd.DataFrame({
+            'Stationing': self._catenarysag.get('HA_STA'),
+            'Load': self._catenarysag.get('SupportLoad_CW'),
+            'type': 'HA',
+            'cable': 'HA'
+            })
+        _sptL_mw = pd.DataFrame({
+            'Stationing': self._wr.STA,
+            'Load': self._catenarysag.get('SupportLoad_MW'),
+            'type': 'MW',
+            'cable': 'MW'
+            })
+        _sptL_df = pd.concat([_sptL_mw, _sptL_cw], ignore_index=False)
+        return _sptL_df
+    
+    def dataframe_halength(self):
+        """ return a seaborn plot of the wire """
+        if not self._solved:
+            self._solve()
+        __sta = self._catenarysag.get('Stationing')
+        __hasta = self._catenarysag.get('HA_STA')
+        __cwel = self._catenarysag.get('LoadedSag')
+        __mwel = self._catenarysag.get('LoadedSag_MW')
+        _haL = __mwel[np.in1d(__sta, __hasta)] - __cwel[np.in1d(__sta, __hasta)]
+        _haL_df = pd.DataFrame({
+            'Stationing': __hasta,
+            'Length': _haL*12,
+            'type': 'HA Length',
+            'cable': 'HA Length'
+            })
+        return _haL_df
 
 class AltCondition():
     """ container for calculating changes made to an already calculated
@@ -500,6 +536,25 @@ class AltCondition():
         if not self._solved:
             self._solve()
         return self._srdf
+    
+    def dataframe_spt(self):
+        """ return a seaborn plot of the wire """
+        if not self._solved:
+            self._solve()
+        _sptL_cw = pd.DataFrame({
+            'Stationing': self._catenarysag.get('HA_STA'),
+            'Load': self._catenarysag.get('SupportLoad_CW'),
+            'type': 'HA',
+            'cable': 'HA'
+            })
+        _sptL_mw = pd.DataFrame({
+            'Stationing': self._ref._wr.STA,
+            'Load': self._catenarysag.get('SupportLoad_MW'),
+            'type': 'MW',
+            'cable': 'MW'
+            })
+        _sptL_df = pd.concat([_sptL_mw, _sptL_cw], ignore_index=False)
+        return _sptL_df
 
 class AltCondition_Series():
     def __init__(self, altconductor, basedesign):
@@ -511,6 +566,7 @@ class AltCondition_Series():
         self._df_cw = None
         self._df_cwdiff = None
         self._df_sr = None
+        self._df_spt = None
         self._solved = False
     
     def _solve(self):
@@ -518,6 +574,7 @@ class AltCondition_Series():
         _df_cw = pd.DataFrame()
         _df_cwdiff = pd.DataFrame()
         _df_sr = pd.DataFrame()
+        _df_spt = pd.DataFrame()
         for index, row in self._data.iterrows():
             if np.isfinite(row['MW Weight']):
                 _acd = split_acd(self._data,index)
@@ -527,18 +584,22 @@ class AltCondition_Series():
                 _df_cw_tmp = ALT.dataframe_cw()
                 _df_cwdiff_tmp = ALT.dataframe_cwdiff()
                 _df_sr_tmp = ALT.dataframe_sr()
+                _df_spt_tmp = ALT.dataframe_spt()
                 #_df_tmp.type += '_' + row['Load Condition']
                 _df_tmp.type = row['Load Condition']
                 _df_cwdiff_tmp.type = row['Load Condition']
                 _df_sr_tmp.type = row['Load Condition']
+                _df_spt_tmp.type = row['Load Condition']
                 _df = pd.concat([_df, _df_tmp], ignore_index=False)
                 _df_cw = pd.concat([_df_cw, _df_cw_tmp], ignore_index=False)
                 _df_cwdiff = pd.concat([_df_cwdiff, _df_cwdiff_tmp], ignore_index=False)
                 _df_sr = pd.concat([_df_sr, _df_sr_tmp], ignore_index=False)
+                _df_spt = pd.concat([_df_spt, _df_spt_tmp], ignore_index=False)
         self._df = _df
         self._df_cw = _df_cw
         self._df_cwdiff = _df_cwdiff
         self._df_sr = _df_sr
+        self._df_spt = _df_spt
         self._solved = True
 
     def dataframe(self):
@@ -560,6 +621,11 @@ class AltCondition_Series():
         if not self._solved:
             self._solve()
         return self._df_sr
+    
+    def dataframe_spt(self):
+        if not self._solved:
+            self._solve()
+        return self._df_spt
 
 class Elasticity_series():
     def __init__(self, altconductor, basedesign, upliftforce, stepsize, startspt=0, endspt=None):

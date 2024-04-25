@@ -145,9 +145,19 @@ def L_HA_STA(WR, HA_QTY, STARound):
     return val
 
 def LoadTribSpan(StationList):
-    i = StationList[1:]
-    j = StationList[:-1]
-    return np.append((i-j),0)
+    #i = StationList[1:]
+    #j = StationList[:-1]
+    #return np.append((i-j),0)
+    tribspan = np.empty_like(StationList)
+    for i in range(0,len(StationList)):
+        if i == 0:
+            span = 0.5*abs(StationList[i+1]-StationList[i])
+        elif i == (len(StationList)-1):
+            span = 0.5*abs(StationList[i]-StationList[i-1])
+        else:
+            span = 0.5*abs(StationList[i+1]-StationList[i-1])
+        tribspan[i] = span
+    return tribspan
 
 def L_HA_EL(WR, HangerStationing, CableWeight, CableTension, STARound):
     j=0
@@ -155,8 +165,11 @@ def L_HA_EL(WR, HangerStationing, CableWeight, CableTension, STARound):
     #HAEL = np.empty_like(HangerStationing)
     HAEL = HangerStationing*0
     for i in range(0,(len(HangerStationing))):
-        if i == 1 and i < (len(HangerStationing)):
-            HASag = sag(2*TribSpan[i],CableTension,CableWeight,0,TribSpan[i])
+        if i == 0:
+            HASag = 0
+        elif i == 1 and i < (len(HangerStationing)):
+            l_tmp = TribSpan[0]+0.5*TribSpan[1]
+            HASag = sag(l_tmp,CableTension,CableWeight,0,0.5*l_tmp)
         elif i == (len(HangerStationing)-1) and i>0:
             HASag = sag(2*TribSpan[i],CableTension,CableWeight,0,TribSpan[i])
         else:
