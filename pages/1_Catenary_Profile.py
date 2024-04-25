@@ -149,14 +149,20 @@ def PlotHALength(_REF) -> None:
 @st.cache_data()
 def ShowHATable(_REF) -> None:
     df = Nom.dataframe_ha()
+    df_spt = _REF.dataframe_spt()
     st.write('### BASE Design: Hanger Table')
     st.dataframe(df)
     a, b, minHAL = GenFun.FtIn(min(df['HA Length']))
     a, b, maxHAL = GenFun.FtIn(max(df['HA Length']))
-    spans = df.iloc[:,0].diff(periods=1).abs()
+    spans_HA = df.iloc[:,0].diff(periods=1).abs()
+    spans_MW = df_spt.loc[df_spt['type'] == 'MW', 'Stationing'].reset_index(drop=True).diff(periods=1).abs()
+    LEq_HA = GenFun.EquivalentSpan(spans_HA)
+    LEq_MW = GenFun.EquivalentSpan(spans_MW)
     st.caption(f"Min/Max HA Lengths (ft-in)= {minHAL}/{maxHAL} \
                \n  Min/Max HA Load (lb)= {format(min(df['HA Load']),'n')}/{format(max(df['HA Load']),'n')} \
-               \n  Min/Max HA Spacing (ft) = {np.nanmin(spans)}/{np.nanmax(spans)}")
+               \n  Min/Max HA Spacing (ft) = {np.nanmin(spans_HA)}/{np.nanmax(spans_HA)} \
+               \n  Min/Max Span Spacing (ft) = {np.nanmin(spans_MW)}/{np.nanmax(spans_MW)} \
+               \n  MW/CW Equivalent Spans (ft) = {format(round(LEq_MW,0),'n')}/{format(round(LEq_HA,0),'n')}")
 
 @st.cache_data()
 def ShowResults(_REF_Base, _REF=pd.DataFrame()):
