@@ -195,12 +195,12 @@ def sample_df_wr():
     """
     _df = pd.DataFrame({
         'PoleID': ['Pole1', 'Pole2', 'Pole3', 'Pole4'],
-        'STA': [162297, 162452, 162612, 162775],
+        'STA': [0, 200, 400, 600],
         'Rail EL': [0, 0, 0, 0],
-        'MW Height': [24, 23.5, 22.5, 24],
-        'CW Height': [20, 19.25, 18.5, 18.5],
-        'PreSag': [0.19375, 0.2, 0.16625, 0],
-        'Deviation Angle': [0, 4, -5, 0]
+        'MW Height': [24, 24, 24, 24],
+        'CW Height': [20, 20, 20, 20],
+        'PreSag': [0, 0, 0, 0],
+        'Deviation Angle': [0, 0, 0, 0]
     })
     return _df
 
@@ -277,6 +277,7 @@ class CatenaryFlexible():
         self._catenarysag = None
         self._sag = None
         self._sag_w_ha = None
+        self.empty = False
 
     def _solve(self):
         """ Solve catenary system and cache results"""
@@ -390,6 +391,7 @@ class CatenaryFlexible():
             'HA Length': _hal,
             'HA Load': self._catenarysag.get('SupportLoad_CW')
             })
+        _df_ha = _df_ha.loc[1:len(_df_ha)-2] #Remove the first and last record, as these are not actually hangers
         return _df_ha
     
     def dataframe_spt(self):
@@ -423,8 +425,8 @@ class CatenaryFlexible():
         _haL_df = pd.DataFrame({
             'Stationing': __hasta,
             'Length': _haL*12,
-            'type': 'HA Length',
-            'cable': 'HA Length'
+            'type': 'HA',
+            'cable': 'HA'
             })
         return _haL_df
 
@@ -449,6 +451,7 @@ class AltCondition():
         self._df_cw = None
         self._cwdiffdf = None
         self.updateconductor(altconductor)
+        self.empty = False
 
     def resetloadlist(self, loadlist):
         """ update the load list for the alternate condition """
@@ -592,6 +595,7 @@ class AltCondition_Series():
         self._df_sr = None
         self._df_spt = None
         self._solved = False
+        self.empty = False
     
     def _solve(self):
         _df = pd.DataFrame()
