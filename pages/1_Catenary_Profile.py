@@ -450,15 +450,15 @@ with tab2:
             m, s = divmod(et_time-st_time, 60)
             msg = 'Done!' + ' That took ' + '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s)
             st.success(msg)
-        if not verified_alt_conditions and Nom is not None:
-            PlotSag(Nom, yExagg)
-            PlotSupportLoad(Nom)
-            PlotHALength(Nom)
-        elif Ref is not None:
-            PlotSagaltCond(Nom, Ref, yExagg)
-            PlotSupportLoad_alt(Nom, Ref)
-            PlotHALength(Nom,)
-            PlotCWDiff(Ref)
+            if not verified_alt_conditions and Nom is not None:
+                PlotSag(Nom, yExagg)
+                PlotSupportLoad(Nom)
+                PlotHALength(Nom)
+            elif Ref is not None:
+                PlotSagaltCond(Nom, Ref, yExagg)
+                PlotSupportLoad_alt(Nom, Ref)
+                PlotHALength(Nom,)
+                PlotCWDiff(Ref)
     elif wrfile is None and ddfile is None:
         SagData.clear()
         Nom = SagData(OCS.sample_df_dd(), OCS.sample_df_wr())
