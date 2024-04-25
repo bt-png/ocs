@@ -89,7 +89,7 @@ else:
 
 st.set_page_config(page_title="Simple Calcs", page_icon="📹")
 st.markdown("# Simple Reference Calculations")
-st.sidebar.header("Simple Calculations")
+#st.sidebar.header("Simple Calculations")
 st.write(
     """Use this app for simple reference calculations.  
     You are welcome!."""

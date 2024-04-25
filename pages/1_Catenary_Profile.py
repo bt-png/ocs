@@ -23,6 +23,7 @@ def plotdimensions(staList,elList,yscale=1):
     width = 1200
     widthratio = width/max_x
     height = widthratio*yscale*max_y
+    height = max(height, 300)
     return int(width), int(height)
 
 def dataframe_with_selections(df, inputkey):
@@ -101,17 +102,21 @@ def PlotSag(_REF, yscale) -> None:
     df = _REF.dataframe_w_ha()
     pwidth, pheight = plotdimensions(df['Stationing'],df['Elevation'],yscale)
     st.write('### Catenary Wire Sag Plot')
-    selection = alt.selection_point(fields=['type'], bind='legend')
-    chart = alt.Chart(df).mark_line().encode(
+    nearest = alt.selection_point(nearest=True, on='mouseover', fields=['Stationing'], empty=False)
+    line = alt.Chart(df).mark_line().encode(
         alt.X('Stationing:Q').scale(zero=False), 
         alt.Y('Elevation:Q').scale(zero=False),
         alt.Detail('cable'),
         alt.Color('type'),
-        opacity=alt.condition(selection, alt.value(1), alt.value(0.1))
-        ).add_params(selection).properties(
-            width=pwidth,
-            height=pheight
-        ).interactive()
+    )
+    selectors = alt.Chart(df).mark_point().encode(
+        alt.X('Stationing:Q'),
+        opacity=alt.value(0)
+    ).add_params(nearest)
+    points = line.mark_point().encode(opacity=alt.condition(nearest, alt.value(1), alt.value(0)))
+    text = line.mark_text(align='left', dx=5, dy=-5).encode(text=alt.condition(nearest, 'Elevation:Q', alt.value(' ')))
+    rules = alt.Chart(df).mark_rule(color='gray').encode(x='Stationing:Q').transform_filter(nearest)
+    chart = alt.layer(line + selectors + points + rules + text).properties(width=pwidth, height=pheight).interactive()
     st.write(chart)
 
 @st.cache_data()
@@ -122,25 +127,51 @@ def PlotSagaltCond(_REF_Base, _REF, yscale) -> None:
     dfa = pd.concat([dfbase, dfalt], ignore_index=True)
     pwidth, pheight = plotdimensions(dfa['Stationing'],dfa['Elevation'],yscale)
     st.write('### Catenary Wire Sag Plot')
-    selection = alt.selection_point(fields=['type'], bind='legend')
-    chart = alt.Chart(dfa).mark_line().encode(
+    nearest = alt.selection_point(nearest=True, on='mouseover', fields=['Stationing'], empty=False)
+    line = alt.Chart(dfa).mark_line().encode(
         alt.X('Stationing:Q').scale(zero=False), 
         alt.Y('Elevation:Q').scale(zero=False),
         alt.Detail('cable'),
         alt.Color('type'),
-        opacity=alt.condition(selection, alt.value(1), alt.value(0.1))
-        ).add_params(selection).properties(
-            width=pwidth,
-            height=pheight
-        ).interactive()
+    )
+    selectors = alt.Chart(dfa).mark_point().encode(
+        alt.X('Stationing:Q'),
+        opacity=alt.value(0)
+    ).add_params(nearest)
+    points = line.mark_point().encode(opacity=alt.condition(nearest, alt.value(1), alt.value(0)))
+    text = line.mark_text(align='left', dx=5, dy=-5).encode(text=alt.condition(nearest, 'Elevation:Q', alt.value(' ')))
+    rules = alt.Chart(dfa).mark_rule(color='gray').encode(x='Stationing:Q').transform_filter(nearest)
+    chart = alt.layer(line + selectors + points + rules + text).properties(width=pwidth, height=pheight).interactive()
     st.write(chart)
 
+@st.cache_data()
+def PlotHALength(_REF) -> None:
+    df = _REF.dataframe_halength()
+    pwidth, pheight = plotdimensions(df['Stationing'],df['Length'])
+    st.write('### Hanger Lengths')
+    nearest = alt.selection_point(nearest=True, on='mouseover', fields=['Stationing'], empty=False)
+    line = alt.Chart(df).mark_point().encode(
+        alt.X('Stationing:Q').scale(zero=False), 
+        alt.Y('Length:Q', title='HA Length (in)').scale(zero=False),
+        alt.Detail('cable'),
+        alt.Color('type')
+    )
+    selectors = alt.Chart(df).mark_point().encode(
+        alt.X('Stationing:Q'),
+        opacity=alt.value(0)
+    ).add_params(nearest)
+    points = line.mark_point().encode(opacity=alt.condition(nearest, alt.value(1), alt.value(0)))
+    text = line.mark_text(align='left', dx=5, dy=-5).encode(text=alt.condition(nearest, 'Length:Q', alt.value(' ')))
+    rules = alt.Chart(df).mark_rule(color='gray').encode(x='Stationing:Q').transform_filter(nearest)
+    chart = alt.layer(line + selectors + points + rules + text).properties(width=pwidth, height=300).interactive()
+    st.write(chart)
+    
 @st.cache_data()
 def PlotCWDiff(_REF) -> None:
     df = _REF.dataframe_cwdiff()
     df['Elevation'] *= 12
     pwidth, pheight = plotdimensions(df['Stationing'],df['Elevation'])
-    st.write('### Difference from BASE')
+    st.write('### CW Elevation difference from BASE')
     nearest = alt.selection_point(nearest=True, on='mouseover', fields=['Stationing'], empty=False)
     line = alt.Chart(df).mark_line().encode(
         alt.X('Stationing:Q').scale(zero=False), 
@@ -155,7 +186,58 @@ def PlotCWDiff(_REF) -> None:
     points = line.mark_point().encode(opacity=alt.condition(nearest, alt.value(1), alt.value(0)))
     text = line.mark_text(align='left', dx=5, dy=-5).encode(text=alt.condition(nearest, 'Elevation:Q', alt.value(' ')))
     rules = alt.Chart(df).mark_rule(color='gray').encode(x='Stationing:Q').transform_filter(nearest)
-    chart = alt.layer(line + selectors + points + rules + text).properties(width=pwidth, height=300)
+    chart = alt.layer(line + selectors + points + rules + text).properties(width=pwidth, height=300).interactive()
+    st.write(chart)
+
+@st.cache_data()
+def PlotSupportLoad(_REF) -> None:
+    df_temp = _REF.dataframe()
+    df = _REF.dataframe_spt()
+    pwidth, pheight = plotdimensions(df['Stationing'],df_temp['Elevation'])
+    st.write('### Support Loading')
+    
+    nearest = alt.selection_point(nearest=True, on='mouseover', fields=['Stationing'], empty=False)
+    line = alt.Chart(df).mark_point().encode(
+        alt.X('Stationing:Q').scale(zero=False), 
+        alt.Y('Load:Q', title='Loading (lb)').scale(zero=False),
+        alt.Detail('cable'),
+        alt.Color('type')
+    )
+    selectors = alt.Chart(df).mark_point().encode(
+        alt.X('Stationing:Q'),
+        opacity=alt.value(0)
+    ).add_params(nearest)
+    points = line.mark_point().encode(opacity=alt.condition(nearest, alt.value(1), alt.value(0)))
+    text = line.mark_text(align='left', dx=5, dy=-5).encode(text=alt.condition(nearest, 'Load:Q', alt.value(' ')))
+    rules = alt.Chart(df).mark_rule(color='gray').encode(x='Stationing:Q').transform_filter(nearest)
+    chart = alt.layer(line + selectors + points + rules + text).properties(width=pwidth, height=300).interactive()
+    st.write(chart)
+
+@st.cache_data()
+def PlotSupportLoad_alt(_REF_Base, _REF) -> None:
+    df_temp = _REF.dataframe()
+    dfbase = _REF_Base.dataframe_spt()
+    dfbase.type = 'BASE'
+    dfalt = _REF.dataframe_spt()
+    dfa = pd.concat([dfbase, dfalt], ignore_index=True)
+    pwidth, pheight = plotdimensions(dfa['Stationing'],df_temp['Elevation'])
+    st.write('### Support Loading')
+    
+    nearest = alt.selection_point(nearest=True, on='mouseover', fields=['Stationing'], empty=False)
+    line = alt.Chart(dfa).mark_point().encode(
+        alt.X('Stationing:Q').scale(zero=False), 
+        alt.Y('Load:Q').scale(zero=False),
+        alt.Detail('cable'),
+        alt.Color('type')
+    )
+    selectors = alt.Chart(dfa).mark_point().encode(
+        alt.X('Stationing:Q'),
+        opacity=alt.value(0)
+    ).add_params(nearest)
+    points = line.mark_point().encode(opacity=alt.condition(nearest, alt.value(1), alt.value(0)))
+    text = line.mark_text(align='left', dx=5, dy=-5).encode(text=alt.condition(nearest, 'Load:Q', alt.value(' ')))
+    rules = alt.Chart(dfa).mark_rule(color='gray').encode(x='Stationing:Q').transform_filter(nearest)
+    chart = alt.layer(line + selectors + points + rules + text).properties(width=pwidth, height=300).interactive()
     st.write(chart)
     
 @st.cache_data()
@@ -255,12 +337,12 @@ def show_download_CAD_Script(_Ref, _yExag):
                     )
 
 st.set_page_config(
-    page_title="CAT SAG", 
-    page_icon="📹",
-    layout='wide')
+    page_title = "CAT SAG", 
+    page_icon = "📹",
+    layout = 'wide')
 
 st.markdown("# Simple Catenary Sag")
-st.sidebar.header("CAT SAG")
+#st.sidebar.header("Profile Tool")
 
 st.write(
     """This app shows you the simple sag curves for a flexible catenary system
@@ -273,9 +355,6 @@ if st.session_state['accesskey'] != st.secrets['accesskey']:
         st.stop()
 
 tab1, tab2, tab3, tab4 = st.tabs(['Input', 'Sag Plot', 'Elasticity', 'Output'])
-
-st.sidebar.checkbox('Consider Alt Conductors', key='altConductors', value=True)
-st.sidebar.checkbox('Perform Elasticity Check', key='elasticity', value=True)
 
 with tab1:
     cbd = st.container(border=True)
@@ -353,8 +432,11 @@ with tab2:
             submit_altCond = False
             SagData.clear()
             PlotSag.clear()
+            PlotSupportLoad.clear()
+            PlotHALength.clear()
             altSagData.clear()
             PlotSagaltCond.clear()
+            PlotSupportLoad_alt.clear()
             PlotCWDiff.clear()
             tmp_wr = wr.iloc[startSPT:endSPT+1]
             tmp_wr = tmp_wr.reset_index(drop=True)
@@ -370,8 +452,12 @@ with tab2:
             st.success(msg)
         if not verified_alt_conditions and Nom is not None:
             PlotSag(Nom, yExagg)
+            PlotSupportLoad(Nom)
+            PlotHALength(Nom)
         elif Ref is not None:
             PlotSagaltCond(Nom, Ref, yExagg)
+            PlotSupportLoad_alt(Nom, Ref)
+            PlotHALength(Nom,)
             PlotCWDiff(Ref)
     elif wrfile is None and ddfile is None:
         SagData.clear()
@@ -380,7 +466,7 @@ with tab2:
     else:
         st.warning('Provide both "System Design" and "Layout Design" files to run calculation.')
 with tab3:
-    if ddfile is not None and wrfile is not None and st.session_state['elasticity']:
+    if ddfile is not None and wrfile is not None:
         ec = None
         st.write('Consider load conditions')
         new_df_acd_elastic = dataframe_with_selections(OCS.add_base_acd(_df_cd, _df_acd), 'elasticdf')
@@ -408,7 +494,7 @@ with tab3:
             st_time = time.time()
             SagData.clear()
             Nom = SagData(_dd, wr)
-            #new_df_acd_elastic = _df_acd[elastic_df_acd.Calculate]
+
             if len(new_df_acd_elastic) > 0:
                 elasticityalt.clear()
                 ec = elasticityalt(new_df_acd_elastic, Nom, pUplift, stepSize, startSPT, endSPT)
@@ -418,10 +504,6 @@ with tab3:
                 st.success(msg)
             else:
                 st.error('Please select at least one load condition')
-                #if st.session_state['altConductors']:
-                #    ec = elasticityalt(_df_acd, Nom, pUplift, stepSize, startSPT, endSPT)
-                #else:
-                #    ec = elasticity(_df_cd, Nom, pUplift, stepSize, startSPT, endSPT)
         if ec is not None:
             Plotelasticity(ec)
 
@@ -429,10 +511,6 @@ with tab4:
     if ddfile is not None and wrfile is not None:
         cdd0, cdd1, cdd2 = st.columns([0.1, 0.5, 0.4])
         with cdd1:
-            #if st.session_state['altConductors']:
-            #    if submit_altCond:
-            #        if not new_df_acd.empty:
-            #            OutputAltCond(Ref, Nom)
             if Nom is not None:
                 OutputSag(Nom)
             elif ec is not None:
@@ -442,18 +520,12 @@ with tab4:
         with cdd2:
             if Nom is not None:
                 st.markdown('#### Download CAD Scripts')
-                
-                #acadScript2 = OCS.SagtoCAD(Nom, yExagg)
+
                 a1, b1, c1 = st.columns([0.4, 0.3, 0.3])
                 with a1:
                     st.write('Cable Profile')
                 with b1:
                     show_download_CAD_Script(Nom, 1)
-                with c1:
-                    show_download_CAD_Script(Nom, yExagg)
-                    #st.download_button(
-                    #    label="### yExaggeration",
-                    #    data=acadScript2,
-                    #    file_name="_sag_.scr",
-                    #    mime="text/scr"
-                    #)
+                if yExagg != 1:
+                    with c1:
+                        show_download_CAD_Script(Nom, yExagg)
