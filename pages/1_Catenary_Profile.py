@@ -105,6 +105,7 @@ def PlotSag(_REF_Base, _REF=pd.DataFrame(), yscale=1) -> None:
         dfbase.type = 'BASE'
         dfalt = _REF.dataframe()
         df = pd.concat([dfbase, dfalt], ignore_index=True)
+    df['FtInText'] = df['Elevation'].apply(lambda x : GenFun.FtIn_Simple(x))
     pwidth, pheight = plotdimensions(df['Stationing'],df['Elevation'],yscale)
     st.write('### Catenary Wire Sag Plot')
     nearest = alt.selection_point(nearest=True, on='mouseover', fields=['Stationing'], empty=False)
@@ -119,7 +120,7 @@ def PlotSag(_REF_Base, _REF=pd.DataFrame(), yscale=1) -> None:
         opacity=alt.value(0)
     ).add_params(nearest)
     points = line.mark_point().encode(opacity=alt.condition(nearest, alt.value(1), alt.value(0)))
-    text = line.mark_text(align='left', dx=5, dy=-5).encode(text=alt.condition(nearest, 'Elevation:Q', alt.value(' ')))
+    text = line.mark_text(align='left', dx=5, dy=-5).encode(text=alt.condition(nearest, 'FtInText:N', alt.value(' ')))
     rules = alt.Chart(df).mark_rule(color='gray').encode(x='Stationing:Q').transform_filter(nearest)
     chart = alt.layer(line + selectors + points + rules + text).properties(width=pwidth, height=pheight).interactive()
     st.write(chart)
@@ -127,6 +128,7 @@ def PlotSag(_REF_Base, _REF=pd.DataFrame(), yscale=1) -> None:
 @st.cache_data()
 def PlotHALength(_REF) -> None:
     df = _REF.dataframe_halength()
+    df['FtInText'] = df['Length'].apply(lambda x : GenFun.FtIn_Simple(x/12))
     pwidth, pheight = plotdimensions(df['Stationing'],df['Length'])
     st.write('### Hanger Lengths')
     nearest = alt.selection_point(nearest=True, on='mouseover', fields=['Stationing'], empty=False)
@@ -141,7 +143,7 @@ def PlotHALength(_REF) -> None:
         opacity=alt.value(0)
     ).add_params(nearest)
     points = line.mark_point().encode(opacity=alt.condition(nearest, alt.value(1), alt.value(0)))
-    text = line.mark_text(align='left', dx=5, dy=-5).encode(text=alt.condition(nearest, 'Length:Q', alt.value(' ')))
+    text = line.mark_text(align='left', dx=5, dy=-5).encode(text=alt.condition(nearest, 'FtInText:N', alt.value(' ')))
     rules = alt.Chart(df).mark_rule(color='gray').encode(x='Stationing:Q').transform_filter(nearest)
     chart = alt.layer(line + selectors + points + rules + text).properties(width=pwidth, height=300).interactive()
     st.write(chart)
@@ -196,6 +198,7 @@ def ShowResults(_REF_Base, _REF=pd.DataFrame()):
 def PlotCWDiff(_REF) -> None:
     if not _REF.empty:
         df = _REF.dataframe_cwdiff()
+        df['FtInText'] = df['Elevation'].apply(lambda x : GenFun.FtIn_Simple(x))
         df['Elevation'] *= 12
         pwidth, pheight = plotdimensions(df['Stationing'],df['Elevation'])
         st.write('### CW Elevation difference from BASE')
@@ -211,7 +214,7 @@ def PlotCWDiff(_REF) -> None:
             opacity=alt.value(0)
         ).add_params(nearest)
         points = line.mark_point().encode(opacity=alt.condition(nearest, alt.value(1), alt.value(0)))
-        text = line.mark_text(align='left', dx=5, dy=-5).encode(text=alt.condition(nearest, 'Elevation:Q', alt.value(' ')))
+        text = line.mark_text(align='left', dx=5, dy=-5).encode(text=alt.condition(nearest, 'FtInText:N', alt.value(' ')))
         rules = alt.Chart(df).mark_rule(color='gray').encode(x='Stationing:Q').transform_filter(nearest)
         chart = alt.layer(line + selectors + points + rules + text).properties(width=pwidth, height=300).interactive()
         st.write(chart)
@@ -446,13 +449,17 @@ with tab2:
                 ShowHATable(Nom)
     elif wrfile is None and ddfile is None:
         SagData.clear()
+        PlotSag.clear()
+        PlotSupportLoad.clear()
+        PlotHALength.clear()
+        ShowHATable.clear()
         Nom = SagData(OCS.sample_df_dd(), OCS.sample_df_wr())
         PlotSag(_REF_Base=Nom, yscale=yExagg)
         PlotSupportLoad(_REF_Base=Nom)
         PlotHALength(Nom)
         ShowHATable(Nom)
     else:
-        st.warning('Provide both "System Design" and "Layout Design" files to run calculation.')
+        tab2warning = st.warning('Provide both "System Design" and "Layout Design" files to run calculation.')
 with tab3:
     if ddfile is not None and wrfile is not None:
         ec = None
@@ -460,6 +467,9 @@ with tab3:
         new_df_acd_elastic = dataframe_with_selections(OCS.add_base_acd(_df_cd, _df_acd), 'elasticdf')
         startSPT, endSPT = st.slider(label='Portion of the full span to investigate', min_value=0, max_value=len(wr)-1, value = (2,4), key='elasticslider')
         SPTID_range(startSPT, endSPT)
+        spanBuffer = st.number_input(label='Span Buffer', min_value = 0, step=1, value=3)
+        bufferStart = max(0,startSPT-spanBuffer)
+        bufferEnd = min(len(wr)-1, endSPT+spanBuffer)
         stepSize = st.number_input(label='Resolution (ft)', min_value = 1, step=1, value=10)
         pUplift = st.number_input(label='Uplift Force (lbf)', value=25)
         conditions = len(new_df_acd_elastic)
@@ -480,12 +490,14 @@ with tab3:
         if submit_elastic:
             submit_elastic = False
             st_time = time.time()
-            SagData.clear()
-            Nom = SagData(_dd, wr)
-
+            #Make the wire run extend up to 3 spans further
+            tmp_wr = wr.iloc[bufferStart:bufferEnd+1]
+            tmp_wr = tmp_wr.reset_index(drop=True)
             if len(new_df_acd_elastic) > 0:
+                SagData.clear()
                 elasticityalt.clear()
-                ec = elasticityalt(new_df_acd_elastic, Nom, pUplift, stepSize, startSPT, endSPT)
+                Nom = SagData(_dd, tmp_wr)
+                ec = elasticityalt(new_df_acd_elastic, Nom, pUplift, stepSize, startSPT-bufferStart, endSPT-bufferStart)
                 et_time = time.time()
                 m, s = divmod(et_time-st_time, 60)
                 msg = 'Done!' + ' That took ' + '{:02.0f} minute(s) {:02.0f} seconds'.format(m, s)
