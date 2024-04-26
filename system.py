@@ -45,6 +45,29 @@ def conductor_particulars(mw, cw, ha):
          })
     return _df
 
+def sample_df_conductor_data():
+    _df = pd.DataFrame({
+        'Load Condition': ['OP', 'OP-Loaded', 'OP-UnLoaded', ],
+        'Conductor Type': ['350 KCMIL HD', '500 KCMIL 19-HD', '500 KCMIL 19-HD'],
+        'Bare Conductor Weight': [1.063, 2.633, 1.544],
+        'Bare Conductor Diameter': [0.620, 0.811, 0.811],
+        'Bare Conductor Area': [0.2758, 0.3926, 0.3926],
+        'Nominal Conductor Tension': [3000, 6000, 5353],
+        'Nominal Temperature': [70, 70, 70],
+        'Equivalent Span': [21, 150, 150],
+        'Conductor Modulus of Elasticity': [1.6*10**7, 1.6*10**7, 1.6*10**7],
+        'Conductor Coefficient of Thermal Expansion': [9.4*10**-6, 9.4*10**-6, 9.4*10**-6],
+        'Conductor Nominal Breaking Load': [11810, 21590, 21590],
+        'Condition Radial Thickness of Ice': [0.0, 0.0, 0.0],
+        'Condition Wind Speed': [40, 40, 40],
+        'Condition Conductor Section Loss': [0, 0, 0],
+        'Condition Temperature': [110, 110, 110],
+        'Calc Wind Shape Coefficient': [1.0, 1.0, 1.0],
+        'Calc Ice Load is Nominal State': [False, False, False],
+        'Calc Wind Load Influences Cable Tension': [True, True, True]
+    })
+    return _df
+
 def sample_df_cp():
     _df = pd.DataFrame({
         'Cable': ['MW', 'CW', 'HA'],

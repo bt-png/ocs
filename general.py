@@ -31,6 +31,10 @@ def FtIn(val):
         _strFtIn = 'Error'
     return _ft, _in, _strFtIn
 
+def FtIn_Simple(val):
+    a, b, _strFtIn = FtIn(val)
+    return _strFtIn
+
 def WindPressure(windspeed, shapecoefficient=1):
     return windspeed ** 2 * 0.00256 * shapecoefficient
 
@@ -95,7 +99,7 @@ def loop(_T1, _Q, _R, precision):
             else:
                 _T1 += .01/precision
         loops += 1
-        if loops > 500000:
+        if loops > 5000000:
             break
     return (_T1, _try, loops)
 
@@ -151,7 +155,7 @@ def x_SPAN_LIST(WR, STA_Step, STARound):
     return val
 
 def L_HA_QTY(WR, MaxLength):
-    return (WR['SpanLength']/MaxLength).round(0)
+    return np.ceil(WR['SpanLength']/MaxLength)
 
 def L_HA_STA(WR, HA_QTY, STARound):
     HASpacing=WR['SpanLength']/HA_QTY
