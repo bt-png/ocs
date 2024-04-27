@@ -57,6 +57,7 @@ def intro(dummy: str = "robot"):
 
     plotter.window_size = [450, 300]
     return plotter
+    
 #@st.experimental_fragment
 def form_SC(_key,):
     with st.form(key=_key):
@@ -97,7 +98,7 @@ def draw():
     plotter = pv.Plotter()
     df1 = st.session_state.wiring_values['val1']['DataFrame']
     df2 = st.session_state.wiring_values['val2']['DataFrame']
-    df = pd.concat([df1, df2], ignore_index=True)
+    #df = pd.concat([df1, df2], ignore_index=True)
     spline1 = pv.Spline(df1) #.tube(radius=1) #0.5*st.session_state.wiring_values['val1']['Diameter'])
     spline2 = pv.Spline(df2) #.tube(radius=1) #0.5*st.session_state.wiring_values['val2']['Diameter'])
     plotter.add_mesh(spline1, color="green") # , render_lines_as_tubes=True, line_width=1)
