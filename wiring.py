@@ -25,7 +25,7 @@ def intro(dummy: str = "robot"):
     plotter.add_mesh(spline2, color="red")
 
     
-    head = pv.Cylinder(radius=3.5, height=8)
+    #head = pv.Cylinder(radius=3.5, height=8)
     #nose = pv.Cylinder(radius=0.5, height=8, direction=(0, 0, 1), center=(0, 0, 1.7))
     #eye_left = pv.Cylinder(
     #    radius=1.0, height=4, direction=(0, 0, 1), center=(-2.0, 1, 2)
