@@ -81,6 +81,7 @@ def draw():
     )
     
     fig = go.Figure(data=data, layout=layout)
+    fig.update_layout(scene_aspectmode='cube', width=600)
     st.plotly_chart(fig)
     
 def run():
