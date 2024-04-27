@@ -13,7 +13,7 @@ import inspect
 from os import system
 
 # Start app
-import pantry.stpyvista_pantry as stpv
+import stpyvista_pantry as stpv
 
 # Initial configuration
 pv.start_xvfb()
@@ -92,12 +92,12 @@ def fill_up_main_window():
 
 
 def main():
-    st.set_page_config(
-        page_title="stpyvista",
-        page_icon="🧊",
-        layout="centered",
-        initial_sidebar_state="expanded",
-    )
+    #st.set_page_config(
+    #    page_title="stpyvista",
+    #    page_icon="🧊",
+    #    layout="centered",
+    #    initial_sidebar_state="expanded",
+    #)
 
     # Add styling with CSS selectors
     with open("assets/style.css") as f:
