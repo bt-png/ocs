@@ -1,17 +1,6 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Apr 26 14:04:04 2024
-
-@author: TharpBM
-"""
-
 import streamlit as st
 import conductor
-import pyvista as pv
 import numpy as np
-from stpyvista import stpyvista
-from stpyvista.utils import is_the_app_embedded
-import pantry.stpyvista_pantry as stpv
 
 def system_types():
     return ('Structure', 'Single Conductor', 'Catenary System')
@@ -49,35 +38,13 @@ def form_SC(_key,):
             st.session_state.wiring_values[_key] = new_dict
             
 def draw():
-    plotter = pv.Plotter()
-    spline1 = pv.Spline(st.session_state.wiring_values['val1']['DataFrame']).tube(radius=0.5*st.session_state.wiring_values['val1']['Diameter'])
-    spline2 = pv.Spline(st.session_state.wiring_values['val2']['DataFrame']).tube(radius=0.5*st.session_state.wiring_values['val2']['Diameter'])
-    actor = plotter.add_mesh(spline1, color='white')
-    actor = plotter.add_mesh(spline2, color='red')
-    #plotter.show()
-    stpyvista(plotter, key='pv_wire')
-    
-    #plotter = pv.Plotter(window_size = [400,400])
-    #mesh = pv.Cube(center=(0,0,0))
-    #esh['my_scalar'] = mesh.points[:,2] * mesh.points[:,0]
-    #plotter.add_mesh(mesh, scalars='my_scalar', cmap='bwr')
-    #plotter.view_isometric()
-    #plotter.add_scalar_bar()
-    #plotter.background_color = 'white'
-    #st.write(st.session_state.wiring_values)
+    st.write(st.session_state.wiring_values)
     
 def run():
     if 'wiring_values' not in st.session_state:
         st.session_state.wiring_values = ({'val1': ({'values': 1}), 'val2': ({'values': 2})})
     else:
         st.session_state.wiring_values = st.session_state.wiring_values
-    if "FIRST_ACCESS" not in st.session_state:
-        st.session_state.FIRST_ACCESS = True
-    
-    pv.start_xvfb()
-    st.session_state.is_app_embedded = st.session_state.get(
-        "is_app_embedded", is_the_app_embedded()
-    )
     
     col1, col2 = st.columns([1,1])
     type1 = col1.selectbox(
