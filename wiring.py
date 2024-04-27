@@ -12,36 +12,48 @@ def system_types():
 @st.cache_resource
 def intro(dummy: str = "robot"):
     plotter = pv.Plotter()
+    
+    df1 = st.session_state.wiring_values['val1']['DataFrame']
+    df2 = st.session_state.wiring_values['val2']['DataFrame']
+    
+    df = pd.concat([df1, df2], ignore_index=True)
+    st.dataframe(df)
+    plotter = pv.Plotter()
+    spline1 = pv.Spline(df1).tube(radius=0.5*st.session_state.wiring_values['val1']['Diameter'])
+    spline2 = pv.Spline(df2).tube(radius=0.5*st.session_state.wiring_values['val2']['Diameter'])
+    plotter.add_mesh(spline1, color='green')
+    plotter.add_mesh(spline2, color='red')
 
+    
     head = pv.Cylinder(radius=3.5, height=8)
-    nose = pv.Cylinder(radius=0.5, height=8, direction=(0, 0, 1), center=(0, 0, 1.7))
-    eye_left = pv.Cylinder(
-        radius=1.0, height=4, direction=(0, 0, 1), center=(-2.0, 1, 2)
-    )
-    eye_left_p = pv.Cylinder(
-        radius=0.3, height=4.1, direction=(0, 0, 1), center=(-2.0, 1, 2)
-    )
-    eye_right = pv.Cylinder(
-        radius=1.0, height=4, direction=(0, 0, 1), center=(2.0, 1, 2)
-    )
-    eye_right_p = pv.Cylinder(
-        radius=0.3, height=4.1, direction=(0, 0, 1), center=(2.0, 1, 2)
-    )
+    #nose = pv.Cylinder(radius=0.5, height=8, direction=(0, 0, 1), center=(0, 0, 1.7))
+    #eye_left = pv.Cylinder(
+    #    radius=1.0, height=4, direction=(0, 0, 1), center=(-2.0, 1, 2)
+    #)
+    #eye_left_p = pv.Cylinder(
+    #    radius=0.3, height=4.1, direction=(0, 0, 1), center=(-2.0, 1, 2)
+    #)
+    #eye_right = pv.Cylinder(
+    #    radius=1.0, height=4, direction=(0, 0, 1), center=(2.0, 1, 2)
+    #)
+    #eye_right_p = pv.Cylinder(
+    #    radius=0.3, height=4.1, direction=(0, 0, 1), center=(2.0, 1, 2)
+    #)
 
     plotter.add_mesh(head, color="grey")
-    plotter.add_mesh(nose, color="red")
-    plotter.add_mesh(eye_left, color="white")
-    plotter.add_mesh(eye_right, color="white")
-    plotter.add_mesh(eye_left_p, color="green")
-    plotter.add_mesh(eye_right_p, color="green")
+    #plotter.add_mesh(nose, color="red")
+    #plotter.add_mesh(eye_left, color="white")
+    #plotter.add_mesh(eye_right, color="white")
+    #plotter.add_mesh(eye_left_p, color="green")
+    #plotter.add_mesh(eye_right_p, color="green")
 
-    plane = pv.Plane(center=[0, -3.65, 0], direction=[0, 1, 0], i_size=12, j_size=12)
-    plotter.add_mesh(plane, color="#09ab3b", show_edges=True)
+    #plane = pv.Plane(center=[0, -3.65, 0], direction=[0, 1, 0], i_size=12, j_size=12)
+    #plotter.add_mesh(plane, color="#09ab3b", show_edges=True)
 
     plotter.background_color = "white"
     plotter.view_xy()
-    plotter.camera.azimuth = 25
-    plotter.camera.elevation = 15
+    #plotter.camera.azimuth = 25
+    #plotter.camera.elevation = 15
 
     plotter.window_size = [450, 300]
     return plotter
@@ -79,18 +91,9 @@ def form_SC(_key,):
             
 def draw():
     pv.start_xvfb()
-    df1 = st.session_state.wiring_values['val1']['DataFrame']
-    df2 = st.session_state.wiring_values['val2']['DataFrame']
     
-    df = pd.concat([df1, df2], ignore_index=True)
-    st.dataframe(df)
-    plotter = pv.Plotter()
-    spline1 = pv.Spline(df1).tube(radius=0.5*st.session_state.wiring_values['val1']['Diameter'])
-    spline2 = pv.Spline(df2).tube(radius=0.5*st.session_state.wiring_values['val2']['Diameter'])
-    plotter.add_mesh(spline1, color='green')
-    plotter.add_mesh(spline2, color='red')
     #stpyvista(plotter)
-    #plotter = intro()
+    plotter = intro()
 
     stpyvista(
         plotter,
