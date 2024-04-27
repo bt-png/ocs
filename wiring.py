@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import conductor
 import pyvista as pv
+import panel as pn
 from stpyvista import stpyvista
 
 def system_types():
