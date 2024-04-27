@@ -47,8 +47,8 @@ def draw():
     df = pd.concat([df1, df2], ignore_index=True)
     #st.write(df)
     fig = go.Figure()
-    fig.update_traces(name='val1', x=df1['Stationing'], y=df1['Offset'], z=df1['Elevation'], mode='lines', selector=dict(type='scatter3d'))
-    fig.update_traces(name='val2', x=df2['Stationing'], y=df2['Offset'], z=df2['Elevation'], mode='lines', selector=dict(type='scatter3d'))
+    fig.add_trace(name='val1', x=df1['Stationing'], y=df1['Offset'], z=df1['Elevation'], mode='lines', selector=dict(type='scatter3d'))
+    fig.add_trace(name='val2', x=df2['Stationing'], y=df2['Offset'], z=df2['Elevation'], mode='lines', selector=dict(type='scatter3d'))
     #data=go.Scatter3d(x=df['Stationing'], y=df['Offset'], z=df['Elevation'], mode='lines')
     fig.update_layout(scene_aspectmode='cube') #cube
     #fig.update_layout(scene_aspectmode='manual', scene_aspectratio=dict(x=1, y=1, z=2)) # elevation doubled
