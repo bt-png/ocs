@@ -6,3 +6,4 @@ pandas
 pydeck
 streamlit
 seaborn
+pyvista
