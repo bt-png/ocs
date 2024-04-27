@@ -59,13 +59,20 @@ def draw():
         z=[1, 2],
         name='Legendary'
         )
-    data = go.Data([trace1])
+    trace2 = go.Scatter3d(
+        x=[4, 200],
+        y=[4, 200],
+        z=[4, 200],
+        name='Legendary2'
+        )
+    data = go.Data([trace1, trace2])
     layout = go.Layout(
         showlegend=True,
         scene=go.Scene(
             xaxis=go.XAxis(title='x axis title'),
             yaxis=go.YAxis(title='y axis title'),
-            zaxis=go.ZAxis(title='z axis title')
+            zaxis=go.ZAxis(title='z axis title'),
+            aspectmode='cube'
         )
     )
     
