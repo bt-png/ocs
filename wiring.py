@@ -9,7 +9,7 @@ import streamlit as st
 import conductor
 import pyvista as pv
 import numpy as np
-from stpyvista import stpyvista
+#from stpyvista import stpyvista
 #from stpyvista.utils import start_xvfb
 
 
