@@ -40,7 +40,7 @@ def intro(dummy: str = "robot"):
     #    radius=0.3, height=4.1, direction=(0, 0, 1), center=(2.0, 1, 2)
     #)
 
-    plotter.add_mesh(head, color="grey")
+    #plotter.add_mesh(head, color="grey")
     #plotter.add_mesh(nose, color="red")
     #plotter.add_mesh(eye_left, color="white")
     #plotter.add_mesh(eye_right, color="white")
