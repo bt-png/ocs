@@ -42,8 +42,8 @@ def form_SC(_key,):
             st.session_state.wiring_values[_key] = new_dict
             
 def draw():
-    #df1 = st.session_state.wiring_values['val1']['DataFrame']
-    #df2 = st.session_state.wiring_values['val2']['DataFrame']
+    df1 = st.session_state.wiring_values['val1']['DataFrame']
+    df2 = st.session_state.wiring_values['val2']['DataFrame']
     #df = pd.concat([df1, df2], ignore_index=True)
     #st.write(df)
     #fig = go.Figure()
