@@ -42,7 +42,7 @@ def draw():
     df = px.data.gapminder().query("continent=='Europe'")
     st.write(df)
     fig = px.line_3d(df, x="gdpPercap", y="pop", z="year", color='country')
-    st.write(fig.show())
+    st.plotly_chart(fig)
     #st.write(st.session_state.wiring_values)
     
 def run():
