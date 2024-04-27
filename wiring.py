@@ -10,7 +10,7 @@ import conductor
 import pyvista as pv
 import numpy as np
 from stpyvista import stpyvista
-from stpyvista.utils import start_xvfb
+#from stpyvista.utils import start_xvfb
 
 
 def system_types():
@@ -54,8 +54,8 @@ def draw():
     spline2 = pv.Spline(st.session_state.wiring_values['val2']['DataFrame']).tube(radius=0.5*st.session_state.wiring_values['val2']['Diameter'])
     actor = plotter.add_mesh(spline1, color='white')
     actor = plotter.add_mesh(spline2, color='red')
-    #plotter.show()
-    stpyvista(plotter, key='pv_wire')
+    plotter.show()
+    #stpyvista(plotter, key='pv_wire')
     
     #plotter = pv.Plotter(window_size = [400,400])
     #mesh = pv.Cube(center=(0,0,0))
@@ -72,9 +72,9 @@ def run():
     else:
         st.session_state.wiring_values = st.session_state.wiring_values
 
-    if "IS_XVFB_RUNNING" not in st.session_state:
-        start_xvfb()
-        st.session_state.IS_XVFB_RUNNING = True
+    #if "IS_XVFB_RUNNING" not in st.session_state:
+    #    start_xvfb()
+    #    st.session_state.IS_XVFB_RUNNING = True
       
     col1, col2 = st.columns([1,1])
     type1 = col1.selectbox(
