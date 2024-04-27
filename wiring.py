@@ -44,9 +44,10 @@ def draw():
     df1 = st.session_state.wiring_values['val1']['DataFrame']
     df2 = st.session_state.wiring_values['val2']['DataFrame']
     df = pd.concat([df1, df2], ignore_index=True)
+    st.write(df)
     fig = px.line_3d(df, x='Station', y='Offset', z='Elevation', color='type')
     st.plotly_chart(fig)
-    #st.write(st.session_state.wiring_values)
+    
     
 def run():
     if 'wiring_values' not in st.session_state:
