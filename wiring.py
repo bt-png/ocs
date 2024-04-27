@@ -51,7 +51,7 @@ def intro(dummy: str = "robot"):
     #plotter.add_mesh(plane, color="#09ab3b", show_edges=True)
 
     plotter.background_color = "white"
-    plotter.view_xy()
+    #plotter.view_xy()
     #plotter.camera.azimuth = 25
     #plotter.camera.elevation = 15
 
@@ -93,8 +93,15 @@ def draw():
     pv.start_xvfb()
     
     #stpyvista(plotter)
-    plotter = intro()
-
+    #plotter = intro()
+    plotter = pv.Plotter()
+    df1 = st.session_state.wiring_values['val1']['DataFrame']
+    df2 = st.session_state.wiring_values['val2']['DataFrame']
+    df = pd.concat([df1, df2], ignore_index=True)
+    spline1 = pv.Spline(df1, tube(radius=0.5*st.session_state.wiring_values['val1']['Diameter'])
+    spline2 = pv.Spline(df2, tube(radius=0.5*st.session_state.wiring_values['val2']['Diameter'])
+    plotter.add_mesh(spline1, color="green")
+    plotter.add_mesh(spline2, color="red")
     stpyvista(
         plotter,
         panel_kwargs=dict(
