@@ -6,3 +6,4 @@ streamlit
 seaborn
 pyvista
 panels
+stpyvista
