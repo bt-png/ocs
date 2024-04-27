@@ -54,16 +54,18 @@ def draw():
     #fig.update_layout(scene_aspectmode='manual', scene_aspectratio=dict(x=1, y=1, z=2)) # elevation doubled
     #st.plotly_chart(fig, use_container_width=False, theme='streamlit')
     trace1 = go.Scatter3d(
-        x=[1, 2],
-        y=[1, 2],
-        z=[1, 2],
-        name='Legendary'
+        x=df1['Stationing'], 
+        y=df1['Offset'], 
+        z=df1['Elevation']
+        name='val1',
+        mode='lines'
         )
     trace2 = go.Scatter3d(
-        x=[4, 200],
-        y=[4, 200],
-        z=[4, 200],
-        name='Legendary2'
+        x=df2['Stationing'], 
+        y=df2['Offset'], 
+        z=df2['Elevation']
+        name='val2',
+        mode='lines'
         )
     data = go.Data([trace1, trace2])
     layout = go.Layout(
