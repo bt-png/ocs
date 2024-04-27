@@ -69,7 +69,7 @@ def draw():
         )
     )
     
-    fig = go.FigureWidget(data=data, layout=layout)
+    fig = go.Figure(data=data, layout=layout)
     st.plotly_chart(fig)
     
 def run():
