@@ -45,7 +45,7 @@ def draw():
     df2 = st.session_state.wiring_values['val2']['DataFrame']
     df = pd.concat([df1, df2], ignore_index=True)
     st.write(df)
-    fig = px.line_3d(df, x='Station', y='Offset', z='Elevation', color='type')
+    fig = px.line_3d(df, x='Stationing', y='Offset', z='Elevation', color='type')
     st.plotly_chart(fig)
     
     
