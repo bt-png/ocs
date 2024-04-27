@@ -73,9 +73,9 @@ def draw():
         scene=go.Scene(
             xaxis=go.XAxis(title='x axis title'),
             yaxis=go.YAxis(title='y axis title'),
-            zaxis=go.ZAxis(title='z axis title'),
-            aspectmode='cube'
-        )
+            zaxis=go.ZAxis(title='z axis title')            
+        ),
+        aspectmode='cube'
     )
     
     fig = go.Figure(data=data, layout=layout)
