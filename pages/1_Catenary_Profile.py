@@ -11,7 +11,12 @@ if 'accesskey' not in st.session_state:
     st.session_state.accesskey = ''
 else:
     st.session_state.accesskey = st.session_state.accesskey
-    
+
+st.set_page_config(
+    page_title = "CAT SAG", 
+    page_icon = "📹",
+    layout = 'wide')
+
 Nom = None
 Ref = None
 ec = None
@@ -325,10 +330,6 @@ def show_download_CAD_Script(_Ref, _yExag):
                         mime="text/scr"
                     )
 
-st.set_page_config(
-    page_title = "CAT SAG", 
-    page_icon = "📹",
-    layout = 'wide')
 
 st.markdown("# Simple Catenary Sag")
 #st.sidebar.header("Profile Tool")
