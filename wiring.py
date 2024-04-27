@@ -35,6 +35,7 @@ def form_SC(_key,):
                 })
             SW = conductor.SingleWire(new_dict)
             _df = SW.dataframe()
+            _df['type'] = _key
             new_dict['DataFrame'] = _df
             st.session_state.wiring_values[_key] = new_dict
             
