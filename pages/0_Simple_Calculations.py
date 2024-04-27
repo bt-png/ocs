@@ -36,5 +36,7 @@ match selection:
         wiring.run()
     case 'Cantilever Resetting Forces':
         st.write('Wiring Plan')
+        import testapp
+        testapp.main()
     case _:
         st.warning('Please make a selection')
