@@ -46,7 +46,7 @@ def draw():
     df2 = st.session_state.wiring_values['val2']['DataFrame']
     df = pd.concat([df1, df2], ignore_index=True)
     #st.write(df)
-    fig = go.Figure(data=go.Scatter3d(x=df['Stationing'], y=df['Offset'], z=df['Elevation'], color=df['type'], mode='lines'))
+    fig = go.Figure(data=go.Scatter3d(x=df['Stationing'], y=df['Offset'], z=df['Elevation'], mode='lines'), color=df['type'])
     fig.update_layout(scene_aspectmode='cube') #cube
     #fig.update_layout(scene_aspectmode='manual', scene_aspectratio=dict(x=1, y=1, z=2)) # elevation doubled
     st.plotly_chart(fig, use_container_width=True, theme='streamlit')
