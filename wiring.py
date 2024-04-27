@@ -42,18 +42,35 @@ def form_SC(_key,):
             st.session_state.wiring_values[_key] = new_dict
             
 def draw():
-    df1 = st.session_state.wiring_values['val1']['DataFrame']
-    df2 = st.session_state.wiring_values['val2']['DataFrame']
-    df = pd.concat([df1, df2], ignore_index=True)
+    #df1 = st.session_state.wiring_values['val1']['DataFrame']
+    #df2 = st.session_state.wiring_values['val2']['DataFrame']
+    #df = pd.concat([df1, df2], ignore_index=True)
     #st.write(df)
-    fig = go.Figure()
-    fig.add_trace(name='val1', x=df1['Stationing'], y=df1['Offset'], z=df1['Elevation'], mode='lines', selector=dict(type='scatter3d'))
-    fig.add_trace(name='val2', x=df2['Stationing'], y=df2['Offset'], z=df2['Elevation'], mode='lines', selector=dict(type='scatter3d'))
+    #fig = go.Figure()
+    #fig.add_trace(data=go.Scatter3d(x=df['Stationing'], y=df['Offset'], z=df['Elevation'], mode='lines'))
+    #fig.add_trace(name='val2', x=df2['Stationing'], y=df2['Offset'], z=df2['Elevation'], mode='lines', selector=dict(type='scatter3d'))
     #data=go.Scatter3d(x=df['Stationing'], y=df['Offset'], z=df['Elevation'], mode='lines')
-    fig.update_layout(scene_aspectmode='cube') #cube
+    #fig.update_layout(scene_aspectmode='cube') #cube
     #fig.update_layout(scene_aspectmode='manual', scene_aspectratio=dict(x=1, y=1, z=2)) # elevation doubled
     st.plotly_chart(fig, use_container_width=False, theme='streamlit')
+    trace1 = go.Scatter3d(
+        x=[1, 2],
+        y=[1, 2],
+        z=[1, 2],
+        name='Legendary'
+        )
+    data = go.Data([trace1])
+    layout = go.Layout(
+        showlegend=True,
+        scene=go.Scene(
+            xaxis=go.XAxis(title='x axis title'),
+            yaxis=go.YAxis(title='y axis title'),
+            zaxis=go.ZAxis(title='z axis title')
+        )
+    )
     
+    fig = go.FigureWidget(data=data, layout=layout)
+    st.plotly_chart(fig)
     
 def run():
     if 'wiring_values' not in st.session_state:
