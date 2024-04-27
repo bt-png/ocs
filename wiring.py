@@ -54,6 +54,14 @@ def draw():
     actor = plotter.add_mesh(spline1, color='green')
     actor = plotter.add_mesh(spline2, color='red')
     stpyvista(plotter)
+    plotter = stpv.intro()
+
+    stpyvista(
+        plotter,
+        panel_kwargs=dict(
+            orientation_widget=True, interactive_orientation_widget=True
+        ),
+    )
     
 def run():
     if 'wiring_values' not in st.session_state:
