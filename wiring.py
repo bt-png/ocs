@@ -10,8 +10,8 @@ import conductor
 import pyvista as pv
 import numpy as np
 from stpyvista import stpyvista
-from stpyvista.utils import start_xvfb
-
+from stpyvista.utils import is_the_app_embedded
+import pantry.stpyvista_pantry as stpv
 
 def system_types():
     return ('Structure', 'Single Conductor', 'Catenary System')
@@ -71,11 +71,14 @@ def run():
         st.session_state.wiring_values = ({'val1': ({'values': 1}), 'val2': ({'values': 2})})
     else:
         st.session_state.wiring_values = st.session_state.wiring_values
-
-    if "IS_XVFB_RUNNING" not in st.session_state:
-        start_xvfb()
-        st.session_state.IS_XVFB_RUNNING = True
-      
+    if "FIRST_ACCESS" not in st.session_state:
+        st.session_state.FIRST_ACCESS = True
+    
+    pv.start_xvfb()
+    st.session_state.is_app_embedded = st.session_state.get(
+        "is_app_embedded", is_the_app_embedded()
+    )
+    
     col1, col2 = st.columns([1,1])
     type1 = col1.selectbox(
         label='system 1', 
