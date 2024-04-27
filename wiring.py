@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.express as px
+import plotly.graph_objects as go
 import conductor
 
 def system_types():
@@ -45,7 +46,7 @@ def draw():
     df2 = st.session_state.wiring_values['val2']['DataFrame']
     df = pd.concat([df1, df2], ignore_index=True)
     #st.write(df)
-    fig = px.line_3d(df, x='Stationing', y='Offset', z='Elevation', color='type')
+    fig = go.line_3d(df, x='Stationing', y='Offset', z='Elevation', color='type')
     fig.update_layout(scene_aspectmode='cube') #cube
     #fig.update_layout(scene_aspectmode='manual', scene_aspectratio=dict(x=1, y=1, z=2)) # elevation doubled
     st.plotly_chart(fig, use_container_width=True, theme='streamlit')
