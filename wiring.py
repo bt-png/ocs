@@ -42,7 +42,9 @@ def form_SC(_key,):
 def draw():
     df1 = st.session_state.wiring_values['val1']['DataFrame']
     df2 = st.session_state.wiring_values['val2']['DataFrame']
+    
     df = pd.concat([df1, df2], ignore_index=True)
+    st.dataframe(df)
     plotter = pv.Plotter()
     spline1 = pv.Spline(df1).tube(radius=0.5*st.session_state.wiring_values['val1']['Diameter'])
     spline2 = pv.Spline(df2).tube(radius=0.5*st.session_state.wiring_values['val2']['Diameter'])
