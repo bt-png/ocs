@@ -1,6 +1,7 @@
 import streamlit as st
-import conductor
 import numpy as np
+import plotly.express as px
+import conductor
 
 def system_types():
     return ('Structure', 'Single Conductor', 'Catenary System')
@@ -38,7 +39,11 @@ def form_SC(_key,):
             st.session_state.wiring_values[_key] = new_dict
             
 def draw():
-    st.write(st.session_state.wiring_values)
+    df = px.data.gapminder().query("continent=='Europe'")
+    st.write(df)
+    fig = px.line_3d(df, x="gdpPercap", y="pop", z="year", color='country')
+    fig.show()
+    #st.write(st.session_state.wiring_values)
     
 def run():
     if 'wiring_values' not in st.session_state:
