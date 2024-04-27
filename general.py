@@ -117,6 +117,12 @@ def EquivalentSpan(spanlist):
     val = nom/denom
     return val**0.5
     
+def SpanOffset(stationlist, startoffset, endoffset):
+    xp = [stationlist[0], stationlist[-1]]
+    fp = [startoffset, endoffset]
+    return np.interp(stationlist, xp, fp)
+    
+    
 # WIRE RUN GENERAL
 def WireRun_df(df, STARound):
     #expected DataFrame Headers [PoleID, STA, RailEL, MWHT, CWHT, PreSag, DeviationAngle
@@ -145,14 +151,17 @@ def sag(l,H,G,h,a):
     return val
 
 # SPAN GEOMETRY
+def TotalElements(STAStart, STAEnd, STA_Step):
+    return int((STAEnd-STAStart)/STA_Step+1)
+
+def Spans(STAStart, STAEnd, STA_Step, STARound):
+    val = np.linspace(STAStart, STAEnd, num=TotalElements(STAStart, STAEnd, STA_Step), endpoint=True)
+    return np.unique(RoundVal(val, STARound))
+
 def x_SPAN_LIST(WR, STA_Step, STARound):
     STAStart = RoundVal(WR['STA'].iloc[0],STARound)
     STAEnd = RoundVal(WR['STA'].iloc[-1],STARound)
-    TotalElements=int((STAEnd-STAStart)/STA_Step+1)
-    val = np.linspace(STAStart,STAEnd,num=TotalElements, endpoint=True)
-    #val = np.arange(STAStart, STAEnd, RoundVal(STA_Step,STARound))
-    val = np.unique(RoundVal(val,STARound))
-    return val
+    return Spans(STAStart, STAEnd, STA_Step, STARound)
 
 def L_HA_QTY(WR, MaxLength):
     return np.ceil(WR['SpanLength']/MaxLength)
@@ -349,3 +358,32 @@ def DiscreteMoment(STAList, LoadList, HangerStationing, STARound):
         Step = (aPrior <= aList[i]) * (aPrior >= 0)
         DM[i] = sum(Step*LoadList*aPrior)
     return DM
+
+def SagSpanData(STAList, LoadList, TensionList, HangerStationing, HangerElevation, STARound):
+    """
+    Determine the final elevation for each point using sum of moments method.
+    
+    Parameters:
+        STAList (floats): x-axis values for determining elevations
+        LoadList (floats): vertical loading at each STAList
+        TensionList (floats): horizontal loading at each STAList
+        HangerStationing (floats): controlled elevations
+        HangerElevation (floats): corresponding elevations
+        STARound (float): used to match HangerStationing to STAList
+    Returns:
+        floats: Elevations corresponding to the input STAList
+    """
+    #EL = np.empty_like(STAList)
+    EL = STAList*0
+    aList = DistanceFromHA(STAList, HangerStationing, STARound)
+    RightSupportLoadList = SupportLoadRight(STAList, LoadList, TensionList, HangerStationing, HangerElevation, STARound)
+    LeftSupportLoadList = SupportLoadLeft(STAList, LoadList, HangerStationing, RightSupportLoadList, STARound)
+    DiscreteMomentList = DiscreteMoment(STAList, LoadList, HangerStationing, STARound)
+    for i in range(0,len(HangerStationing)-1):
+        Step = (STAList >= HangerStationing[i]) * (STAList < HangerStationing[i+1])
+        sag = (LeftSupportLoadList[i] * aList - DiscreteMomentList) * (1 / TensionList)
+        EL += (HangerElevation[i]-sag)*Step
+        j, = np.where(HangerStationing[i] == STAList)
+        EL[j] = HangerElevation[i]
+    EL[-1] = HangerElevation[-1]
+    return EL

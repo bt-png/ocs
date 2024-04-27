@@ -4,3 +4,6 @@ pandas
 pydeck
 streamlit
 seaborn
+pyvista
+stpyvista
+panels

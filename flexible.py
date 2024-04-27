@@ -1,43 +1,8 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Feb 29 08:36:43 2024
-
-@author: TharpBM
-"""
 import numpy as np
 import general as GenFun
 
 dimensionalTolerance = 0.001*12
 loadTolerance = 0.01
-
-def SagSpanData(STAList, LoadList, TensionList, HangerStationing, HangerElevation, STARound):
-    """
-    Determine the final elevation for each point using sum of moments method.
-    
-    Parameters:
-        STAList (floats): x-axis values for determining elevations
-        LoadList (floats): vertical loading at each STAList
-        TensionList (floats): horizontal loading at each STAList
-        HangerStationing (floats): controlled elevations
-        HangerElevation (floats): corresponding elevations
-        STARound (float): used to match HangerStationing to STAList
-    Returns:
-        floats: Elevations corresponding to the input STAList
-    """
-    #EL = np.empty_like(STAList)
-    EL = STAList*0
-    aList = GenFun.DistanceFromHA(STAList, HangerStationing, STARound)
-    RightSupportLoadList = GenFun.SupportLoadRight(STAList, LoadList, TensionList, HangerStationing, HangerElevation, STARound)
-    LeftSupportLoadList = GenFun.SupportLoadLeft(STAList, LoadList, HangerStationing, RightSupportLoadList, STARound)
-    DiscreteMomentList = GenFun.DiscreteMoment(STAList, LoadList, HangerStationing, STARound)
-    for i in range(0,len(HangerStationing)-1):
-        Step = (STAList >= HangerStationing[i]) * (STAList < HangerStationing[i+1])
-        sag = (LeftSupportLoadList[i] * aList - DiscreteMomentList) * (1 / TensionList)
-        EL += (HangerElevation[i]-sag)*Step
-        j, = np.where(HangerStationing[i] == STAList)
-        EL[j] = HangerElevation[i]
-    EL[-1] = HangerElevation[-1]
-    return EL
 
 def ELDiff_FreeSag_NegativeLoadedHA_Simple(Cycle_Stationing, Cycle_P_SpanWeight, Cycle_H_SpanTension,
                                            Cycle_HA_STA, New_HA_EL, minCW_P, Cycle_SupportLoad_CW, STARound):
@@ -66,7 +31,7 @@ def ELDiff_FreeSag_NegativeLoadedHA_Simple(Cycle_Stationing, Cycle_P_SpanWeight,
                 D_H_SpanTension = Cycle_H_SpanTension[D_Step != 0]
                 D_HangerStationing = np.array([D_PriorSTA,D_NextSTA])
                 D_HangerElevation = np.array([D_PriorEL,D_NextEL])
-                D_LoadedSag = SagSpanData(D_STAList, D_LoadList, D_H_SpanTension, D_HangerStationing, D_HangerElevation, STARound)
+                D_LoadedSag = GenFun.SagSpanData(D_STAList, D_LoadList, D_H_SpanTension, D_HangerStationing, D_HangerElevation, STARound)
                 try:
                     nEL[HA_N] = D_LoadedSag[(HA_STA_List[i] == D_STAList) != 0]
                 except:
@@ -104,7 +69,7 @@ def CatenarySag_Flexible(WireRun, L_Weight, L_Tension, L_SpanLoading, L_DesignHA
         HA_EL += 1*ELStep
         subLoop += 1
     #print(subLoop)
-    LoadedSag = SagSpanData(Stationing, P_SpanWeight, H_SpanTension, HA_STA, HA_EL, xRound)
+    LoadedSag = GenFun.SagSpanData(Stationing, P_SpanWeight, H_SpanTension, HA_STA, HA_EL, xRound)
 
     P_SpanWeight_MW = GenFun.LoadSpanWeight(Stationing, (L_Weight[0]+L_Weight[2])*yMultiplier/xMultiplier)
     P_SpanWeight_MW = GenFun.AddDiscreteLoadstoSpan(P_SpanWeight_MW, Stationing,
@@ -116,7 +81,7 @@ def CatenarySag_Flexible(WireRun, L_Weight, L_Tension, L_SpanLoading, L_DesignHA
                                                     xRound)
     H_SpanTension_MW = GenFun.LoadSpanTension(Stationing,L_Tension[0]*xMultiplier)
     SupportLoad_MW = GenFun.SupportLoad(Stationing, P_SpanWeight_MW, H_SpanTension_MW, np.array(WR['STA']), np.array(WR['Rail EL']+WR['MW Height']), xRound)
-    LoadedSag_MW = SagSpanData(Stationing, P_SpanWeight_MW, H_SpanTension_MW, np.array(WR['STA']), np.array(WR['Rail EL']+WR['MW Height']), xRound)
+    LoadedSag_MW = GenFun.SagSpanData(Stationing, P_SpanWeight_MW, H_SpanTension_MW, np.array(WR['STA']), np.array(WR['Rail EL']+WR['MW Height']), xRound)
     return {'Stationing': Stationing/xMultiplier, 'HA_STA': HA_STA/xMultiplier, 'HA_EL': HA_EL/xMultiplier,
             'LoadedSag': LoadedSag/yMultiplier, 'SupportLoad_CW': SupportLoad_CW*xMultiplier/yMultiplier,
             'P_SpanWeight': P_SpanWeight*xMultiplier/yMultiplier,
@@ -157,7 +122,7 @@ def CatenarySag_FlexibleHA_Iterative(WireRun, L_WeightChange, L_Tension, L_Desig
             Cycle_P_SpanWeight = GenFun.AddDiscreteLoadstoSpan(P_SpanWeight, Stationing,
                                                                PriorCWSupportReaction*yMultiplier/xMultiplier,
                                                                np.array(WR['STA']),xRound)
-            Cycle_LoadedSag = SagSpanData(Stationing, Cycle_P_SpanWeight, H_SpanTension, HA_STA, Cycle_HA_EL, xRound)
+            Cycle_LoadedSag = GenFun.SagSpanData(Stationing, Cycle_P_SpanWeight, H_SpanTension, HA_STA, Cycle_HA_EL, xRound)
             Cycle_CWELDiff, Cycle_CWELDiffSTA = GenFun.CWSupportELDifference(Stationing, ORIGINALDESIGN.get('LoadedSag'),
                                                           Cycle_LoadedSag, np.array(WR['STA']))
             Cycle_CWSupportReaction = GenFun.SteadyArm_VerticalResettingForce(RadialLoad, np.array(WR['STA']), Cycle_CWELDiff/yMultiplier, Cycle_CWELDiffSTA, SteadyArmLength)
@@ -188,7 +153,7 @@ def CatenarySag_FlexibleHA_Iterative(WireRun, L_WeightChange, L_Tension, L_Desig
         Cycle_P_SpanWeight_MW = GenFun.AddDiscreteLoadstoSpan(P_SpanWeight_MW, Stationing,
                                                               Cycle_SupportLoad_CW[Cycle_SupportLoad_CW>minCW_P],
                                                               HA_STA[Cycle_SupportLoad_CW>minCW_P], xRound)
-        Cycle_LoadedSag_MW = SagSpanData(Stationing, Cycle_P_SpanWeight_MW, H_SpanTension_MW, np.array(WR['STA']),
+        Cycle_LoadedSag_MW = GenFun.SagSpanData(Stationing, Cycle_P_SpanWeight_MW, H_SpanTension_MW, np.array(WR['STA']),
                                          np.array(WR['Rail EL']+WR['MW Height']), xRound)
         #Resolve to the correct solution for Hanger lengths. They are allowed to shrink and unload, but hanger lengths cannot get bigger.
         #CW HA elevations need to be adjusted so they do not increase in length.
