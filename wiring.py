@@ -52,7 +52,7 @@ def draw():
     #data=go.Scatter3d(x=df['Stationing'], y=df['Offset'], z=df['Elevation'], mode='lines')
     #fig.update_layout(scene_aspectmode='cube') #cube
     #fig.update_layout(scene_aspectmode='manual', scene_aspectratio=dict(x=1, y=1, z=2)) # elevation doubled
-    st.plotly_chart(fig, use_container_width=False, theme='streamlit')
+    #st.plotly_chart(fig, use_container_width=False, theme='streamlit')
     trace1 = go.Scatter3d(
         x=[1, 2],
         y=[1, 2],
