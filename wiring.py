@@ -19,10 +19,10 @@ def intro(dummy: str = "robot"):
     df = pd.concat([df1, df2], ignore_index=True)
     st.dataframe(df)
     
-    spline1 = pv.Spline(df1).tube(radius=0.5*st.session_state.wiring_values['val1']['Diameter'])
-    spline2 = pv.Spline(df2).tube(radius=0.5*st.session_state.wiring_values['val2']['Diameter'])
-    #plotter.add_mesh(spline1, color="green")
-    #plotter.add_mesh(spline2, color="red")
+    spline1 = pv.Spline(df1)#.tube(radius=0.5*st.session_state.wiring_values['val1']['Diameter'])
+    spline2 = pv.Spline(df2)#.tube(radius=0.5*st.session_state.wiring_values['val2']['Diameter'])
+    plotter.add_mesh(spline1, color="green")
+    plotter.add_mesh(spline2, color="red")
 
     
     head = pv.Cylinder(radius=3.5, height=8)
