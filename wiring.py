@@ -56,14 +56,14 @@ def draw():
     trace1 = go.Scatter3d(
         x=df1['Stationing'], 
         y=df1['Offset'], 
-        z=df1['Elevation']
+        z=df1['Elevation'],
         name='val1',
         mode='lines'
         )
     trace2 = go.Scatter3d(
         x=df2['Stationing'], 
         y=df2['Offset'], 
-        z=df2['Elevation']
+        z=df2['Elevation'],
         name='val2',
         mode='lines'
         )
