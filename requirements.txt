@@ -7,3 +7,4 @@ pydeck
 streamlit
 seaborn
 pyvista
+stpyvista
