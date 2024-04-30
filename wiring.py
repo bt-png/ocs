@@ -171,8 +171,17 @@ def ReportDistance():
         df2 = st.session_state.wiring_values['val2']['DataFrame'].copy()
     elif (st.session_state.wiring_values['val2']['Type'] == 'SC'):
         df2 = st.session_state.wiring_values['val2']['DataFrame'].copy()
+        df2.drop(labels=['type', 'cable'], axis=1, inplace=True)
+        df2 = df2.reset_index(drop=True)
+        _df = st.session_state.wiring_values['val2']['DataFrameHA'].copy()   
+        for index, row in _df.iterrows():
+            df_ha = pd.DataFrame({
+                'Stationing': np.full((10,),row['Stationing']),
+                'Offset': np.full((10,),row['Offset']),
+                'Elevation': np.linspace(start=row['MW Elevation'], stop=row['CW Elevation'], num=10)
+                })
+            df2 = pd.concat([df2, df_ha], ignore_index=False)
     try:
-        #print(df1)
         dist = distance.cdist(df1, df2).min()
     except:
         dist=None
