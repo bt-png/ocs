@@ -6,6 +6,7 @@ pandas
 #pydeck
 streamlit
 seaborn
+scipy
 
 #matplotlib
 #panel>=1.4.1
