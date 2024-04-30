@@ -174,6 +174,40 @@ def filter_dataframe(df: pd.DataFrame) -> pd.DataFrame:
         selected_rows = df
     return selected_rows
 
+@st.cache_data
+def CalcTension(
+        _c_E, 
+        _c_alpha,
+        _c_tension,
+        _c_initialweight,
+        _c_finalwindweight, 
+        _c_temp, 
+        _c_equiv_span, 
+        _c_area,
+        _c_section_loss,
+        _c_temp_nom=0):
+    try:
+        if len(_c_temp) > 1:
+            tension = [
+                GenFun.ConductorTension(
+                _c_E, _c_alpha, _c_tension, _c_initialweight, _c_finalwindweight,
+                (_t-_c_temp_nom), _c_equiv_span, _c_area, 
+                _c_area*(100-_c_section_loss)/100) 
+                for _t in _c_temp]
+        else:
+            tension = [
+                GenFun.ConductorTension(
+                _c_E, _c_alpha, _c_tension, _c_initialweight, _c_finalwindweight,
+                (_c_temp-_c_temp_nom), _c_equiv_span, _c_area, 
+                _c_area*(100-_c_section_loss)/100)
+                ]
+    except:
+        tension = GenFun.ConductorTension(
+            _c_E, _c_alpha, _c_tension, _c_initialweight, _c_finalwindweight,
+            (_c_temp-_c_temp_nom), _c_equiv_span, _c_area, 
+            _c_area*(100-_c_section_loss)/100)
+    return pd.DataFrame({'Temperature': _c_temp, 'Tension': tension})
+
 class SingleWire():
     """ A simple container for the single wire system containing all design data
     """
@@ -248,13 +282,13 @@ def run():
         _c_weight = _conductor['Bare Conductor Weight'][0]
         _c_diameter = _conductor['Bare Conductor Diameter'][0]
         _c_iced_radius = _conductor['Condition Radial Thickness of Ice'][0]
-        _c_windspeed = _conductor['Condition Wind Speed'][0]
+        _c_windspeed = int(_conductor['Condition Wind Speed'][0])
         _c_shapecoeff = float(_conductor['Calc Wind Shape Coefficient'][0])
-        _c_tension = _conductor['Nominal Conductor Tension'][0]
+        _c_tension = int(_conductor['Nominal Conductor Tension'][0])
         _c_equiv_span = int(_conductor['Equivalent Span'][0])
         _c_temp_diff = _conductor['Condition Temperature'][0]-_conductor['Nominal Temperature'][0]
         _c_area = _conductor['Bare Conductor Area'][0]
-        _c_section_loss = _conductor['Condition Conductor Section Loss'][0]
+        _c_section_loss = int(_conductor['Condition Conductor Section Loss'][0])
         _c_E = _conductor['Conductor Modulus of Elasticity'][0]
         _c_alpha = _conductor['Conductor Coefficient of Thermal Expansion'][0]
         _c_BS = _conductor['Conductor Nominal Breaking Load'][0]
@@ -422,3 +456,19 @@ def run():
             df2 = pd.concat([dfi[::-1],dfh])
             df = pd.concat([df1,df2])
             plotSection(df)
+        with st.expander('Export', expanded=False):
+            _c_temp_nom = st.number_input(label='Nominal Temperature', value=70)
+            _c_temp_min = st.number_input(label='Min Temperature', value=0)
+            _c_temp_max = st.number_input(label='Max Temperature', value=110)
+            _c_temp_step = st.number_input(label='Temperature Step', value=10)
+            if st.button(label='Populate Tension Table'):
+                temp = np.arange(_c_temp_min, (_c_temp_max+_c_temp_step), _c_temp_step)
+                CalcTension.clear()
+                tension = CalcTension(
+                    _c_E, _c_alpha, _c_tension, _c_initialweight, _c_finalwindweight, 
+                    temp, _c_equiv_span, _c_area, _c_section_loss, _c_temp_nom)
+                st.dataframe(tension, hide_index=True, column_config={
+                    'Temperature': st.column_config.TextColumn(label='Temp', width='small'),
+                    'Tension': st.column_config.NumberColumn(width='medium', step=1),
+                })
+                    
