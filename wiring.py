@@ -349,7 +349,7 @@ def draw():
         plotter.update_layout(
             showlegend=False,
             scene=dict(
-                aspectratio = dict(x=1, y=1/10, z=1/10),
+                aspectratio = dict(x=2, y=1, z=1),
                 aspectmode = 'manual'
                 ),
             )
