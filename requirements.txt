@@ -3,11 +3,13 @@ plotly>=5.21.0
 altair
 numpy
 pandas
-#pydeck
 streamlit
 seaborn
 scipy
+geopandas
+streamlit-folium
 
+#pydeck
 #matplotlib
 #panel>=1.4.1
 #bokeh
