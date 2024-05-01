@@ -46,7 +46,7 @@ def filter_dataframe(df: pd.DataFrame) -> None:
     
 def load_GeoJSON(_route, _country):
     val = st.session_state["GeoJSON"]
-    path = 'sample_data\\saved_geometry_' + _country + '_' + str(_route) +'.geojson'
+    path = 'sample_data\saved_geometry_' + _country + '_' + str(_route) +'.geojson'
     try:
         new_val = geopandas.read_file(path)
         if val.empty:
