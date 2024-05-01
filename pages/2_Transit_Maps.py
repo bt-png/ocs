@@ -34,6 +34,9 @@ def filter_dataframe(df: pd.DataFrame) -> None:
             'start_time': st.column_config.TimeColumn(
                 format='hh:mm:ss a'
                 ),
+            'end_time': st.column_config.TimeColumn(
+                format='hh:mm:ss a'
+                ),
             'peak_start_time': st.column_config.TimeColumn(
                 format='hh:mm:ss a'
                 ),
