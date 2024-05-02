@@ -61,6 +61,15 @@ def load_GeoJSON(_route, _country):
     except:
         pass
 
+def fix_time(_val):
+    try:
+        HH, MM, SS = _val.split(':')
+        if int(HH)>23:
+            HH = str(int(HH)-24)
+        return str(HH+':'+MM+':'+SS)
+    except:
+        return _val
+
 if "center" not in st.session_state:
     st.session_state["center"] = [39.949610, -75.150282]
 if "zoom" not in st.session_state:
@@ -134,5 +143,6 @@ if len(st.session_state["GeoJSON"])>0:
     _df = st.session_state["GeoJSON"].copy()
     _df = _df.drop(['geometry', 'route_desc', 'route_sort_order', 'date'], axis=1)
     _df = _df.dropna(axis=1, how='all')
+    _df['end_time'] = _df['end_time'].apply(lambda x: fix_time(x))
     filter_dataframe(_df)
 #'route_id', 'agency_id', 'route_short_name_x', 'route_long_name', 'route_type_x', 'route_url', 'route_color', 'route_text_color', 'route_sort_order', 'network_id', 'direction0_name', 'direction1_name', 'route_group', 'route_pattern1', 'route_pattern2', 'route_short_name_y', 'route_type_y', 'num_trips', 'num_trip_starts', 'num_trip_ends', 'is_loop', 'is_bidirectional', 'start_time', 'end_time', 'max_headway', 'min_headway', 'mean_headway', 'peak_num_trips', 'peak_start_time', 'peak_end_time', 'service_distance', 'service_duration', 'service_speed', 'mean_trip_distance', 'mean_trip_duration', 'date', 'route_desc', 'ext_route_type', 'route_division', 'alt_route_type', 'route_fare_class', 'line_id', 'listed_route', 'as_route', 'min_headway_minutes', 'eligibility_restricted', 'continuous_pickup', 'continuous_drop_off', 'tts_route_short_name', 'tts_route_long_name'
