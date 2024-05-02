@@ -29,7 +29,7 @@ def run():
     """
     )
     st.sidebar.text_input('access key', key='accesskey', type='password')
-    if st.secrets['accesskey'] in st.session_state['accesskey']:
+    if st.session_state['accesskey'] in st.secrets['accesskey']:
         st.write('#### access granted')
     st.write(df.tail(2))
 
