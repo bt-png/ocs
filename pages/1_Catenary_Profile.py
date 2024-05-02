@@ -341,7 +341,7 @@ st.write(
     supports and the designated pre-sag."""
     )
 
-if st.session_state['accesskey'] != st.secrets['accesskey']:
+if st.secrets['accesskey'] not in st.session_state['accesskey']:
         st.stop()
 
 tab1, tab2, tab3, tab4 = st.tabs(['Input', 'Sag Plot', 'Elasticity', 'Output'])
