@@ -36,8 +36,8 @@ def VideoCapture():
     video_object = st.session_state.video_object
     tfile = tempfile.NamedTemporaryFile(delete=False)
     tfile.write(video_object.read())
-    vidcap = cv2.VideoCapture(tfile.name)
-    return vidcap
+    return cv2.VideoCapture(tfile.name)
+
     
 def upload_and_show_video_details(upload_folder, video_object):
     v_dict = {}
