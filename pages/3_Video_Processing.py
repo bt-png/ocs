@@ -40,9 +40,13 @@ def upload_and_show_video_details(upload_folder, video_object):
     st.caption('Raw Original Video: ' + v_dict['Video Name'])
     played_video = st.video(video_object)
     v_dict['Video Path'] = os.path.join(upload_folder, v_dict['Video Name'])
-    with open(v_dict.get('Video Path'), mode='wb') as f:
-        f.write(video_object.read())
-    vidcap = cv2.VideoCapture(v_dict['Video Path'])
+    # with open(v_dict.get('Video Path'), mode='wb') as f:
+    #     f.write(video_object.read())
+    # vidcap = cv2.VideoCapture(v_dict['Video Path'])
+    import tempfile
+    tfile = tempfile.NamedTemporaryFile(delete=False)
+    tfile.write(video_object.read())
+    vidcap = cv.VideoCapture(tfile.name)
     assert vidcap.isOpened()
     v_dict['Frame Width'] = int(vidcap.get(cv2.CAP_PROP_FRAME_WIDTH))
     v_dict['Frame Height'] = int(vidcap.get(cv2.CAP_PROP_FRAME_HEIGHT))
