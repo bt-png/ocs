@@ -22,6 +22,10 @@ from pages.st_Video_Workflow_Process import shift_box
 # from st_Video_Workflow import test_extract_panview
 # from st_Video_Workflow import test_annotate_panview
 
+if 'accesskey' not in st.session_state:
+    st.session_state.accesskey = ''
+else:
+    st.session_state.accesskey = st.session_state.accesskey
 
 def annotate_panview(v_dict, pan_row, arc_rows):
     pan_box = pan_row['pan_x'], pan_row['pan_y'], pan_row['pan_w'], pan_row['pan_h']
