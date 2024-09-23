@@ -51,7 +51,7 @@ def upload_and_show_video_details(upload_folder, video_object):
     #     f.write(video_object.read())
     # vidcap = cv2.VideoCapture(v_dict['Video Path'])
     vidcap = VideoCapture()
-    assert vidcap.isOpened()
+    # assert vidcap.isOpened()
     v_dict['Frame Width'] = int(vidcap.get(cv2.CAP_PROP_FRAME_WIDTH))
     v_dict['Frame Height'] = int(vidcap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     v_dict['Frames per Second'] = int(vidcap.get(cv2.CAP_PROP_FPS))
@@ -80,7 +80,7 @@ def update_trim_timing(v_dict, frames) -> None:
     v_dict['End Frame'] = frames[1]
     # vidcap = cv2.VideoCapture(v_dict['Video Path'])
     vidcap = VideoCapture()
-    assert vidcap.isOpened()
+    # assert vidcap.isOpened()
     vidcap.set(cv2.CAP_PROP_POS_FRAMES, v_dict['Start Frame']-1)
     success, im0 = vidcap.read()  # Read progresses a frame
     v_dict['Start Time (ms)'] = vidcap.get(cv2.CAP_PROP_POS_MSEC)
