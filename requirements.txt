@@ -9,6 +9,14 @@ scipy
 geopandas
 streamlit-folium
 
+opencv-python==4.10.0.84
+ultralytics==8.2.82  # ultralytics==8.0.196  # ultralytics==8.2.82
+torch==2.3.0
+torchvision==0.18
+roboflow==1.1.43
+lapx==0.5.10
+
+
 #pydeck
 #matplotlib
 #panel>=1.4.1
