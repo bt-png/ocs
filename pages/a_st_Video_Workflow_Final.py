@@ -432,7 +432,8 @@ def Create_Final_Video(v_dict: dict):
 
 
 def run(video_dict):
-
+    if st.session_state['accesskey'] not in st.secrets['accesskey']:
+        st.stop()
     upload_dir = video_dict['Upload Folder']
     base_name, ext = os.path.splitext(video_dict['Video Name'])
     save_folder = os.path.join(upload_dir, base_name)
