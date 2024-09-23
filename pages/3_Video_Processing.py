@@ -13,6 +13,10 @@ import torch
 global Testing
 Testing = True
 
+if 'accesskey' not in st.session_state:
+    st.session_state.accesskey = ''
+else:
+    st.session_state.accesskey = st.session_state.accesskey
 
 def clean_uploads_sessionstate(upload_folder, video_name):
     if Testing:
