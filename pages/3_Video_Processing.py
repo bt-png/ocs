@@ -462,6 +462,8 @@ def Step3b(video_dict):
 
 
 def run():
+    if st.session_state['accesskey'] not in st.secrets['accesskey']:
+        st.stop()
     # columns = [0.5, 9.5]
     # col1, col2 = st.columns(columns)
     # col1.header('1')
