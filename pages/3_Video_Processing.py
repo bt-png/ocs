@@ -46,7 +46,7 @@ def upload_and_show_video_details(upload_folder, video_object):
     import tempfile
     tfile = tempfile.NamedTemporaryFile(delete=False)
     tfile.write(video_object.read())
-    vidcap = cv.VideoCapture(tfile.name)
+    vidcap = cv2.VideoCapture(tfile.name)
     assert vidcap.isOpened()
     v_dict['Frame Width'] = int(vidcap.get(cv2.CAP_PROP_FRAME_WIDTH))
     v_dict['Frame Height'] = int(vidcap.get(cv2.CAP_PROP_FRAME_HEIGHT))
