@@ -33,7 +33,7 @@ def run():
         page_icon='🚊'
     )
     delete_page('Hello.py', "a_st_Video_Workflow_Process")
-    delete_page('Hello.py', "a_st_Video_Workflow_Final"
+    delete_page('Hello.py', "a_st_Video_Workflow_Final")
     st.write('# Welcome to OCS Calculation Templates!')
     st.markdown(
         """
