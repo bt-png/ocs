@@ -1,6 +1,7 @@
 import os
 import time
 import json
+import tempfile
 from datetime import timedelta
 from shutil import rmtree
 
@@ -31,7 +32,13 @@ def clean_uploads_sessionstate(upload_folder, video_name):
             else:
                 rmtree(file_object_path)
 
-
+def VideoCapture():
+    video_object = st.session_state.video_object
+    tfile = tempfile.NamedTemporaryFile(delete=False)
+    tfile.write(video_object.read())
+    vidcap = cv2.VideoCapture(tfile.name)
+    return vidcap
+    
 def upload_and_show_video_details(upload_folder, video_object):
     v_dict = {}
     v_dict['Upload Folder'] = upload_folder
@@ -43,10 +50,7 @@ def upload_and_show_video_details(upload_folder, video_object):
     # with open(v_dict.get('Video Path'), mode='wb') as f:
     #     f.write(video_object.read())
     # vidcap = cv2.VideoCapture(v_dict['Video Path'])
-    import tempfile
-    tfile = tempfile.NamedTemporaryFile(delete=False)
-    tfile.write(video_object.read())
-    vidcap = cv2.VideoCapture(tfile.name)
+    vidcap = VideoCapture()
     assert vidcap.isOpened()
     v_dict['Frame Width'] = int(vidcap.get(cv2.CAP_PROP_FRAME_WIDTH))
     v_dict['Frame Height'] = int(vidcap.get(cv2.CAP_PROP_FRAME_HEIGHT))
@@ -74,7 +78,8 @@ def upload_and_show_video_details(upload_folder, video_object):
 def update_trim_timing(v_dict, frames) -> None:
     v_dict['Start Frame'] = frames[0]
     v_dict['End Frame'] = frames[1]
-    vidcap = cv2.VideoCapture(v_dict['Video Path'])
+    # vidcap = cv2.VideoCapture(v_dict['Video Path'])
+    vidcap = VideoCapture()
     assert vidcap.isOpened()
     vidcap.set(cv2.CAP_PROP_POS_FRAMES, v_dict['Start Frame']-1)
     success, im0 = vidcap.read()  # Read progresses a frame
@@ -104,7 +109,8 @@ def load_model(model_name):
 
 # @st.cache_data
 def video_get_single_frame(v_dict, idx):
-    videocapture = cv2.VideoCapture(v_dict['Video Path'])  # Capture the video
+    # videocapture = cv2.VideoCapture(v_dict['Video Path'])  # Capture the video
+    vidcap = VideoCapture()
     if not videocapture.isOpened():
         st.error("Could not open video file.")
     videocapture.set(cv2.CAP_PROP_POS_FRAMES, idx)
@@ -307,7 +313,8 @@ def YOLOprocess(v_dict) -> None:
     fps_display = st.empty()  # Placeholder for FPS display
 
     if st.button("Start"):
-        videocapture = cv2.VideoCapture(v_dict['Video Path'])  # Capture the video
+        # videocapture = cv2.VideoCapture(v_dict['Video Path'])  # Capture the video
+        videocapture = VideoCapture()
 
         if not videocapture.isOpened():
             st.error("Could not open video file.")
@@ -412,6 +419,7 @@ def Step4_1(v_dict):
 def Step1():
     upload_folder = 'uploads'
     video_object = st.file_uploader('Video to Process', ["mp4", "mov", "avi", "mkv"], accept_multiple_files=False)
+    st.session_state.video_object = video_object
     if video_object is None:
         if 'last_video_upload' in st.session_state:
             if len(st.session_state.last_video_upload) > 0:
