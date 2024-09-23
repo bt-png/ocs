@@ -6,11 +6,33 @@ if 'accesskey' not in st.session_state:
 else:
     st.session_state.accesskey = st.session_state.accesskey
 
+from pathlib import Path
+from streamlit.source_util import (
+    page_icon_and_name, 
+    calc_md5, 
+    get_pages,
+    _on_pages_changed
+)
+
+def delete_page(main_script_path_str, page_name):
+
+    current_pages = get_pages(main_script_path_str)
+
+    for key, value in current_pages.items():
+        if value['page_name'] == page_name:
+            del current_pages[key]
+            break
+        else:
+            pass
+    _on_pages_changed.send()
+
+
 def run():
     st.set_page_config(
         page_title='OCS Calculations',
         page_icon='🚊'
     )
+    delete_page('Hello.py', "a_st_Video_Workflow_Process")
     st.write('# Welcome to OCS Calculation Templates!')
     st.markdown(
         """
