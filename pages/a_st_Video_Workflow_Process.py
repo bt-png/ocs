@@ -443,7 +443,7 @@ def run(video_dict):
         st.session_state.video_dict = video_dict
         st.switch_page('pages\a_st_Video_Workflow_Final.py')
     if st.button('Go Back to Settings'):
-        st.switch_page('st_Video_Workflow.py')
+        st.switch_page('pages\3_Video_Processing.py')
 
 
 if __name__ == '__main__':
