@@ -22,6 +22,10 @@ from st_Video_Workflow import load_model
 # from st_Video_Workflow import test_extract_panview
 # from st_Video_Workflow import test_annotate_panview
 
+if 'accesskey' not in st.session_state:
+    st.session_state.accesskey = ''
+else:
+    st.session_state.accesskey = st.session_state.accesskey
 
 def draw_text(img, text,
               font=cv2.FONT_HERSHEY_PLAIN,
